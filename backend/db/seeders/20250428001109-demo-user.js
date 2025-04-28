@@ -63,11 +63,11 @@ module.exports = {
             {
                 username: {
                     [Op.in]: [
-                        "Demo-lition",
-                        "FakeUser1",
-                        "FakeUser2",
-                        "FakeUser3",
-                        "FakeUser4",
+                        "LastMinuteJustin",
+                        "DeeLayed",
+                        "VayKay",
+                        "CarryOnQueen",
+                        "DangerZoneMav",
                     ],
                 },
             },
