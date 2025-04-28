@@ -54,11 +54,11 @@ router.post("/", async (req, res, next) => {
     return res.status(200).json({ user: safeUser });
 });
 
-// // Log out
-// router.delete("/", (req, res) => {
-//     res.clearCookie("token");
-//     return res.status(200).json({ message: "success" });
-// });
+// Log out
+router.delete("/", (req, res) => {
+    res.clearCookie("token");
+    return res.status(200).json({ message: "success" });
+});
 
 // // Restore session user
 // router.get("/", (req, res) => {
