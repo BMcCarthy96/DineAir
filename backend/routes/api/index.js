@@ -12,10 +12,6 @@ router.use("/session", sessionRouter);
 
 router.use("/users", usersRouter);
 
-router.post("/test", (req, res) => {
-    res.json({ requestBody: req.body });
-});
-
 // Add CSRF token route
 router.get("/csrf/restore", (req, res) => {
     const csrfToken = req.csrfToken();
