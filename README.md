@@ -1,12 +1,12 @@
 # DineAir
 
-https://stayhaven-hyyh.onrender.com
+https://dineair.onrender.com
 
 ## Database Schema Design
 
-![airbnb-database-schema]
+![DineAir-database-schema]
 
-[airbnb-database-schema]: ./images/dbSchema.png
+[DineAir-database-schema]: ./images/DineAir_Schema.png
 [airbnb-db-diagram-info]: https://appacademy-open-assets.s3.us-west-1.amazonaws.com/Modular-Curriculum/content/week-12/airbnb-db-diagram-info.txt
 
 ## API Documentation
