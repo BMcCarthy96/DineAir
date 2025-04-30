@@ -2,8 +2,7 @@
     display: flex;
     align-items: center;
     background: none;
-    border: 1px solid white;
-    border-radius: 20px;
+    border: none;
     cursor: pointer;
     color: #eeeaea;
     font-size: 24px;

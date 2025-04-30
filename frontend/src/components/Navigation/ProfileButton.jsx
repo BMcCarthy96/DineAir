@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
 import { useDispatch } from 'react-redux';
-import { FaUserCircle } from 'react-icons/fa';
 import { Link, useNavigate } from 'react-router-dom';
 import * as sessionActions from '../../store/session';
 import OpenModalMenuItem from './OpenModalMenuItem';
@@ -50,9 +49,6 @@ function ProfileButton({ user }) {
       <button onClick={toggleMenu} className='profile-button'>
         <div className='menu'>
           <HiBars3 size={30} />
-        </div>
-        <div className='user'>
-          <FaUserCircle size={30}/>
         </div>
       </button>
 

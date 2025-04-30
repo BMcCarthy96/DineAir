@@ -1,7 +1,6 @@
 import { NavLink } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import ProfileButton from './ProfileButton';
-import { GiHouse } from "react-icons/gi";
 import "./Navigation.css";
 
 function Navigation({ isLoaded }) {
@@ -11,9 +10,9 @@ function Navigation({ isLoaded }) {
     <div>
       <nav className="navbar">
         <div className="nav-left">
-          <NavLink to="/" className="home-logo">
-            <GiHouse size={35} color="#000000" />
-          </NavLink>
+          <div className="profile-btn-wrapper">
+            {isLoaded && <ProfileButton user={sessionUser} />}
+          </div>
           <NavLink to="/" className="title">DineAir</NavLink>
         </div>
         <div className="nav-right">
@@ -24,9 +23,8 @@ function Navigation({ isLoaded }) {
               </NavLink>
             </div>
           )}
-          <div className="profile-btn-wrapper">
-            {isLoaded && <ProfileButton user={sessionUser} />}
-          </div>
+          <NavLink to="/login">Log in</NavLink>
+          <NavLink to="/signup">Sign Up</NavLink>
         </div>
       </nav>
     </div>
