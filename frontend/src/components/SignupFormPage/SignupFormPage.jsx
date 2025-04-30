@@ -1,12 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
-// import { useModal } from '../../context/Modal';
 import * as sessionActions from '../../store/session';
 import './SignupFormPage.css';
 
 function SignupFormPage() {
   const dispatch = useDispatch();
-//   const { closeModal } = useModal();
 
   // Form state
   const [email, setEmail] = useState("");
@@ -37,7 +35,8 @@ function SignupFormPage() {
 
     setErrors({});
     try {
-      const newUser = await dispatch(
+    //   const newUser = await dispatch(
+        await dispatch(
         sessionActions.signup({
           email,
           username,
@@ -68,6 +67,7 @@ function SignupFormPage() {
     password !== confirmPassword;
 
   return (
+    <div className="page-container">
     <div className="sign-up-container">
       <h1>Sign Up</h1>
       <form onSubmit={handleSubmit} className="form-div">
@@ -129,6 +129,7 @@ function SignupFormPage() {
           Sign Up
         </button>
       </form>
+    </div>
     </div>
   );
 }

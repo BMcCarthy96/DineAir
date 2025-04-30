@@ -2,38 +2,37 @@ import { useState, useEffect, useRef } from 'react';
 import { useDispatch } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import * as sessionActions from '../../store/session';
-import OpenModalMenuItem from './OpenModalMenuItem';
-import LoginFormPage from '../LoginFormPage';
-import SignupFormPage from '../SignupFormPage';
+// import LoginFormPage from '../LoginFormPage';
+// import SignupFormPage from '../SignupFormPage';
 import { HiBars3 } from "react-icons/hi2";
 import './ProfileButton.css'
 
 function ProfileButton({ user }) {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const [showMenu, setShowMenu] = useState(false);
+  const [showSideBar, setSideBar] = useState(false);
   const ulRef = useRef();
 
   const toggleMenu = (e) => {
     e.stopPropagation(); // Keep from bubbling up to document and triggering closeMenu
-    setShowMenu(!showMenu);
+    setSideBar(!showSideBar);
   };
 
   useEffect(() => {
-    if (!showMenu) return;
+    if (!showSideBar) return;
 
     const closeMenu = (e) => {
       if (!ulRef.current.contains(e.target)) {
-        setShowMenu(false);
+        setSideBar(false);
       }
     };
 
     document.addEventListener('click', closeMenu);
 
     return () => document.removeEventListener("click", closeMenu);
-  }, [showMenu]);
+  }, [showSideBar]);
 
-  const closeMenu = () => setShowMenu(false);
+  const closeMenu = () => setSideBar(false);
 
   const logout = (e) => {
     e.preventDefault();
@@ -42,7 +41,7 @@ function ProfileButton({ user }) {
     navigate('/') // Navigates to home page after logging out
   };
 
-  const ulClassName = "profile-dropdown" + (showMenu ? "" : " hidden");
+  const ulClassName = "profile-dropdown" + (showSideBar ? "" : " hidden");
 
   return (
     <>
@@ -80,18 +79,10 @@ function ProfileButton({ user }) {
           </div>
         </>
         ) : (
-          <>
-            <OpenModalMenuItem
-              itemText="Log In"
-              onItemClick={closeMenu}
-              modalComponent={<LoginFormPage />}
-            />
-            <OpenModalMenuItem
-              itemText="Sign Up"
-              onItemClick={closeMenu}
-              modalComponent={<SignupFormPage />}
-            />
-          </>
+            <div className="sidebar-content">
+            <Link to="/login" className="sidebar-link">Log In</Link>
+            <Link to="/signup" className="sidebar-link">Sign Up</Link>
+          </div>
         )}
       </ul>
     </>

@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import * as sessionActions from '../../store/session';
 import { useDispatch } from 'react-redux';
-// import { useModal } from '../../context/Modal';
 import './LoginFormPage.css';
 
 function LoginFormPage() {
@@ -9,7 +8,6 @@ function LoginFormPage() {
   const [credential, setCredential] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState({});
-//   const { closeModal } = useModal();
 
   const resetForm = () => {
     setCredential("");
@@ -23,7 +21,6 @@ function LoginFormPage() {
     return dispatch(sessionActions.login({ credential, password }))
       .then(() => {
         resetForm();
-        // closeModal()
       })
       .catch(async (res) => {
         const data = await res.json();
@@ -41,7 +38,8 @@ function LoginFormPage() {
   }, []);
 
   return (
-    <div className="login-modal-container">
+    <div className="page-container">
+    <div className="login-container">
       <h1>Log In</h1>
 
       {errors.credential && (
@@ -95,6 +93,7 @@ function LoginFormPage() {
           Demo User
         </button>
       </div>
+    </div>
     </div>
   );
 }
