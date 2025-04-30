@@ -21,6 +21,7 @@ module.exports = {
                     firstName: "Justin",
                     lastName: "Tyme",
                     hashedPassword: bcrypt.hashSync("password"),
+                    userType: "customer",
                 },
                 {
                     email: "DeeLayed@dineair.com",
@@ -28,6 +29,7 @@ module.exports = {
                     firstName: "Dee",
                     lastName: "Layed",
                     hashedPassword: bcrypt.hashSync("password2"),
+                    userType: "customer",
                 },
                 {
                     email: "VayKay@dineair.com",
@@ -35,6 +37,7 @@ module.exports = {
                     firstName: "Vay",
                     lastName: "Kay",
                     hashedPassword: bcrypt.hashSync("password3"),
+                    userType: "customer",
                 },
                 {
                     email: "carrie.on@dineair.com",
@@ -42,6 +45,7 @@ module.exports = {
                     firstName: "Carrie",
                     lastName: "On",
                     hashedPassword: bcrypt.hashSync("password4"),
+                    userType: "runner",
                 },
                 {
                     email: "maverick@dineair.com",
@@ -49,6 +53,7 @@ module.exports = {
                     firstName: "Pete",
                     lastName: "Mitchell",
                     hashedPassword: bcrypt.hashSync("TopGun"),
+                    userType: "runner",
                 },
             ],
             { validate: true }
@@ -59,7 +64,6 @@ module.exports = {
         options.tableName = "Users";
         await queryInterface.bulkDelete(
             options,
-            null,
             {
                 username: {
                     [Op.in]: [

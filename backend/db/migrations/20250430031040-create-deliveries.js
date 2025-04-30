@@ -9,7 +9,7 @@ if (process.env.NODE_ENV === "production") {
 module.exports = {
     async up(queryInterface, Sequelize) {
         await queryInterface.createTable(
-            "Users",
+            "Deliveries",
             {
                 id: {
                     allowNull: false,
@@ -17,36 +17,24 @@ module.exports = {
                     primaryKey: true,
                     type: Sequelize.INTEGER,
                 },
-                firstName: {
-                    type: Sequelize.STRING,
+                orderId: {
+                    type: Sequelize.INTEGER,
+                    allowNull: false,
+                    references: { model: "Orders" },
+                    onDelete: "CASCADE",
+                },
+                runnerId: {
+                    type: Sequelize.INTEGER,
+                    allowNull: false,
+                    references: { model: "Users" },
+                    onDelete: "CASCADE",
+                },
+                deliveryTime: {
+                    type: Sequelize.DATE,
                     allowNull: false,
                 },
-                lastName: {
-                    type: Sequelize.STRING,
-                    allowNull: false,
-                },
-                username: {
-                    type: Sequelize.STRING(30),
-                    allowNull: false,
-                    unique: true,
-                },
-                email: {
-                    type: Sequelize.STRING(100),
-                    allowNull: false,
-                    unique: true,
-                },
-                phone: {
-                    type: Sequelize.STRING,
-                    allowNull: true, // You can make this false if it's required
-                },
-                userType: {
-                    type: Sequelize.STRING,
-                    allowNull: false,
-                    defaultValue: "customer", // values: 'customer', 'runner'
-                },
-                hashedPassword: {
-                    type: Sequelize.STRING.BINARY,
-                    allowNull: false,
+                notes: {
+                    type: Sequelize.TEXT,
                 },
                 createdAt: {
                     allowNull: false,
@@ -64,7 +52,7 @@ module.exports = {
     },
 
     async down(queryInterface, Sequelize) {
-        options.tableName = "Users";
+        options.tableName = "Deliveries";
         return queryInterface.dropTable(options);
     },
 };

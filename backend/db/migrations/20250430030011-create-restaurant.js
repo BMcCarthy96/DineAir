@@ -1,15 +1,13 @@
 "use strict";
-
 let options = {};
 if (process.env.NODE_ENV === "production") {
     options.schema = process.env.SCHEMA;
 }
 
-/** @type {import('sequelize-cli').Migration} */
 module.exports = {
     async up(queryInterface, Sequelize) {
         await queryInterface.createTable(
-            "Users",
+            "Restaurants",
             {
                 id: {
                     allowNull: false,
@@ -17,36 +15,41 @@ module.exports = {
                     primaryKey: true,
                     type: Sequelize.INTEGER,
                 },
-                firstName: {
+                ownerId: {
+                    type: Sequelize.INTEGER,
+                    allowNull: false,
+                    references: { model: "Users" },
+                    onDelete: "CASCADE",
+                },
+                airportId: {
+                    type: Sequelize.INTEGER,
+                    allowNull: false,
+                    references: { model: "Airports" },
+                    onDelete: "CASCADE",
+                },
+                name: {
                     type: Sequelize.STRING,
                     allowNull: false,
                 },
-                lastName: {
+                terminal: {
                     type: Sequelize.STRING,
-                    allowNull: false,
+                    allowNull: true,
                 },
-                username: {
-                    type: Sequelize.STRING(30),
-                    allowNull: false,
-                    unique: true,
-                },
-                email: {
-                    type: Sequelize.STRING(100),
-                    allowNull: false,
-                    unique: true,
-                },
-                phone: {
+                gate: {
                     type: Sequelize.STRING,
-                    allowNull: true, // You can make this false if it's required
+                    allowNull: true,
                 },
-                userType: {
+                cuisineType: {
                     type: Sequelize.STRING,
-                    allowNull: false,
-                    defaultValue: "customer", // values: 'customer', 'runner'
+                    allowNull: true,
                 },
-                hashedPassword: {
-                    type: Sequelize.STRING.BINARY,
-                    allowNull: false,
+                description: {
+                    type: Sequelize.TEXT,
+                    allowNull: true,
+                },
+                imageUrl: {
+                    type: Sequelize.STRING,
+                    allowNull: true,
                 },
                 createdAt: {
                     allowNull: false,
@@ -64,7 +67,7 @@ module.exports = {
     },
 
     async down(queryInterface, Sequelize) {
-        options.tableName = "Users";
-        return queryInterface.dropTable(options);
+        options.tableName = "Restaurants";
+        await queryInterface.dropTable(options);
     },
 };

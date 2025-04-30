@@ -9,7 +9,7 @@ if (process.env.NODE_ENV === "production") {
 module.exports = {
     async up(queryInterface, Sequelize) {
         await queryInterface.createTable(
-            "Users",
+            "CartItems",
             {
                 id: {
                     allowNull: false,
@@ -17,36 +17,22 @@ module.exports = {
                     primaryKey: true,
                     type: Sequelize.INTEGER,
                 },
-                firstName: {
-                    type: Sequelize.STRING,
+                cartId: {
+                    type: Sequelize.INTEGER,
                     allowNull: false,
+                    references: { model: "Carts" },
+                    onDelete: "CASCADE",
                 },
-                lastName: {
-                    type: Sequelize.STRING,
+                menuItemId: {
+                    type: Sequelize.INTEGER,
                     allowNull: false,
+                    references: { model: "MenuItems" },
+                    onDelete: "CASCADE",
                 },
-                username: {
-                    type: Sequelize.STRING(30),
+                quantity: {
+                    type: Sequelize.INTEGER,
                     allowNull: false,
-                    unique: true,
-                },
-                email: {
-                    type: Sequelize.STRING(100),
-                    allowNull: false,
-                    unique: true,
-                },
-                phone: {
-                    type: Sequelize.STRING,
-                    allowNull: true, // You can make this false if it's required
-                },
-                userType: {
-                    type: Sequelize.STRING,
-                    allowNull: false,
-                    defaultValue: "customer", // values: 'customer', 'runner'
-                },
-                hashedPassword: {
-                    type: Sequelize.STRING.BINARY,
-                    allowNull: false,
+                    defaultValue: 1,
                 },
                 createdAt: {
                     allowNull: false,
@@ -64,7 +50,7 @@ module.exports = {
     },
 
     async down(queryInterface, Sequelize) {
-        options.tableName = "Users";
+        options.tableName = "CartItems";
         return queryInterface.dropTable(options);
     },
 };

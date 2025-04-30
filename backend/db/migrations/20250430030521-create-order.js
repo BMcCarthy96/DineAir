@@ -9,7 +9,7 @@ if (process.env.NODE_ENV === "production") {
 module.exports = {
     async up(queryInterface, Sequelize) {
         await queryInterface.createTable(
-            "Users",
+            "Orders",
             {
                 id: {
                     allowNull: false,
@@ -17,36 +17,36 @@ module.exports = {
                     primaryKey: true,
                     type: Sequelize.INTEGER,
                 },
-                firstName: {
+                userId: {
+                    type: Sequelize.INTEGER,
+                    allowNull: false,
+                    references: { model: "Users" },
+                    onDelete: "CASCADE",
+                },
+                runnerId: {
+                    type: Sequelize.INTEGER,
+                    allowNull: true, // initially null, can be assigned once a runner picks up the order
+                    references: { model: "Users" },
+                    onDelete: "SET NULL",
+                },
+                airportId: {
+                    type: Sequelize.INTEGER,
+                    allowNull: false,
+                    references: { model: "Airports" },
+                    onDelete: "CASCADE",
+                },
+                gate: {
                     type: Sequelize.STRING,
                     allowNull: false,
                 },
-                lastName: {
+                totalPrice: {
+                    type: Sequelize.DECIMAL(10, 2),
+                    allowNull: false,
+                },
+                status: {
                     type: Sequelize.STRING,
                     allowNull: false,
-                },
-                username: {
-                    type: Sequelize.STRING(30),
-                    allowNull: false,
-                    unique: true,
-                },
-                email: {
-                    type: Sequelize.STRING(100),
-                    allowNull: false,
-                    unique: true,
-                },
-                phone: {
-                    type: Sequelize.STRING,
-                    allowNull: true, // You can make this false if it's required
-                },
-                userType: {
-                    type: Sequelize.STRING,
-                    allowNull: false,
-                    defaultValue: "customer", // values: 'customer', 'runner'
-                },
-                hashedPassword: {
-                    type: Sequelize.STRING.BINARY,
-                    allowNull: false,
+                    defaultValue: "pending", // statuses: 'pending', 'preparing', 'picked_up', 'delivered'
                 },
                 createdAt: {
                     allowNull: false,
@@ -64,7 +64,7 @@ module.exports = {
     },
 
     async down(queryInterface, Sequelize) {
-        options.tableName = "Users";
+        options.tableName = "Orders";
         return queryInterface.dropTable(options);
     },
 };

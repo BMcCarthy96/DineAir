@@ -5,11 +5,10 @@ if (process.env.NODE_ENV === "production") {
     options.schema = process.env.SCHEMA;
 }
 
-/** @type {import('sequelize-cli').Migration} */
 module.exports = {
     async up(queryInterface, Sequelize) {
         await queryInterface.createTable(
-            "Users",
+            "Airports",
             {
                 id: {
                     allowNull: false,
@@ -17,35 +16,25 @@ module.exports = {
                     primaryKey: true,
                     type: Sequelize.INTEGER,
                 },
-                firstName: {
+                name: {
                     type: Sequelize.STRING,
                     allowNull: false,
                 },
-                lastName: {
+                code: {
                     type: Sequelize.STRING,
-                    allowNull: false,
-                },
-                username: {
-                    type: Sequelize.STRING(30),
                     allowNull: false,
                     unique: true,
                 },
-                email: {
-                    type: Sequelize.STRING(100),
-                    allowNull: false,
-                    unique: true,
-                },
-                phone: {
-                    type: Sequelize.STRING,
-                    allowNull: true, // You can make this false if it's required
-                },
-                userType: {
+                city: {
                     type: Sequelize.STRING,
                     allowNull: false,
-                    defaultValue: "customer", // values: 'customer', 'runner'
                 },
-                hashedPassword: {
-                    type: Sequelize.STRING.BINARY,
+                state: {
+                    type: Sequelize.STRING,
+                    allowNull: false,
+                },
+                country: {
+                    type: Sequelize.STRING,
                     allowNull: false,
                 },
                 createdAt: {
@@ -64,7 +53,7 @@ module.exports = {
     },
 
     async down(queryInterface, Sequelize) {
-        options.tableName = "Users";
-        return queryInterface.dropTable(options);
+        options.tableName = "Airports";
+        await queryInterface.dropTable(options);
     },
 };
