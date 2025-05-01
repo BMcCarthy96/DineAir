@@ -4,9 +4,26 @@ const { setTokenCookie } = require("../utils/auth");
 const { Op } = require("sequelize");
 
 exports.signup = async (req, res, next) => {
-    const { firstName, lastName, email, password, username } = req.body;
+    const { firstName, lastName, email, password, username, userType } =
+        req.body;
 
     try {
+        const validUserTypes = ["customer", "runner", "restaurantOwner"];
+        if (userType && !validUserTypes.includes(userType)) {
+            return next({
+                status: 400,
+                message: "Invalid user type",
+                errors: {
+                    userType: `User type must be one of: ${validUserTypes.join(
+                        ", "
+                    )}`,
+                },
+            });
+        }
+
+        // Default to 'customer' if no userType is provided
+        const finalUserType = userType || "customer";
+
         // Check for existing username or email
         const existingUser = await User.findOne({
             where: { [Op.or]: [{ username }, { email }] },
@@ -29,6 +46,7 @@ exports.signup = async (req, res, next) => {
             email,
             username,
             hashedPassword: bcrypt.hashSync(password),
+            userType: finalUserType,
         });
 
         const safeUser = {
@@ -37,6 +55,7 @@ exports.signup = async (req, res, next) => {
             lastName: user.lastName,
             email: user.email,
             username: user.username,
+            userType: user.userType,
         };
 
         await setTokenCookie(res, safeUser);

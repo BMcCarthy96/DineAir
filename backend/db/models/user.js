@@ -87,7 +87,14 @@ module.exports = (sequelize, DataTypes) => {
             // User Type: Customer or Runner
             userType: {
                 type: DataTypes.STRING,
-                allowNull: false, // 'customer' or 'runner'
+                allowNull: false,
+                defaultValue: "customer", // Default userType is 'customer'
+                validate: {
+                    isIn: {
+                        args: [["customer", "runner", "restaurantOwner"]],
+                        msg: "User type must be 'customer', 'runner', or 'restaurantOwner'",
+                    },
+                },
             },
 
             // Timestamps
