@@ -48,12 +48,15 @@ const initialState = {};
 // Reducer
 const usersReducer = (state = initialState, action) => {
     switch (action.type) {
-        case SET_USER:
-            return { ...state, [action.payload.id]: action.payload };
-        case REMOVE_USER:
+        case SET_USER: {
+            const user = action.payload;
+            return { ...state, [user.id]: user };
+        }
+        case REMOVE_USER: {
             const newState = { ...state };
             delete newState[action.payload];
             return newState;
+        }
         default:
             return state;
     }

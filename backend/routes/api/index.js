@@ -1,6 +1,10 @@
 const router = require("express").Router();
 const authRouter = require("./auth.js");
+const usersRouter = require("./users.js");
+const searchRouter = require("./search.js");
 const cartRouter = require("./carts.js");
+const cartItemsRouter = require("./cartItems.js");
+const ordersRouter = require("./orders.js");
 const deliveryRouter = require("./deliveries.js");
 const restaurantRouter = require("./restaurants.js");
 const reviewRouter = require("./reviews.js");
@@ -13,7 +17,11 @@ const { restoreUser } = require("../../utils/auth.js");
 router.use(restoreUser);
 
 router.use("/auth", authRouter);
+router.use("/users", usersRouter);
+router.use("/search", searchRouter);
 router.use("/carts", cartRouter);
+router.use("/carts/items", cartItemsRouter);
+router.use("/orders", ordersRouter);
 router.use("/deliveries", deliveryRouter);
 router.use("/restaurants", restaurantRouter);
 

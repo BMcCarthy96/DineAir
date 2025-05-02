@@ -37,7 +37,7 @@ module.exports = {
                 },
                 phone: {
                     type: Sequelize.STRING,
-                    allowNull: true, // You can make this false if it's required
+                    allowNull: true,
                 },
                 userType: {
                     type: Sequelize.STRING,

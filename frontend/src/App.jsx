@@ -6,6 +6,7 @@ import * as sessionActions from './store/session';
 import LoginFormPage from './components/LoginFormPage';
 import SignupFormPage from './components/SignupFormPage';
 import LandingPage from './components/LandingPage';
+// import RestaurantPage from "./components/RestaurantPage/RestaurantPage";
 
 
 function Layout() {
@@ -43,6 +44,10 @@ const router = createBrowserRouter([
         path: '/signup',
         element: <SignupFormPage />
       },
+      // {
+      //   path: "/restaurants/:restaurantId",
+      //   element: <RestaurantPage />,
+      // },
       // {
       //   path: "/api/spots",
       //   element: <CreateSpot/>
