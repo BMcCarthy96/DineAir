@@ -1,67 +1,62 @@
 const { User } = require("../db/models");
-const bcrypt = require("bcryptjs");
-const { setTokenCookie } = require("../utils/auth");
-const { Op } = require("sequelize");
 
-exports.signup = async (req, res, next) => {
-    const { firstName, lastName, email, password, username, userType } =
-        req.body;
-
+exports.getUserById = async (req, res, next) => {
     try {
-        const validUserTypes = ["customer", "runner", "restaurantOwner"];
-        if (userType && !validUserTypes.includes(userType)) {
-            return next({
-                status: 400,
-                message: "Invalid user type",
-                errors: {
-                    userType: `User type must be one of: ${validUserTypes.join(
-                        ", "
-                    )}`,
-                },
-            });
-        }
-
-        // Default to 'customer' if no userType is provided
-        const finalUserType = userType || "customer";
-
-        // Check for existing username or email
-        const existingUser = await User.findOne({
-            where: { [Op.or]: [{ username }, { email }] },
+        const { id } = req.params;
+        const user = await User.findByPk(id, {
+            attributes: [
+                "id",
+                "firstName",
+                "lastName",
+                "email",
+                "username",
+                "userType",
+            ],
         });
 
-        if (existingUser) {
-            return next({
-                status: 500,
-                message: "User already exists",
-                errors: {
-                    username: "User with that username already exists",
-                    email: "User with that email already exists",
-                },
-            });
+        if (!user) {
+            return res.status(404).json({ error: "User not found" });
         }
 
-        const user = await User.create({
-            firstName,
-            lastName,
-            email,
-            username,
-            hashedPassword: bcrypt.hashSync(password),
-            userType: finalUserType,
-        });
-
-        const safeUser = {
-            id: user.id,
-            firstName: user.firstName,
-            lastName: user.lastName,
-            email: user.email,
-            username: user.username,
-            userType: user.userType,
-        };
-
-        await setTokenCookie(res, safeUser);
-
-        return res.status(201).json({ user: safeUser });
+        res.json(user);
     } catch (err) {
-        return next(err);
+        next(err);
+    }
+};
+
+exports.updateUser = async (req, res, next) => {
+    try {
+        const { id } = req.params;
+        const { firstName, lastName, email, username } = req.body;
+
+        const user = await User.findByPk(id);
+
+        if (!user) {
+            return res.status(404).json({ error: "User not found" });
+        }
+
+        await user.update({ firstName, lastName, email, username });
+
+        res.json(user);
+    } catch (err) {
+        next(err);
+    }
+};
+
+exports.deleteUser = async (req, res, next) => {
+    try {
+        const { id } = req.params;
+
+        const user = await User.findByPk(id);
+
+        if (!user) {
+            return res.status(404).json({ error: "User not found" });
+        }
+
+        await user.destroy();
+
+        res.status(204).end();
+    } catch (err) {
+        next(err);
     }
 };

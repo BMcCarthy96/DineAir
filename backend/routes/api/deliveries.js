@@ -8,7 +8,7 @@ router.get("/", requireAuth, deliveryController.getRunnerDeliveries);
 
 // Mark a delivery as completed
 router.put(
-    "/:deliveryId/complete",
+    "/deliveries/:deliveryId/complete",
     requireAuth,
     deliveryController.completeDelivery
 );

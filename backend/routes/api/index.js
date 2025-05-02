@@ -1,8 +1,10 @@
 const router = require("express").Router();
-const sessionRouter = require("./session.js");
-const usersRouter = require("./users.js");
+const authRouter = require("./auth.js");
 const cartRouter = require("./carts.js");
 const deliveryRouter = require("./deliveries.js");
+const restaurantRouter = require("./restaurants.js");
+const reviewRouter = require("./reviews.js");
+const menuItemRouter = require("./menuItems.js");
 const { restoreUser } = require("../../utils/auth.js");
 
 // Connect restoreUser middleware to the API router
@@ -10,10 +12,14 @@ const { restoreUser } = require("../../utils/auth.js");
 // If current user session is not valid, set req.user to null
 router.use(restoreUser);
 
-router.use("/session", sessionRouter);
-router.use("/users", usersRouter);
-router.use("/cart", cartRouter);
-router.use("/delivery", deliveryRouter);
+router.use("/auth", authRouter);
+router.use("/carts", cartRouter);
+router.use("/deliveries", deliveryRouter);
+router.use("/restaurants", restaurantRouter);
+
+// Add routes for reviews and menu items (under restaurants.js)
+router.use("/restaurants/:restaurantId/reviews", reviewRouter);
+router.use("/restaurants/:restaurantId/menu-items", menuItemRouter);
 
 // Add CSRF token route
 router.get("/csrf/restore", (req, res) => {

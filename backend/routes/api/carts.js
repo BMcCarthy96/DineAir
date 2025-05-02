@@ -7,12 +7,16 @@ const cartController = require("../../controllers/cartController");
 router.get("/", requireAuth, cartController.getUserCart);
 
 // Add item to cart
-router.post("/", requireAuth, cartController.addItemToCart);
+router.post("/items", requireAuth, cartController.addItemToCart);
 
 // Update cart item quantity
-router.put("/:cartItemId", requireAuth, cartController.updateCartItem);
+router.put("/items/:cartItemId", requireAuth, cartController.updateCartItem);
 
 // Remove item from cart
-router.delete("/:cartItemId", requireAuth, cartController.removeItemFromCart);
+router.delete(
+    "/items/:cartItemId",
+    requireAuth,
+    cartController.removeItemFromCart
+);
 
 module.exports = router;
