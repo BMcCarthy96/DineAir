@@ -39,8 +39,9 @@ module.exports = (sequelize, DataTypes) => {
                     max: 5,
                 },
             },
-            body: {
+            comment: {
                 type: DataTypes.TEXT,
+                allowNull: true,
             },
         },
         {

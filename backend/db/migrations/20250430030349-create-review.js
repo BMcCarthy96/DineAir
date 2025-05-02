@@ -37,8 +37,9 @@ module.exports = {
                         max: 5,
                     },
                 },
-                body: {
+                comment: {
                     type: Sequelize.TEXT,
+                    allowNull: true,
                 },
                 createdAt: {
                     allowNull: false,
