@@ -35,6 +35,12 @@ module.exports = {
                     references: { model: "Airports" },
                     onDelete: "CASCADE",
                 },
+                restaurantId: {
+                    type: Sequelize.INTEGER,
+                    allowNull: false,
+                    references: { model: "Restaurants" },
+                    onDelete: "CASCADE",
+                },
                 gate: {
                     type: Sequelize.STRING,
                     allowNull: false,

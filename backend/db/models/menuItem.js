@@ -15,6 +15,7 @@ module.exports = (sequelize, DataTypes) => {
                 },
                 onDelete: "CASCADE",
             });
+            MenuItem.hasMany(models.CartItem, { foreignKey: "menuItemId" });
         }
     }
 

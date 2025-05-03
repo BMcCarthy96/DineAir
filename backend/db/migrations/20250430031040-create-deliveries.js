@@ -36,6 +36,11 @@ module.exports = {
                 notes: {
                     type: Sequelize.TEXT,
                 },
+                status: {
+                    type: Sequelize.STRING,
+                    allowNull: false,
+                    defaultValue: "pending", // Default statuses: 'pending', 'in_progress', 'delivered'
+                },
                 createdAt: {
                     allowNull: false,
                     type: Sequelize.DATE,

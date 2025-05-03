@@ -7,6 +7,7 @@ module.exports = (sequelize, DataTypes) => {
             Order.belongsTo(models.User, { foreignKey: "userId" }); // customer
             Order.belongsTo(models.User, { foreignKey: "runnerId" }); // runner
             Order.belongsTo(models.Airport, { foreignKey: "airportId" });
+            Order.belongsTo(models.Restaurant, { foreignKey: "restaurantId" });
             Order.hasMany(models.OrderItem, {
                 foreignKey: "orderId",
                 onDelete: "CASCADE",
@@ -25,6 +26,10 @@ module.exports = (sequelize, DataTypes) => {
                 allowNull: false,
             },
             airportId: {
+                type: DataTypes.INTEGER,
+                allowNull: false,
+            },
+            restaurantId: {
                 type: DataTypes.INTEGER,
                 allowNull: false,
             },

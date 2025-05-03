@@ -26,6 +26,11 @@ module.exports = (sequelize, DataTypes) => {
             notes: {
                 type: DataTypes.TEXT,
             },
+            status: {
+                type: DataTypes.STRING,
+                allowNull: false,
+                defaultValue: "pending", // Default statuses: 'pending', 'in_progress', 'delivered'
+            },
         },
         {
             sequelize,

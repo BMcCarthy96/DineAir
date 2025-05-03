@@ -1,13 +1,30 @@
-const { CartItem, MenuItem } = require("../db/models");
+const { Cart, CartItem, MenuItem } = require("../db/models");
 
 module.exports = {
     async getUserCart(req, res, next) {
         try {
-            const cart = await CartItem.findAll({
+            const cart = await Cart.findOne({
                 where: { userId: req.user.id },
-                include: [{ model: MenuItem }],
+                include: {
+                    model: CartItem,
+                    include: {
+                        model: MenuItem,
+                        attributes: [
+                            "id",
+                            "name",
+                            "description",
+                            "price",
+                            "imageUrl",
+                        ],
+                    },
+                },
             });
-            res.json(cart);
+
+            if (!cart) {
+                return res.json([]);
+            }
+
+            res.json(cart.CartItems);
         } catch (err) {
             next(err);
         }
