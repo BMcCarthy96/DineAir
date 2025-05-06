@@ -26,3 +26,15 @@ exports.deleteCartItem = async (req, res) => {
     await item.destroy();
     res.status(204).end();
 };
+
+exports.getCartItemsByCartId = async (req, res) => {
+    const { cartId } = req.params;
+    const items = await CartItem.findAll({
+        where: { cartId },
+        include: {
+            model: MenuItem,
+            attributes: ["id", "name", "description", "price", "imageUrl"],
+        },
+    });
+    res.json(items);
+};

@@ -10,15 +10,19 @@ module.exports = {
                 return res.status(400).json({ error: "Search query required" });
             }
 
+            const lowerQuery = query.toLowerCase();
+
+            // Search for restaurants
             const restaurants = await Restaurant.findAll({
                 where: {
-                    name: { [Op.iLike]: `%${query}%` },
+                    name: { [Op.like]: `%${lowerQuery}%` },
                 },
             });
 
+            // Search for menu items
             const menuItems = await MenuItem.findAll({
                 where: {
-                    name: { [Op.iLike]: `%${query}%` },
+                    name: { [Op.like]: `%${lowerQuery}%` },
                 },
             });
 

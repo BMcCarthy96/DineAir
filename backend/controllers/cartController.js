@@ -30,53 +30,41 @@ module.exports = {
         }
     },
 
-    async addItemToCart(req, res, next) {
+    async getAllCarts(req, res, next) {
         try {
-            const { menuItemId, quantity } = req.body;
-
-            const cartItem = await CartItem.create({
-                userId: req.user.id,
-                menuItemId,
-                quantity,
+            const carts = await Cart.findAll({
+                include: {
+                    model: CartItem,
+                    include: {
+                        model: MenuItem,
+                        attributes: [
+                            "id",
+                            "name",
+                            "description",
+                            "price",
+                            "imageUrl",
+                        ],
+                    },
+                },
             });
 
-            res.status(201).json(cartItem);
+            res.json(carts);
         } catch (err) {
             next(err);
         }
     },
 
-    async updateCartItem(req, res, next) {
+    async deleteCart(req, res, next) {
         try {
-            const { cartItemId } = req.params;
-            const { quantity } = req.body;
+            const { cartId } = req.params;
 
-            const cartItem = await CartItem.findByPk(cartItemId);
+            const cart = await Cart.findByPk(cartId);
 
-            if (!cartItem || cartItem.userId !== req.user.id) {
-                return res.status(403).json({ error: "Forbidden" });
+            if (!cart) {
+                return res.status(404).json({ error: "Cart not found" });
             }
 
-            cartItem.quantity = quantity;
-            await cartItem.save();
-
-            res.json(cartItem);
-        } catch (err) {
-            next(err);
-        }
-    },
-
-    async removeItemFromCart(req, res, next) {
-        try {
-            const { cartItemId } = req.params;
-
-            const cartItem = await CartItem.findByPk(cartItemId);
-
-            if (!cartItem || cartItem.userId !== req.user.id) {
-                return res.status(403).json({ error: "Forbidden" });
-            }
-
-            await cartItem.destroy();
+            await cart.destroy();
             res.status(204).end();
         } catch (err) {
             next(err);

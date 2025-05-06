@@ -24,14 +24,13 @@ module.exports = (sequelize, DataTypes) => {
                 foreignKey: "userId",
                 onDelete: "CASCADE",
             });
-            // User can have many CartItems
-            User.hasMany(models.CartItem, {
-                foreignKey: "userId",
-                onDelete: "CASCADE",
-            });
             // User can like many Reviews
             User.hasMany(models.ReviewLike, {
                 foreignKey: "userId",
+                onDelete: "CASCADE",
+            });
+            User.hasMany(models.Restaurant, {
+                foreignKey: "ownerId",
                 onDelete: "CASCADE",
             });
         }
@@ -91,8 +90,10 @@ module.exports = (sequelize, DataTypes) => {
                 defaultValue: "customer", // Default userType is 'customer'
                 validate: {
                     isIn: {
-                        args: [["customer", "runner", "restaurantOwner"]],
-                        msg: "User type must be 'customer', 'runner', or 'restaurantOwner'",
+                        args: [
+                            ["customer", "runner", "restaurantOwner", "admin"],
+                        ],
+                        msg: "User type must be 'customer', 'runner', 'restaurantOwner', or 'admin'",
                     },
                 },
             },

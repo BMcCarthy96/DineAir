@@ -70,4 +70,46 @@ const requireAuth = function (req, _res, next) {
     return next(err);
 };
 
-module.exports = { setTokenCookie, restoreUser, requireAuth };
+// Middleware to check if the user is an admin
+const requireAdmin = (req, res, next) => {
+    if (req.user && req.user.userType === "admin") {
+        return next();
+    }
+    res.status(403).json({ error: "Forbidden: Admin access required" });
+};
+
+// Middleware to check if the user is a restaurant owner
+const requireRestaurantOwner = (req, res, next) => {
+    if (req.user && req.user.userType === "restaurantOwner") {
+        return next();
+    }
+    res.status(403).json({
+        error: "Forbidden: Restaurant owner access required",
+    });
+};
+
+// Middleware to check if the user is a runner
+const requireRunner = (req, res, next) => {
+    if (req.user && req.user.userType === "runner") {
+        return next();
+    }
+    res.status(403).json({ error: "Forbidden: Runner access required" });
+};
+
+// Middleware to check if the user is a customer
+const requireCustomer = (req, res, next) => {
+    if (req.user && req.user.userType === "customer") {
+        return next();
+    }
+    res.status(403).json({ error: "Forbidden: Customer access required" });
+};
+
+module.exports = {
+    setTokenCookie,
+    restoreUser,
+    requireAuth,
+    requireAdmin,
+    requireRestaurantOwner,
+    requireRunner,
+    requireCustomer,
+};

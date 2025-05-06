@@ -9,7 +9,7 @@ module.exports = {
                 {
                     name: "Taco 'Bout It",
                     description: "Tacos and fun in the sun!",
-                    ownerId: 1,
+                    ownerId: 7,
                     airportId: 1,
                     terminal: "T1",
                     gate: "A3",
@@ -21,7 +21,7 @@ module.exports = {
                 {
                     name: "The Wok and Roll",
                     description: "Sushi so fresh, you'll think it’s swimming!",
-                    ownerId: 2,
+                    ownerId: 7,
                     airportId: 2,
                     terminal: "T2",
                     gate: "C4",
@@ -33,7 +33,7 @@ module.exports = {
                 {
                     name: "Pasta La Vista",
                     description: "Italian cuisine for your layover cravings.",
-                    ownerId: 3,
+                    ownerId: 7,
                     airportId: 1,
                     terminal: "T1",
                     gate: "B2",
@@ -45,7 +45,7 @@ module.exports = {
                 {
                     name: "Bagel Space",
                     description: "Where bagels orbit your breakfast dreams.",
-                    ownerId: 1,
+                    ownerId: 8,
                     airportId: 2,
                     terminal: "T3",
                     gate: "D2",
@@ -57,7 +57,7 @@ module.exports = {
                 {
                     name: "Brew & Fly",
                     description: "Caffeinate before you elevate.",
-                    ownerId: 2,
+                    ownerId: 8,
                     airportId: 1,
                     terminal: "T1",
                     gate: "A1",

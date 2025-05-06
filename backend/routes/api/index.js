@@ -1,5 +1,7 @@
 const router = require("express").Router();
 const authRouter = require("./auth.js");
+const adminRouter = require("./admin");
+const restaurantOwnersRouter = require("./restaurantOwners");
 const usersRouter = require("./users.js");
 const searchRouter = require("./search.js");
 const cartRouter = require("./carts.js");
@@ -17,6 +19,8 @@ const { restoreUser } = require("../../utils/auth.js");
 router.use(restoreUser);
 
 router.use("/auth", authRouter);
+router.use("/admin", adminRouter);
+router.use("/restaurant-owners", restaurantOwnersRouter);
 router.use("/users", usersRouter);
 router.use("/search", searchRouter);
 router.use("/carts", cartRouter);

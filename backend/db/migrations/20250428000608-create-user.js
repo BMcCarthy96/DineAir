@@ -43,6 +43,11 @@ module.exports = {
                     type: Sequelize.STRING,
                     allowNull: false,
                     defaultValue: "customer", // values: 'customer', 'runner'
+                    validate: {
+                        isIn: [
+                            ["customer", "runner", "restaurantOwner", "admin"],
+                        ],
+                    },
                 },
                 hashedPassword: {
                     type: Sequelize.STRING.BINARY,
