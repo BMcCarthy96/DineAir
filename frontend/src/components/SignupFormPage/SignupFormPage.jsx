@@ -1,135 +1,106 @@
-import { useState, useEffect } from 'react';
-import { useDispatch } from 'react-redux';
-import * as sessionActions from '../../store/session';
-import './SignupFormPage.css';
+import { useState } from "react";
+import { useDispatch } from "react-redux";
+import * as sessionActions from "../../store/session";
+import { useNavigate } from "react-router-dom";
+import "./SignupFormPage.css";
 
 function SignupFormPage() {
   const dispatch = useDispatch();
-
-  // Form state
-  const [email, setEmail] = useState("");
-  const [username, setUsername] = useState("");
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+  const navigate = useNavigate();
+  const [formData, setFormData] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    username: "",
+    password: "",
+    confirmPassword: "",
+  });
   const [errors, setErrors] = useState({});
 
-  useEffect(() => {
-    setEmail("");
-    setUsername("");
-    setFirstName("");
-    setLastName("");
-    setPassword("");
-    setConfirmPassword("");
-    setErrors({});
-  }, []);
-//   }, [closeModal]);
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (password !== confirmPassword) {
-      setErrors({ confirmPassword: "Confirm Password must match Password" });
+    if (formData.password !== formData.confirmPassword) {
+      setErrors({ confirmPassword: "Passwords do not match" });
       return;
     }
-
-    setErrors({});
     try {
-    //   const newUser = await dispatch(
-        await dispatch(
-        sessionActions.signup({
-          email,
-          username,
-          firstName,
-          lastName,
-          password
-        })
-      );
-    //   if(newUser) {
-    //     closeModal();
-    //   }
+      await dispatch(sessionActions.signup(formData));
+      navigate("/");
     } catch (res) {
       const data = await res.json();
-      if(data?.errors) setErrors(data.errors);
+      if (data?.errors) setErrors(data.errors);
     }
   };
 
-  // Disable "Sign Up"
-  const isSubmitDisabled =
-    !email ||
-    !username ||
-    username.length < 4 ||
-    !firstName ||
-    !lastName ||
-    !password ||
-    password.length < 6 ||
-    !confirmPassword ||
-    password !== confirmPassword;
-
   return (
-    <div className="page-container">
-    <div className="sign-up-container">
-      <h1>Sign Up</h1>
-      <form onSubmit={handleSubmit} className="form-div">
-        <input
-          type="text"
-          value={firstName}
-          onChange={(e) => setFirstName(e.target.value)}
-          placeholder="First Name"
-          required
-        />
-        {errors.firstName && <p className="error-message">{errors.firstName}</p>}
-
-        <input
-          type="text"
-          value={lastName}
-          onChange={(e) => setLastName(e.target.value)}
-          placeholder="Last Name"
-          required
-        />
-        {errors.lastName && <p className="error-message">{errors.lastName}</p>}
-
-        <input
-          type="text"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="Email"
-          required
-        />
-        {errors.email && <p className="error-message">{errors.email}</p>}
-
-        <input
-          type="text"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          placeholder="Username"
-          required
-        />
-        {errors.username && <p className="error-message">{errors.username}</p>}
-
-        <input
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder="Password"
-          required
-        />
-        {errors.password && <p className="error-message">{errors.password}</p>}
-
-        <input
-          type="password"
-          value={confirmPassword}
-          onChange={(e) => setConfirmPassword(e.target.value)}
-          placeholder="Confirm Password"
-          required
-        />
-        {errors.confirmPassword && <p className="error-message">{errors.confirmPassword}</p>}
-
-        <button type="submit" className="sign-up-button" disabled={isSubmitDisabled}>
-          Sign Up
-        </button>
-      </form>
-    </div>
+    <div className="signup-page">
+      <div className="signup-box">
+        <h1>Create Your Account</h1>
+        <p className="signup-subtitle">Join DineAir and start exploring today</p>
+        {Object.values(errors).map((error, idx) => (
+          <p key={idx} className="error-message">{error}</p>
+        ))}
+        <form onSubmit={handleSubmit} className="signup-form">
+          <input
+            type="text"
+            name="firstName"
+            placeholder="First Name"
+            value={formData.firstName}
+            onChange={handleChange}
+            required
+          />
+          <input
+            type="text"
+            name="lastName"
+            placeholder="Last Name"
+            value={formData.lastName}
+            onChange={handleChange}
+            required
+          />
+          <input
+            type="email"
+            name="email"
+            placeholder="Email"
+            value={formData.email}
+            onChange={handleChange}
+            required
+          />
+          <input
+            type="text"
+            name="username"
+            placeholder="Username"
+            value={formData.username}
+            onChange={handleChange}
+            required
+          />
+          <input
+            type="password"
+            name="password"
+            placeholder="Password"
+            value={formData.password}
+            onChange={handleChange}
+            required
+          />
+          <input
+            type="password"
+            name="confirmPassword"
+            placeholder="Confirm Password"
+            value={formData.confirmPassword}
+            onChange={handleChange}
+            required
+          />
+          <button type="submit" className="signup-button">
+            Sign Up
+          </button>
+        </form>
+        <p className="login-link">
+          Already have an account? <a href="/login">Log In</a>
+        </p>
+      </div>
     </div>
   );
 }
