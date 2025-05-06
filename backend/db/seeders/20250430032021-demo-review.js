@@ -177,6 +177,108 @@ module.exports = {
                     comment:
                         "Decent coffee, but the seating area was too crowded.",
                 },
+
+                // Burger Terminal
+                {
+                    userId: 1,
+                    restaurantId: 6,
+                    rating: 5,
+                    comment: "The bacon burger was amazing! Highly recommend.",
+                },
+                {
+                    userId: 2,
+                    restaurantId: 6,
+                    rating: 3,
+                    comment: "The fries were cold, but the burger was good.",
+                },
+                {
+                    userId: 3,
+                    restaurantId: 6,
+                    rating: 1,
+                    comment: "Worst burger I’ve ever had. Avoid this place.",
+                },
+
+                // Pho Real
+                {
+                    userId: 4,
+                    restaurantId: 7,
+                    rating: 5,
+                    comment: "The beef pho was authentic and delicious!",
+                },
+                {
+                    userId: 5,
+                    restaurantId: 7,
+                    rating: 4,
+                    comment:
+                        "Spring rolls were fresh, but the peanut sauce was too sweet.",
+                },
+                {
+                    userId: 1,
+                    restaurantId: 7,
+                    rating: 2,
+                    comment: "The chicken pho was bland and overpriced.",
+                },
+
+                // The Flying Curry
+                {
+                    userId: 2,
+                    restaurantId: 8,
+                    rating: 5,
+                    comment: "Butter chicken was the best I’ve ever had!",
+                },
+                {
+                    userId: 3,
+                    restaurantId: 8,
+                    rating: 4,
+                    comment: "Garlic naan was soft and flavorful. Loved it!",
+                },
+                {
+                    userId: 4,
+                    restaurantId: 8,
+                    rating: 3,
+                    comment: "The vegetable curry was too spicy for my taste.",
+                },
+
+                // Poke Paradise
+                {
+                    userId: 5,
+                    restaurantId: 9,
+                    rating: 5,
+                    comment: "The ahi tuna bowl was fresh and delicious!",
+                },
+                {
+                    userId: 1,
+                    restaurantId: 9,
+                    rating: 4,
+                    comment: "Great poke, but the portion size was small.",
+                },
+                {
+                    userId: 2,
+                    restaurantId: 9,
+                    rating: 3,
+                    comment:
+                        "The veggie poke bowl was okay, but nothing special.",
+                },
+
+                // Crepe Escape
+                {
+                    userId: 3,
+                    restaurantId: 10,
+                    rating: 5,
+                    comment: "Nutella crepe was heavenly. Perfect dessert!",
+                },
+                {
+                    userId: 4,
+                    restaurantId: 10,
+                    rating: 4,
+                    comment: "Ham and cheese crepe was tasty, but a bit salty.",
+                },
+                {
+                    userId: 5,
+                    restaurantId: 10,
+                    rating: 2,
+                    comment: "The strawberry crepe was soggy. Disappointed.",
+                },
             ],
             { validate: true }
         );

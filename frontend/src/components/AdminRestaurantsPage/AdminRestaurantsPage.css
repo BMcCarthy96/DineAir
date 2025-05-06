@@ -1,0 +1,74 @@
+.admin-restaurants-page {
+    padding: 20px;
+    background-color: #f9f9f9;
+    min-height: 100vh;
+}
+
+.admin-restaurants-page h1 {
+    text-align: center;
+    font-size: 36px;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.create-button {
+    display: block;
+    margin: 20px auto;
+    background-color: #ff6f61;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 15px 30px;
+    font-size: 18px;
+    cursor: pointer;
+}
+
+.create-button:hover {
+    background-color: #f84d3e;
+}
+
+.restaurant-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.restaurant-card {
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 15px;
+}
+
+.restaurant-card h2 {
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.restaurant-card p {
+    font-size: 16px;
+    color: #666;
+    margin-bottom: 10px;
+}
+
+.edit-button,
+.delete-button {
+    background-color: #ff6f61;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 10px 15px;
+    font-size: 14px;
+    cursor: pointer;
+    margin-right: 10px;
+}
+
+.edit-button:hover {
+    background-color: #f84d3e;
+}
+
+.delete-button:hover {
+    background-color: #d9534f;
+}

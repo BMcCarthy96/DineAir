@@ -10,6 +10,8 @@ import RestaurantPage from "./components/RestaurantPage/RestaurantPage";
 import RestaurantDetails from "./components/RestaurantDetails/RestaurantDetails";
 import CartPage from "./components/CartPage/CartPage";
 import OrderHistoryPage from "./components/OrderHistoryPage/OrderHistoryPage";
+import AdminRestaurantsPage from "./components/AdminRestaurantsPage/AdminRestaurantsPage";
+import OwnerRestaurantsPage from "./components/OwnerRestaurantsPage/OwnerRestaurantsPage";
 
 function Layout() {
   const dispatch = useDispatch();
@@ -17,7 +19,6 @@ function Layout() {
 
   useEffect(() => {
     dispatch(sessionActions.restoreUser()).then(() => {
-      // dispatch(fetchSpots())
       setIsLoaded(true)
     });
   }, [dispatch]);
@@ -61,6 +62,14 @@ const router = createBrowserRouter([
       {
         path: "/restaurants/:restaurantId/menu-items",
         element: <RestaurantDetails />,
+      },
+      {
+        path: "/restaurants/admin",
+        element: <AdminRestaurantsPage />,
+      },
+      {
+        path: "/restaurants/owner",
+        element: <OwnerRestaurantsPage />,
       },
       {
         path: '*',

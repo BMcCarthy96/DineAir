@@ -30,9 +30,15 @@ function Navigation({ isLoaded }) {
               <NavLink to="/orders" className="nav-button">
                 Orders
               </NavLink>
-              <NavLink to="/restaurants" className="nav-button">
-                Restaurants
-              </NavLink>
+              {/* Conditionally render the Restaurants button */}
+              {(sessionUser.userType === "admin" || sessionUser.userType === "restaurantOwner") && (
+                <NavLink
+                  to={sessionUser.userType === "admin" ? "/restaurants/admin" : "/restaurants/owner"}
+                  className="nav-button"
+                >
+                  Restaurants
+                </NavLink>
+              )}
             </div>
             <div className="nav-right">
               {isLoaded && <ProfileButton user={sessionUser} />}

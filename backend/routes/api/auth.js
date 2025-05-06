@@ -143,6 +143,7 @@ router.post("/login", validateLogin, async (req, res, next) => {
         lastName: user.lastName,
         email: user.email,
         username: user.username,
+        userType: user.userType,
     };
 
     await setTokenCookie(res, safeUser);
@@ -167,6 +168,7 @@ router.get("/session", restoreUser, (req, res) => {
             lastName: user.lastName,
             email: user.email,
             username: user.username,
+            userType: user.userType,
         };
         return res.json({ user: safeUser });
     }

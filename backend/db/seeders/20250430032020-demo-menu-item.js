@@ -141,6 +141,140 @@ module.exports = {
                     available: true,
                     imageUrl: "https://via.placeholder.com/150",
                 },
+
+                // Burger Terminal
+                {
+                    restaurantId: 6,
+                    name: "Classic Cheeseburger",
+                    description: "A juicy beef patty with melted cheese.",
+                    price: 9.99,
+                    available: true,
+                    imageUrl: "https://via.placeholder.com/150",
+                },
+                {
+                    restaurantId: 6,
+                    name: "Bacon Burger",
+                    description: "Topped with crispy bacon and BBQ sauce.",
+                    price: 11.99,
+                    available: true,
+                    imageUrl: "https://via.placeholder.com/150",
+                },
+                {
+                    restaurantId: 6,
+                    name: "Fries",
+                    description: "Crispy golden fries with ketchup.",
+                    price: 3.99,
+                    available: true,
+                    imageUrl: "https://via.placeholder.com/150",
+                },
+
+                // Pho Real
+                {
+                    restaurantId: 7,
+                    name: "Beef Pho",
+                    description:
+                        "Traditional Vietnamese noodle soup with beef.",
+                    price: 12.99,
+                    available: true,
+                    imageUrl: "https://via.placeholder.com/150",
+                },
+                {
+                    restaurantId: 7,
+                    name: "Chicken Pho",
+                    description: "Classic pho with tender chicken slices.",
+                    price: 11.99,
+                    available: true,
+                    imageUrl: "https://via.placeholder.com/150",
+                },
+                {
+                    restaurantId: 7,
+                    name: "Spring Rolls",
+                    description: "Fresh rolls with shrimp and peanut sauce.",
+                    price: 6.99,
+                    available: true,
+                    imageUrl: "https://via.placeholder.com/150",
+                },
+
+                // The Flying Curry
+                {
+                    restaurantId: 8,
+                    name: "Butter Chicken",
+                    description: "Creamy curry with tender chicken pieces.",
+                    price: 13.99,
+                    available: true,
+                    imageUrl: "https://via.placeholder.com/150",
+                },
+                {
+                    restaurantId: 8,
+                    name: "Vegetable Curry",
+                    description:
+                        "A mix of fresh vegetables in a spicy curry sauce.",
+                    price: 11.99,
+                    available: true,
+                    imageUrl: "https://via.placeholder.com/150",
+                },
+                {
+                    restaurantId: 8,
+                    name: "Garlic Naan",
+                    description: "Soft naan bread with a hint of garlic.",
+                    price: 3.99,
+                    available: true,
+                    imageUrl: "https://via.placeholder.com/150",
+                },
+
+                // Poke Paradise
+                {
+                    restaurantId: 9,
+                    name: "Ahi Tuna Bowl",
+                    description:
+                        "Fresh ahi tuna with rice and tropical toppings.",
+                    price: 14.99,
+                    available: true,
+                    imageUrl: "https://via.placeholder.com/150",
+                },
+                {
+                    restaurantId: 9,
+                    name: "Salmon Poke Bowl",
+                    description: "Salmon with avocado, rice, and sesame seeds.",
+                    price: 13.99,
+                    available: true,
+                    imageUrl: "https://via.placeholder.com/150",
+                },
+                {
+                    restaurantId: 9,
+                    name: "Veggie Poke Bowl",
+                    description:
+                        "A vegetarian option with tofu and fresh veggies.",
+                    price: 12.99,
+                    available: true,
+                    imageUrl: "https://via.placeholder.com/150",
+                },
+
+                // Crepe Escape
+                {
+                    restaurantId: 10,
+                    name: "Nutella Crepe",
+                    description: "Sweet crepe filled with Nutella and bananas.",
+                    price: 8.99,
+                    available: true,
+                    imageUrl: "https://via.placeholder.com/150",
+                },
+                {
+                    restaurantId: 10,
+                    name: "Ham and Cheese Crepe",
+                    description: "Savory crepe with ham and melted cheese.",
+                    price: 9.99,
+                    available: true,
+                    imageUrl: "https://via.placeholder.com/150",
+                },
+                {
+                    restaurantId: 10,
+                    name: "Strawberry Crepe",
+                    description: "Fresh strawberries with whipped cream.",
+                    price: 8.99,
+                    available: true,
+                    imageUrl: "https://via.placeholder.com/150",
+                },
             ],
             { validate: true }
         );
