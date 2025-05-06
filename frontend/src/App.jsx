@@ -6,8 +6,10 @@ import * as sessionActions from './store/session';
 import LoginFormPage from './components/LoginFormPage';
 import SignupFormPage from './components/SignupFormPage';
 import LandingPage from './components/LandingPage';
-// import RestaurantPage from "./components/RestaurantPage/RestaurantPage";
-
+import RestaurantPage from "./components/RestaurantPage/RestaurantPage";
+import RestaurantDetails from "./components/RestaurantDetails/RestaurantDetails";
+import CartPage from "./components/CartPage/CartPage";
+import OrderHistoryPage from "./components/OrderHistoryPage/OrderHistoryPage";
 
 function Layout() {
   const dispatch = useDispatch();
@@ -44,30 +46,22 @@ const router = createBrowserRouter([
         path: '/signup',
         element: <SignupFormPage />
       },
-      // {
-      //   path: "/restaurants/:restaurantId",
-      //   element: <RestaurantPage />,
-      // },
-      // {
-      //   path: "/api/spots",
-      //   element: <CreateSpot/>
-      // },
-      // {
-      //   path: "api/spots/current",
-      //   element: <ManageSpots />
-      // },
-      // {
-      //   path: '/spots/:spotId',
-      //   element: <SpotDetails />
-      // },
-      // {
-      //   path: "/api/spots/:spotId/edit",
-      //   element: <UpdateSpot/>
-      // },
-      // {
-      //   path: "/api/reviews/current",
-      //   element: <ManageReviews />
-      // },
+      {
+        path: "/cart",
+        element: <CartPage />,
+      },
+      {
+        path: "/orders",
+        element: <OrderHistoryPage />,
+      },
+      {
+        path: "/restaurants/:restaurantId",
+        element: <RestaurantPage />,
+      },
+      {
+        path: "/restaurants/:restaurantId/menu-items",
+        element: <RestaurantDetails />,
+      },
       {
         path: '*',
         element: <h1>Page Not Found</h1>

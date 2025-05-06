@@ -1,46 +1,51 @@
-// import { fetchSpots } from "../../store/spots";
-// import { useDispatch, useSelector } from "react-redux";
-// // import { useEffect } from "react";
-// import { Link } from "react-router-dom";
-// import { MdStar } from "react-icons/md";
-// import { Tooltip } from "react-tooltip";
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import "./LandingPage.css";
 
 function LandingPage() {
-    // const dispatch = useDispatch();
-    // const spotsList = useSelector((state) => state.spots.allSpots);
+    const [restaurants, setRestaurants] = useState([]);
 
-    // useEffect(() => {
-    //     dispatch(fetchSpots());
-    // }, [dispatch]);
+    useEffect(() => {
+        async function fetchRestaurants() {
+            const response = await fetch("/api/restaurants");
+            const data = await response.json();
+            setRestaurants(data);
+        }
 
-    // return (
-    //     <section className="container">
-    //         {Object.values(spotsList).map((spot) => (
-    //             <Link to={`/spots/${spot.id}`} key={spot.id} className="spot-link">
-    //                 <div className="spot-card" data-tooltip-id={`tooltip-${spot.id}`}>
-    //                     <div className="spot-image">
-    //                         <img src={spot.previewImage} alt={spot.name} />
-    //                     </div>
-    //                     <div className="spot-info">
-    //                         <p className="spot-location">
-    //                             {spot.city}, {spot.state}
-    //                             <span className="spot-rating">
-    //                                 <MdStar /> {Number(spot.avgRating) > 0 ? Number(spot.avgRating).toFixed(1) : "New"}
-    //                             </span>
-    //                         </p>
-    //                         <p className="spot-price">
-    //                             ${!isNaN(parseFloat(spot.price)) ? parseFloat(spot.price).toFixed(2) : "N/A"} <span>night</span>
-    //                         </p>
-    //                     </div>
-    //                 </div>
-    //                 <Tooltip id={`tooltip-${spot.id}`} place="top" effect="solid" className="tooltip">
-    //                 {spot.name}
-    //                 </Tooltip>
-    //             </Link>
-    //         ))}
-    //     </section>
-    // );
+        fetchRestaurants();
+    }, []);
+
+    return (
+        <div className="landing-page">
+            <h1>Explore Restaurants</h1>
+            <div className="restaurant-list">
+                {restaurants.map((restaurant) => (
+                    <Link
+                        to={`/restaurants/${restaurant.id}`}
+                        key={restaurant.id}
+                        className="restaurant-card"
+                    >
+                        <img
+                            src={restaurant.imageUrl || "https://via.placeholder.com/150"}
+                            alt={restaurant.name}
+                            className="restaurant-image"
+                        />
+                        <div className="restaurant-info">
+                            <h2>{restaurant.name}</h2>
+                            <p>{restaurant.description}</p>
+                            <p>
+                                <strong>Cuisine:</strong> {restaurant.cuisineType}
+                            </p>
+                            <p>
+                                <strong>Terminal:</strong> {restaurant.terminal} |{" "}
+                                <strong>Gate:</strong> {restaurant.gate}
+                            </p>
+                        </div>
+                    </Link>
+                ))}
+            </div>
+        </div>
+    );
 }
 
 export default LandingPage;

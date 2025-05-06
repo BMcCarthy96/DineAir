@@ -1,54 +1,42 @@
-// import React, { useState, useEffect } from "react";
-// import { useDispatch } from "react-redux";
-// import { fetchMenuItemsByRestaurant } from "../../store/menuItems";
-// import "./RestaurantDetails.css";
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import "./RestaurantDetails.css";
 
-// function RestaurantDetails({ restaurantId }) {
-//     const dispatch = useDispatch();
-//     const [page, setPage] = useState(1);
-//     const [menuItems, setMenuItems] = useState([]);
-//     const [totalPages, setTotalPages] = useState(0);
+function RestaurantDetails() {
+    const { restaurantId } = useParams();
+    const [menuItems, setMenuItems] = useState([]);
 
-//     useEffect(() => {
-//         const fetchMenuItems = async () => {
-//             try {
-//                 const data = await dispatch(fetchMenuItemsByRestaurant(restaurantId, page));
-//                 setMenuItems(data.items);
-//                 setTotalPages(data.totalPages);
-//             } catch (err) {
-//                 console.error(err);
-//             }
-//         };
+    useEffect(() => {
+        async function fetchMenuItems() {
+            const response = await fetch(`/api/restaurants/${restaurantId}/menu-items`);
+            const data = await response.json();
+            setMenuItems(data.items);
+        }
 
-//         fetchMenuItems();
-//     }, [dispatch, restaurantId, page]);
+        fetchMenuItems();
+    }, [restaurantId]);
 
-//     return (
-//         <div>
-//             <h1>Menu</h1>
-//             {menuItems.length > 0 ? (
-//                 <div>
-//                     {menuItems.map((item) => (
-//                         <div key={item.id}>
-//                             <h3>{item.name}</h3>
-//                             <p>{item.description}</p>
-//                             <p>Price: ${item.price}</p>
-//                         </div>
-//                     ))}
-//                     <div>
-//                         <button disabled={page === 1} onClick={() => setPage(page - 1)}>
-//                             Previous
-//                         </button>
-//                         <button disabled={page === totalPages} onClick={() => setPage(page + 1)}>
-//                             Next
-//                         </button>
-//                     </div>
-//                 </div>
-//             ) : (
-//                 <p>No menu items available.</p>
-//             )}
-//         </div>
-//     );
-// }
+    return (
+        <div className="restaurant-details">
+            <h1>Menu</h1>
+            <div className="menu-items">
+                {menuItems.map((item) => (
+                    <div key={item.id} className="menu-item-card">
+                        <img
+                            src={item.imageUrl || "https://via.placeholder.com/150"}
+                            alt={item.name}
+                            className="menu-item-image"
+                        />
+                        <div className="menu-item-info">
+                            <h3>{item.name}</h3>
+                            <p>{item.description}</p>
+                            <p className="price">${item.price.toFixed(2)}</p>
+                        </div>
+                    </div>
+                ))}
+            </div>
+        </div>
+    );
+}
 
-// export default RestaurantDetails;
+export default RestaurantDetails;

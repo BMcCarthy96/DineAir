@@ -1,3 +1,3 @@
-// import RestaurantReviews from "./RestaurantReviews";
+import RestaurantReviews from "./RestaurantReviews";
 
-// export default RestaurantReviews;
+export default RestaurantReviews;

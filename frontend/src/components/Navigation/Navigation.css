@@ -1,101 +1,46 @@
-html, body {
-    margin: 0;
-    padding: 0;
-    width: 100%;
-  }
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #ff6f61;
+  padding: 10px 20px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
 
-  .navbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background-color: #FF6F61; /* Coral */
-    padding: 15px 0;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    position: sticky;
-    top: 0;
-    width: 100%;
-    z-index: 1000;
-  }
+.logo {
+  font-size: 24px;
+  font-weight: bold;
+  color: white;
+  text-decoration: none;
+}
 
-  .nav-left {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
+.nav-center {
+  display: flex;
+  gap: 20px;
+}
 
-  .home-logo {
-    text-decoration: none;
-    padding-left: 10px;
-  }
+.nav-button {
+  background-color: white;
+  color: #ff6f61;
+  border: none;
+  border-radius: 20px;
+  padding: 10px 20px;
+  font-size: 16px;
+  font-weight: bold;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.3s, color 0.3s;
+}
 
-  .title {
-    font-size: 22px;
-    font-weight: bold;
-    color: black;
-    text-decoration: none;
-  }
+.nav-button:hover {
+  background-color: #ff6f61;
+  color: white;
+}
 
-  .nav-right {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-
-  /* Style for the Log In button */
-.nav-right .login-link {
-    border: 2px solid black;
-    border-radius: 20px;
-    background-color: white;
-    color: black;
-    padding: 8px 16px;
-    text-decoration: none;
-    font-size: 14px;
-    font-weight: bold;
-    transition: background-color 0.3s, color 0.3s;
-  }
-
-  .nav-right .login-link:hover {
-    background-color: black;
-    color: white;
-  }
-
-  /* Style for the Sign Up button */
-  .nav-right .signup-link {
-    border: 2px solid black;
-    border-radius: 20px;
-    background-color: black;
-    color: white;
-    padding: 8px 16px;
-    text-decoration: none;
-    font-size: 14px;
-    font-weight: bold;
-    transition: background-color 0.3s, color 0.3s;
-  }
-
-  .nav-right .signup-link:hover {
-    background-color: white;
-    color: black;
-  }
-
-  .new-spot-link .create-link {
-    background: none;
-    color: white;
-    text-decoration: none;
-    margin-right: 10px;
-    font-family: "Montserrat Alternates", sans-serif;
-    font-weight: 400;
-    font-size: large;
-  }
-
-  @media (max-width: 768px) {
-    .navbar {
-      padding: 10px 15px;
-    }
-    .title {
-      font-size: 18px;
-    }
-    .home-logo svg {
-      width: 30px;
-      height: 30px;
-    }
-  }
+.nav-right {
+  display: flex;
+  align-items: center;
+}

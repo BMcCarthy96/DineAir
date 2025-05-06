@@ -1,3 +1,3 @@
-// import RestaurantPage from "./RestaurantPage";
+import RestaurantPage from "./RestaurantPage";
 
-// export default RestaurantPage;
+export default RestaurantPage;

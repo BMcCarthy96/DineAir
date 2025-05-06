@@ -1,21 +1,18 @@
-/* .restaurant-details {
-    background-color: #fff;
-    border-radius: 12px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+.restaurant-details {
     padding: 20px;
-    width: 100%;
+    background-color: #f9f9f9;
 }
 
 .restaurant-details h1 {
-    font-size: 28px;
-    font-weight: bold;
+    text-align: center;
+    font-size: 36px;
     margin-bottom: 20px;
     color: #333;
 }
 
 .menu-items {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 20px;
 }
 
@@ -33,7 +30,7 @@
 
 .menu-item-image {
     width: 100%;
-    height: 150px;
+    height: 200px;
     object-fit: cover;
 }
 
@@ -44,46 +41,18 @@
 .menu-item-info h3 {
     font-size: 20px;
     font-weight: bold;
-    color: #333;
     margin-bottom: 10px;
+    color: #333;
 }
 
 .menu-item-info p {
     font-size: 16px;
     color: #666;
-    margin-bottom: 10px;
+    margin-bottom: 5px;
 }
 
 .menu-item-info .price {
     font-size: 18px;
     font-weight: bold;
     color: #ff6f61;
-} */
-
-/* Pagination buttons */
-/* .pagination {
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-    margin-top: 20px;
 }
-
-.pagination button {
-    background-color: #ff6f61;
-    color: #fff;
-    border: none;
-    border-radius: 6px;
-    padding: 10px 20px;
-    font-size: 16px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-.pagination button:hover {
-    background-color: #e65a50;
-}
-
-.pagination button:disabled {
-    background-color: #ccc;
-    cursor: not-allowed;
-} */
