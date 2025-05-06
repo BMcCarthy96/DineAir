@@ -10,6 +10,7 @@ function LoginFormPage() {
   const [credential, setCredential] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState({});
+  const [selectedRole, setSelectedRole] = useState("customer"); // Default role
 
   const resetForm = () => {
     setCredential("");
@@ -36,8 +37,20 @@ function LoginFormPage() {
   };
 
   const handleDemoLogin = () => {
-    dispatch(sessionActions.login({ credential: "JustinTyme@dineair.com", password: "password" }))
-      .then(() => navigate("/")); // Automatically log in as the first customer
+    let demoCredentials;
+
+    // Set credentials based on the selected role
+    if (selectedRole === "Customer") {
+      demoCredentials = { credential: "JustinTyme@dineair.com", password: "password" };
+    } else if (selectedRole === "Admin") {
+      demoCredentials = { credential: "admin@dineair.com", password: "adminpassword" };
+    } else if (selectedRole === "Restaurant Owner") {
+      demoCredentials = { credential: "owner1@dineair.com", password: "ownerpassword" };
+    } else if (selectedRole === "Runner") {
+      demoCredentials = { credential: "carrie.on@dineair.com", password: "password4" };
+    }
+
+    dispatch(sessionActions.login(demoCredentials)).then(() => navigate("/"));
   };
 
   // Reset the form on unmount
@@ -57,6 +70,7 @@ function LoginFormPage() {
             value={credential}
             placeholder="Email or Username"
             onChange={(e) => setCredential(e.target.value)}
+            title="Enter your email or username"
             required
           />
           <input
@@ -64,15 +78,47 @@ function LoginFormPage() {
             value={password}
             placeholder="Password"
             onChange={(e) => setPassword(e.target.value)}
+            title="Password must be at least 6 characters"
             required
           />
           <button type="submit" className="login-button">
             Log In
           </button>
         </form>
-        <button className="demo-user-button" onClick={handleDemoLogin}>
-          Log In as Demo User
-        </button>
+
+        <div className="role-toggle-container">
+          <p>Select a role to log in as:</p>
+          <div className="role-toggle-buttons">
+            <button
+              className={`role-button ${selectedRole === "Customer" ? "active" : ""}`}
+              onClick={() => setSelectedRole("Customer")}
+            >
+              Customer
+            </button>
+            <button
+              className={`role-button ${selectedRole === "Admin" ? "active" : ""}`}
+              onClick={() => setSelectedRole("Admin")}
+            >
+              Admin
+            </button>
+            <button
+              className={`role-button ${selectedRole === "Restaurant Owner" ? "active" : ""}`}
+              onClick={() => setSelectedRole("Restaurant Owner")}
+            >
+              Restaurant Owner
+            </button>
+            <button
+              className={`role-button ${selectedRole === "Runner" ? "active" : ""}`}
+              onClick={() => setSelectedRole("Runner")}
+            >
+              Runner
+            </button>
+          </div>
+          <button className="demo-user-button" onClick={handleDemoLogin}>
+            Log in as {selectedRole === "Customer" ? "Customer" : selectedRole}
+          </button>
+        </div>
+
         <p className="signup-link">
           Don&apos;t have an account? <a href="/signup">Sign Up</a>
         </p>

@@ -51,6 +51,7 @@ function SignupFormPage() {
             placeholder="First Name"
             value={formData.firstName}
             onChange={handleChange}
+            title="Enter your first name"
             required
           />
           <input
@@ -59,6 +60,7 @@ function SignupFormPage() {
             placeholder="Last Name"
             value={formData.lastName}
             onChange={handleChange}
+            title="Enter your last name"
             required
           />
           <input
@@ -67,6 +69,7 @@ function SignupFormPage() {
             placeholder="Email"
             value={formData.email}
             onChange={handleChange}
+            title="Enter a valid email address"
             required
           />
           <input
@@ -75,6 +78,7 @@ function SignupFormPage() {
             placeholder="Username"
             value={formData.username}
             onChange={handleChange}
+            title="Choose a unique username"
             required
           />
           <input
@@ -83,6 +87,7 @@ function SignupFormPage() {
             placeholder="Password"
             value={formData.password}
             onChange={handleChange}
+            title="Password must be at least 6 characters"
             required
           />
           <input
@@ -91,6 +96,7 @@ function SignupFormPage() {
             placeholder="Confirm Password"
             value={formData.confirmPassword}
             onChange={handleChange}
+            title="Re-enter your password"
             required
           />
           <button type="submit" className="signup-button">

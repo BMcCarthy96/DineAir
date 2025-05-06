@@ -59,6 +59,48 @@
   background-color: #f84d3e;
 }
 
+.role-toggle-container {
+  margin-top: 20px;
+  text-align: center;
+}
+
+.role-toggle-container p {
+  font-size: 16px;
+  color: #666;
+  margin-bottom: 10px;
+}
+
+.role-toggle-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.role-button {
+  padding: 10px 20px;
+  border: 2px solid #ccc;
+  border-radius: 8px;
+  background-color: white;
+  color: #333;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.role-button.active {
+  background-color: #ff6f61;
+  color: white;
+  border-color: #ff6f61;
+}
+
+.role-button:hover {
+  background-color: #f84d3e;
+  color: white;
+  border-color: #f84d3e;
+}
+
 .demo-user-button {
   width: 100%;
   padding: 12px;
@@ -69,8 +111,7 @@
   border: 1px solid #ccc;
   border-radius: 8px;
   cursor: pointer;
-  margin-top: 10px;
-  transition: background-color 0.3s;
+  transition: background-color 0.3s ease;
 }
 
 .demo-user-button:hover {
@@ -91,4 +132,10 @@
 
 .signup-link a:hover {
   text-decoration: underline;
+}
+
+.error-message {
+  color: red;
+  font-size: 14px;
+  margin-bottom: 10px;
 }
