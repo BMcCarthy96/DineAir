@@ -10,7 +10,7 @@ function LoginFormPage() {
   const [credential, setCredential] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState({});
-  const [selectedRole, setSelectedRole] = useState("customer"); // Default role
+  const [selectedRole, setSelectedRole] = useState("Customer"); // Default role
 
   const resetForm = () => {
     setCredential("");

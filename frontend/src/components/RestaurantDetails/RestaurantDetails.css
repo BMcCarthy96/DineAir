@@ -56,3 +56,19 @@
     font-weight: bold;
     color: #ff6f61;
 }
+
+.add-to-cart-button {
+    background-color: #ff6f61;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 15px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.add-to-cart-button:hover {
+    background-color: #f84d3e;
+}
