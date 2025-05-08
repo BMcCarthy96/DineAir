@@ -131,7 +131,8 @@ module.exports = {
                     description: "Smooth espresso with steamed milk.",
                     price: 4.49,
                     available: true,
-                    imageUrl: "https://via.placeholder.com/150",
+                    imageUrl:
+                        "https://media.istockphoto.com/id/505168330/photo/cup-of-cafe-latte-with-coffee-beans-and-cinnamon-sticks.jpg?s=612x612&w=0&k=20&c=h7v8kAfWOpRapv6hrDwmmB54DqrGQWxlhP_mTeqTQPA=",
                 },
                 {
                     restaurantId: 5,
@@ -139,7 +140,8 @@ module.exports = {
                     description: "Freshly baked muffin with blueberries.",
                     price: 3.99,
                     available: true,
-                    imageUrl: "https://via.placeholder.com/150",
+                    imageUrl:
+                        "https://media.istockphoto.com/id/478095157/photo/blueberry-muffins.jpg?s=612x612&w=0&k=20&c=bdYN4O2Furch6BAWOLhWmlnaRU5uGaxrpgMgWCeqqdw=",
                 },
 
                 // Burger Terminal
