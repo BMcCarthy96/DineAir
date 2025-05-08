@@ -123,7 +123,7 @@ module.exports = {
                     description: "Rich espresso with steamed milk and foam.",
                     price: 4.99,
                     available: true,
-                    imageUrl: "https://via.placeholder.com/150",
+                    imageUrl: "/images/cappuccino.jpg",
                 },
                 {
                     restaurantId: 5,
