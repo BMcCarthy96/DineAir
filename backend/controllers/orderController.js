@@ -1,4 +1,4 @@
-const { Order } = require("../db/models");
+const { Order, Cart, CartItem, MenuItem, Restaurant } = require("../db/models");
 
 exports.getUserOrders = async (req, res) => {
     const orders = await Order.findAll({ where: { userId: req.user.id } });
@@ -6,8 +6,68 @@ exports.getUserOrders = async (req, res) => {
 };
 
 exports.createOrder = async (req, res) => {
-    const newOrder = await Order.create({ ...req.body, userId: req.user.id });
-    res.status(201).json(newOrder);
+    try {
+        const { gate } = req.body;
+
+        console.log("Gate:", gate); // Debugging: Log the gate value
+        console.log("User ID:", req.user.id); // Debugging: Log the user ID
+
+        // Fetch the user's cart
+        const cart = await Cart.findOne({ where: { userId: req.user.id } });
+
+        if (!cart) {
+            return res.status(400).json({ error: "Cart not found" });
+        }
+
+        console.log("Cart ID:", cart.id); // Debugging: Log the cart ID
+
+        // Fetch the user's cart items
+        const cartItems = await CartItem.findAll({
+            where: { cartId: cart.id },
+            include: {
+                model: MenuItem,
+                include: {
+                    model: Restaurant,
+                    attributes: ["airportId"],
+                },
+            },
+        });
+
+        console.log("Cart Items:", cartItems); // Debugging: Log the cart items
+
+        if (cartItems.length === 0) {
+            return res.status(400).json({ error: "Cart is empty" });
+        }
+
+        // Calculate the total price
+        const totalPrice = cartItems.reduce(
+            (sum, item) => sum + item.quantity * item.MenuItem.price,
+            0
+        );
+
+        console.log("Total Price:", totalPrice); // Debugging: Log the total price
+
+        // Create the order
+        const newOrder = await Order.create({
+            userId: req.user.id,
+            runnerId: null, // Runner will be assigned later
+            airportId: cartItems[0].MenuItem.Restaurant.airportId,
+            restaurantId: cartItems[0].MenuItem.restaurantId,
+            gate,
+            totalPrice,
+            status: "pending",
+        });
+
+        console.log("New Order:", newOrder); // Debugging: Log the created order
+
+        // Clear the user's cart
+        await CartItem.destroy({ where: { cartId: cart.id } });
+
+        res.status(201).json(newOrder);
+    } catch (err) {
+        console.error("Error creating order:", err); // Debugging: Log the error
+        res.status(500).json({ error: "Failed to create order" });
+    }
 };
 
 exports.getOrderById = async (req, res) => {

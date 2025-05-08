@@ -9,6 +9,7 @@ import LandingPage from './components/LandingPage';
 import RestaurantPage from "./components/RestaurantPage/RestaurantPage";
 import RestaurantDetails from "./components/RestaurantDetails/RestaurantDetails";
 import CartPage from "./components/CartPage/CartPage";
+import CheckoutPage from "./components/CheckoutPage/CheckoutPage";
 import OrderHistoryPage from "./components/OrderHistoryPage/OrderHistoryPage";
 import AdminRestaurantsPage from "./components/AdminRestaurantsPage/AdminRestaurantsPage";
 import OwnerRestaurantsPage from "./components/OwnerRestaurantsPage/OwnerRestaurantsPage";
@@ -52,6 +53,10 @@ const router = createBrowserRouter([
       {
         path: "/cart",
         element: <CartPage />,
+      },
+      {
+        path: "/checkout",
+        element: <CheckoutPage />,
       },
       {
         path: "/orders",

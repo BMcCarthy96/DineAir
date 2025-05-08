@@ -41,7 +41,7 @@ function CartPage() {
     };
 
     const handleCheckout = () => {
-        navigate("/orders");
+        navigate("/checkout");
     };
 
     return (
