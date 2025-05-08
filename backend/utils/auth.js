@@ -88,6 +88,20 @@ const requireRestaurantOwner = (req, res, next) => {
     });
 };
 
+// Middleware to check if the user is a restaurant owner or admin
+const requireAdminOrRestaurantOwner = (req, res, next) => {
+    if (
+        req.user &&
+        (req.user.userType === "admin" ||
+            req.user.userType === "restaurantOwner")
+    ) {
+        return next();
+    }
+    res.status(403).json({
+        error: "Forbidden: Admin or Restaurant Owner access required",
+    });
+};
+
 // Middleware to check if the user is a runner
 const requireRunner = (req, res, next) => {
     if (req.user && req.user.userType === "runner") {
@@ -110,6 +124,7 @@ module.exports = {
     requireAuth,
     requireAdmin,
     requireRestaurantOwner,
+    requireAdminOrRestaurantOwner,
     requireRunner,
     requireCustomer,
 };
