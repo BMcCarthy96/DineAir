@@ -44,48 +44,50 @@ function ProfileButton({ user }) {
   const ulClassName = "profile-dropdown" + (showSideBar ? "" : " hidden");
 
   return (
-    <>
-      <button onClick={toggleMenu} className='profile-button'>
-        <div className='menu'>
-          <HiBars3 size={30} />
-        </div>
-      </button>
+      <>
+          <button onClick={toggleMenu} className="profile-button">
+              <HiBars3 size={30} />
+          </button>
 
-      <ul className={ulClassName} ref={ulRef}>
-        {user ? (
-          <>
-          <div className="options">
-            <div>Hello, {user.firstName}</div>
-            <div>{user.email}</div>
-          </div>
-          <hr />
-          <div className="manage-div">
-            <div>
-              <Link to="/api/spots/current" className="manage-link">
-                Manage Spots
-              </Link>
-            </div>
-            <div>
-              <Link to="/api/reviews/current" className="manage-link">
-                Manage Reviews
-              </Link>
-            </div>
-          </div>
-          <hr />
-          <div className="logout-button-div">
-            <button className="logout-button" onClick={logout}>
-              Log Out
-            </button>
-          </div>
-        </>
-        ) : (
-            <div className="sidebar-content">
-            <Link to="/login" className="sidebar-link">Log In</Link>
-            <Link to="/signup" className="sidebar-link">Sign Up</Link>
-          </div>
-        )}
-      </ul>
-    </>
+          <ul className={ulClassName} ref={ulRef}>
+              {user ? (
+                  <>
+                      <div className="options">
+                          <div>Hello, {user.firstName}</div>
+                          <div>{user.email}</div>
+                      </div>
+                      <hr />
+                      <div className="manage-div">
+                          <div>
+                              <Link to="/orders" className="manage-link">
+                                  My Orders
+                              </Link>
+                          </div>
+                          <div>
+                              <Link to="/favorites" className="manage-link">
+                                  Favorites
+                              </Link>
+                          </div>
+                      </div>
+                      <hr />
+                      <div className="logout-button-div">
+                          <button className="logout-button" onClick={logout}>
+                              Log Out
+                          </button>
+                      </div>
+                  </>
+              ) : (
+                  <div className="sidebar-content">
+                      <Link to="/login" className="sidebar-link">
+                          Log In
+                      </Link>
+                      <Link to="/signup" className="sidebar-link">
+                          Sign Up
+                      </Link>
+                  </div>
+              )}
+          </ul>
+      </>
   );
 }
 

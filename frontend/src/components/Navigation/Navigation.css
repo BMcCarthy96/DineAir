@@ -10,6 +10,12 @@
   z-index: 1000;
 }
 
+.nav-left {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
 .logo {
   font-size: 24px;
   font-weight: bold;
@@ -20,6 +26,32 @@
 .nav-center {
   display: flex;
   gap: 20px;
+}
+
+.cart-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: white;
+  color: #ff6f61;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  text-decoration: none;
+  transition: background-color 0.3s, color 0.3s, transform 0.2s;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.cart-icon:hover {
+  background-color: #ff6f61;
+  color: white;
+  transform: scale(1.1);
+}
+
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 15px;
 }
 
 .nav-button {
@@ -38,10 +70,4 @@
 .nav-button:hover {
   background-color: #ff6f61;
   color: white;
-}
-
-.nav-right {
-  display: flex;
-  align-items: center;
-  gap: 15px;
 }
