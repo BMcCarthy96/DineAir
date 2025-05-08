@@ -12,6 +12,8 @@ import CartPage from "./components/CartPage/CartPage";
 import OrderHistoryPage from "./components/OrderHistoryPage/OrderHistoryPage";
 import AdminRestaurantsPage from "./components/AdminRestaurantsPage/AdminRestaurantsPage";
 import OwnerRestaurantsPage from "./components/OwnerRestaurantsPage/OwnerRestaurantsPage";
+import CreateRestaurantPage from "./components/CreateRestaurantPage/CreateRestaurantPage";
+import EditRestaurantPage from "./components/EditRestaurantPage/EditRestaurantPage";
 
 function Layout() {
   const dispatch = useDispatch();
@@ -60,6 +62,9 @@ const router = createBrowserRouter([
         element: <RestaurantPage />,
       },
       {
+        path: "/restaurants/:restaurantId/edit",
+        element: <EditRestaurantPage /> },
+      {
         path: "/restaurants/:restaurantId/menu-items",
         element: <RestaurantDetails />,
       },
@@ -71,6 +76,9 @@ const router = createBrowserRouter([
         path: "/restaurants/owner",
         element: <OwnerRestaurantsPage />,
       },
+      {
+        path: "/restaurants/new",
+        element: <CreateRestaurantPage /> },
       {
         path: '*',
         element: <h1>Page Not Found</h1>

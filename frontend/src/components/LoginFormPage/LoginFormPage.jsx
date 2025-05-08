@@ -22,7 +22,8 @@ function LoginFormPage() {
     e.preventDefault();
     setErrors({});
     return dispatch(sessionActions.login({ credential, password }))
-      .then(() => {
+      .then((res) => {
+        localStorage.setItem("token", res.token);
         resetForm();
         navigate("/"); // Navigate to the home page after login
       })

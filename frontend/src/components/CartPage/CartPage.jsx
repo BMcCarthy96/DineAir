@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import Cookies from "js-cookie";
 import "./CartPage.css";
 
 function CartPage() {
@@ -17,8 +18,26 @@ function CartPage() {
     }, []);
 
     const handleRemoveItem = async (itemId) => {
-        await fetch(`/api/carts/items/${itemId}`, { method: "DELETE" });
-        setCartItems(cartItems.filter((item) => item.id !== itemId));
+        try {
+            const response = await fetch(`/api/carts/items/${itemId}`, {
+                method: "DELETE",
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem("token")}`,
+                    "XSRF-Token": Cookies.get("XSRF-TOKEN"),
+                },
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                console.error("Error removing item from cart:", errorData);
+                throw new Error("Failed to remove item from cart.");
+            }
+
+            setCartItems(cartItems.filter((item) => item.id !== itemId));
+        } catch (err) {
+            console.error(err);
+            alert("Failed to remove item from cart.");
+        }
     };
 
     const handleCheckout = () => {

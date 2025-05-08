@@ -18,7 +18,6 @@ exports.getRestaurantById = async (req, res) => {
 exports.createRestaurant = async (req, res) => {
     try {
         const {
-            ownerId,
             name,
             description,
             terminal,
@@ -28,12 +27,12 @@ exports.createRestaurant = async (req, res) => {
             airportId,
         } = req.body;
 
-        if (!ownerId || !name || !airportId) {
+        if (!name || !airportId) {
             return res.status(400).json({ error: "Missing required fields" });
         }
 
         const restaurant = await Restaurant.create({
-            ownerId,
+            ownerId: req.user.id,
             name,
             description,
             terminal,
@@ -45,11 +44,12 @@ exports.createRestaurant = async (req, res) => {
 
         res.status(201).json(restaurant);
     } catch (err) {
-        console.error(err);
-        res.status(500).json({ error: "Failed to create restaurant" });
+        console.error("Error creating restaurant:", err);
+        res.status(500).json({
+            error: err.message || "Failed to create restaurant",
+        });
     }
 };
-
 exports.updateRestaurant = async (req, res) => {
     try {
         const { id } = req.params;

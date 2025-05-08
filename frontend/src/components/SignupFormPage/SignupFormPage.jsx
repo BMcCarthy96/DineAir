@@ -14,6 +14,7 @@ function SignupFormPage() {
     username: "",
     password: "",
     confirmPassword: "",
+    userType: "customer",
   });
   const [errors, setErrors] = useState({});
 
@@ -27,6 +28,9 @@ function SignupFormPage() {
       setErrors({ confirmPassword: "Passwords do not match" });
       return;
     }
+
+    console.log("Form Data:", formData); // Log the form data
+
     try {
       await dispatch(sessionActions.signup(formData));
       navigate("/");
@@ -99,6 +103,18 @@ function SignupFormPage() {
             title="Re-enter your password"
             required
           />
+          <label htmlFor="userType">Select User Type:</label>
+            <select
+              name="userType"
+              value={formData.userType}
+              onChange={handleChange}
+              required
+            >
+              <option value="customer">Customer</option>
+              <option value="runner">Runner</option>
+              <option value="restaurantOwner">Restaurant Owner</option>
+              <option value="admin">Admin</option>
+          </select>
           <button type="submit" className="signup-button">
             Sign Up
           </button>

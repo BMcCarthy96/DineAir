@@ -1,62 +1,98 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import Cookies from "js-cookie";
 import "./RestaurantDetails.css";
 
 function RestaurantDetails() {
     const { restaurantId } = useParams();
+    const [restaurant, setRestaurant] = useState(null);
     const [menuItems, setMenuItems] = useState([]);
 
     useEffect(() => {
+        async function fetchRestaurantDetails() {
+            const response = await fetch(`/api/restaurants/${restaurantId}`);
+            const data = await response.json();
+            setRestaurant(data);
+        }
+
         async function fetchMenuItems() {
             const response = await fetch(`/api/restaurants/${restaurantId}/menu-items`);
             const data = await response.json();
             setMenuItems(data.items);
         }
 
+        fetchRestaurantDetails();
         fetchMenuItems();
     }, [restaurantId]);
 
     const handleAddToCart = async (menuItemId) => {
-        const response = await fetch("/api/carts/items", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ menuItemId, quantity: 1 }),
-        });
+        try {
+            const response = await fetch("/api/carts/items", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${localStorage.getItem("token")}`,
+                    "XSRF-Token": Cookies.get("XSRF-TOKEN"),
+                },
+                body: JSON.stringify({ menuItemId, quantity: 1 }),
+            });
 
-        if (response.ok) {
+            if (!response.ok) {
+                const errorData = await response.json();
+                console.error("Error adding item to cart:", errorData);
+                throw new Error("Failed to add item to cart.");
+            }
+
             const data = await response.json();
-            alert(`Added ${data.quantity} item(s) to your cart!`);
-        } else {
+            console.log("Cart updated:", data);
+            alert("Item added to cart successfully!");
+        } catch (err) {
+            console.error(err);
             alert("Failed to add item to cart.");
         }
     };
 
     return (
         <div className="restaurant-details">
-            <h1>Menu</h1>
+            {restaurant && (
+                <div className="restaurant-info">
+                    <h1>{restaurant.name}</h1>
+                    <p>{restaurant.description}</p>
+                    <p>
+                        <strong>Terminal:</strong> {restaurant.terminal} |{" "}
+                        <strong>Gate:</strong> {restaurant.gate}
+                    </p>
+                    <p>
+                        <strong>Cuisine:</strong> {restaurant.cuisineType}
+                    </p>
+                </div>
+            )}
+            <h2>Menu</h2>
             <div className="menu-items">
-                {menuItems.map((item) => (
-                    <div key={item.id} className="menu-item-card">
-                        <img
-                            src={item.imageUrl || "https://via.placeholder.com/150"}
-                            alt={item.name}
-                            className="menu-item-image"
-                        />
-                        <div className="menu-item-info">
-                            <h3>{item.name}</h3>
-                            <p>{item.description}</p>
-                            <p className="price">${item.price.toFixed(2)}</p>
-                            <button
-                                className="add-to-cart-button"
-                                onClick={() => handleAddToCart(item.id)}
-                            >
-                                Add to Cart
-                            </button>
+                {menuItems && menuItems.length > 0 ? (
+                    menuItems.map((item) => (
+                        <div key={item.id} className="menu-item-card">
+                            <img
+                                src={item.imageUrl || "https://via.placeholder.com/150"}
+                                alt={item.name}
+                                className="menu-item-image"
+                            />
+                            <div className="menu-item-info">
+                                <h3>{item.name}</h3>
+                                <p>{item.description}</p>
+                                <p className="price">${item.price.toFixed(2)}</p>
+                                <button
+                                    className="add-to-cart-button"
+                                    onClick={() => handleAddToCart(item.id)}
+                                >
+                                    Add to Cart
+                                </button>
+                            </div>
                         </div>
-                    </div>
-                ))}
+                    ))
+                ) : (
+                    <p>No menu items available for this restaurant.</p>
+                )}
             </div>
         </div>
     );

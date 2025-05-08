@@ -48,7 +48,7 @@ exports.createRestaurant = async (req, res, next) => {
         } = req.body;
 
         const restaurant = await Restaurant.create({
-            ownerId,
+            ownerId: req.user.id,
             airportId,
             name,
             description,
