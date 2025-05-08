@@ -24,6 +24,27 @@ exports.getMenuItemsByRestaurant = async (req, res, next) => {
     }
 };
 
+exports.getMenuItemById = async (req, res, next) => {
+    try {
+        const { restaurantId, menuItemId } = req.params;
+
+        const menuItem = await MenuItem.findOne({
+            where: {
+                id: menuItemId,
+                restaurantId: restaurantId, // Ensure the menu item belongs to the specified restaurant
+            },
+        });
+
+        if (!menuItem) {
+            return res.status(404).json({ error: "Menu item not found" });
+        }
+
+        res.json(menuItem);
+    } catch (err) {
+        next(err);
+    }
+};
+
 exports.createMenuItem = async (req, res, next) => {
     try {
         const { restaurantId } = req.params;

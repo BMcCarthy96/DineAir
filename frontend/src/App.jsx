@@ -8,6 +8,7 @@ import SignupFormPage from './components/SignupFormPage';
 import LandingPage from './components/LandingPage';
 import RestaurantPage from "./components/RestaurantPage/RestaurantPage";
 import RestaurantDetails from "./components/RestaurantDetails/RestaurantDetails";
+import MenuItemPage from "./components/MenuItemPage/MenuItemPage";
 import CartPage from "./components/CartPage/CartPage";
 import CheckoutPage from "./components/CheckoutPage/CheckoutPage";
 import OrderHistoryPage from "./components/OrderHistoryPage/OrderHistoryPage";
@@ -73,6 +74,9 @@ const router = createBrowserRouter([
         path: "/restaurants/:restaurantId/menu-items",
         element: <RestaurantDetails />,
       },
+      {
+        path: "/restaurants/:restaurantId/menu-items/:menuItemId",
+        element: <MenuItemPage /> },
       {
         path: "/restaurants/admin",
         element: <AdminRestaurantsPage />,
