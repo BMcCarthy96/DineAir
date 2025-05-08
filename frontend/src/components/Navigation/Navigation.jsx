@@ -1,6 +1,6 @@
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FaShoppingCart, FaSearch } from "react-icons/fa";
 import ProfileButton from "./ProfileButton";
 import { searchRestaurantsAndMenuItems } from "../../store/search";
@@ -17,17 +17,19 @@ function Navigation() {
 
   const isAuthPage = location.pathname === "/login" || location.pathname === "/signup";
 
-  const handleSearch = async (e) => {
-    e.preventDefault();
-    if (query.trim()) {
-      try {
-        await dispatch(searchRestaurantsAndMenuItems(query));
-        setShowDropdown(true); // Show dropdown when results are fetched
-      } catch (err) {
-        console.error("Search failed:", err);
+  // Debounce function to delay API calls
+  useEffect(() => {
+    const delayDebounceFn = setTimeout(() => {
+      if (query.trim()) {
+        dispatch(searchRestaurantsAndMenuItems(query));
+        setShowDropdown(true);
+      } else {
+        setShowDropdown(false);
       }
-    }
-  };
+    }, 300); // Delay of 300ms
+
+    return () => clearTimeout(delayDebounceFn); // Cleanup the timeout
+  }, [query, dispatch]);
 
   const handleResultClick = (type, id, restaurantId = null) => {
     setShowDropdown(false); // Hide dropdown when navigating
@@ -48,18 +50,13 @@ function Navigation() {
       </div>
       {!isAuthPage && (
         <div className="nav-center">
-          <form onSubmit={handleSearch} className="search-bar">
+          <form className="search-bar">
             <FaSearch className="search-icon" />
             <input
               type="text"
               placeholder="Search DineAir"
               value={query}
-              onChange={(e) => {
-                setQuery(e.target.value);
-                if (!e.target.value.trim()) {
-                  setShowDropdown(false); // Hide dropdown if query is empty
-                }
-              }}
+              onChange={(e) => setQuery(e.target.value)}
               onFocus={() => {
                 if (searchResults.restaurants.length || searchResults.menuItems.length) {
                   setShowDropdown(true); // Show dropdown when input is focused
