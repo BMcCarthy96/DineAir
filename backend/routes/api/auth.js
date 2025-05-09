@@ -37,6 +37,7 @@ const validateSignup = [
         .withMessage("Password must be 6 characters or more."),
     check("userType")
         .exists({ checkFalsy: true })
+        .isIn(["customer", "runner", "restaurantOwner"])
         .withMessage("User type is required."),
     handleValidationErrors,
 ];

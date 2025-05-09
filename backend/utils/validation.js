@@ -6,6 +6,8 @@ const handleValidationErrors = (req, _res, next) => {
     const validationErrors = validationResult(req);
 
     if (!validationErrors.isEmpty()) {
+        console.log("Validation Errors:", validationErrors.array());
+
         const errors = {};
         validationErrors
             .array()

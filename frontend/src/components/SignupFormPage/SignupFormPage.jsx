@@ -113,7 +113,6 @@ function SignupFormPage() {
               <option value="customer">Customer</option>
               <option value="runner">Runner</option>
               <option value="restaurantOwner">Restaurant Owner</option>
-              <option value="admin">Admin</option>
           </select>
           <button type="submit" className="signup-button">
             Sign Up

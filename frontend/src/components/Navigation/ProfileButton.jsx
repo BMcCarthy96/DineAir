@@ -41,53 +41,73 @@ function ProfileButton({ user }) {
     navigate('/') // Navigates to home page after logging out
   };
 
+  const getRestaurantsLink = () => {
+    if (user.userType === "admin") {
+      return "/restaurants/admin"; // AdminRestaurantsPage
+    } else if (user.userType === "restaurantOwner") {
+      return "/restaurants/owner"; // OwnerRestaurantsPage
+    }
+    return null;
+  };
+
   const ulClassName = "profile-dropdown" + (showSideBar ? "" : " hidden");
 
   return (
-      <>
-          <button onClick={toggleMenu} className="profile-button">
-              <HiBars3 size={30} />
-          </button>
+    <>
+      <button onClick={toggleMenu} className="profile-button">
+        <HiBars3 size={30} />
+      </button>
 
-          <ul className={ulClassName} ref={ulRef}>
-              {user ? (
-                  <>
-                      <div className="options">
-                          <div>Hello, {user.firstName}</div>
-                          <div>{user.email}</div>
-                      </div>
-                      <hr />
-                      <div className="manage-div">
-                          <div>
-                              <Link to="/orders" className="manage-link">
-                                  My Orders
-                              </Link>
-                          </div>
-                          <div>
-                              <Link to="/favorites" className="manage-link">
-                                  Favorites
-                              </Link>
-                          </div>
-                      </div>
-                      <hr />
-                      <div className="logout-button-div">
-                          <button className="logout-button" onClick={logout}>
-                              Log Out
-                          </button>
-                      </div>
-                  </>
-              ) : (
-                  <div className="sidebar-content">
-                      <Link to="/login" className="sidebar-link">
-                          Log In
-                      </Link>
-                      <Link to="/signup" className="sidebar-link">
-                          Sign Up
-                      </Link>
-                  </div>
+      <ul className={ulClassName} ref={ulRef}>
+        {user ? (
+          <>
+            <div className="options">
+              <div>Hello, {user.firstName}</div>
+              <div>{user.email}</div>
+            </div>
+            <hr />
+            <div className="manage-div">
+              <div>
+                <Link to="/orders" className="manage-link">
+                  My Orders
+                </Link>
+              </div>
+              <div>
+                <Link to="/favorites" className="manage-link">
+                  Favorites
+                </Link>
+              </div>
+              {(user.userType === "admin" || user.userType === "restaurantOwner") && (
+                <div>
+                  <Link
+                    to={getRestaurantsLink()}
+                    className="manage-link"
+                    onClick={closeMenu}
+                  >
+                    Restaurants
+                  </Link>
+                </div>
               )}
-          </ul>
-      </>
+            </div>
+            <hr />
+            <div className="logout-button-div">
+              <button className="logout-button" onClick={logout}>
+                Log Out
+              </button>
+            </div>
+          </>
+        ) : (
+          <div className="sidebar-content">
+            <Link to="/login" className="sidebar-link">
+              Log In
+            </Link>
+            <Link to="/signup" className="sidebar-link">
+              Sign Up
+            </Link>
+          </div>
+        )}
+      </ul>
+    </>
   );
 }
 
