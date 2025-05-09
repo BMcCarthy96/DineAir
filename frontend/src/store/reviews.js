@@ -56,20 +56,34 @@ export const createReview = (restaurantId, review) => async (dispatch) => {
 };
 
 export const updateReview = (review) => async (dispatch) => {
-    const response = await csrfFetch(`/api/reviews/${review.id}`, {
-        method: "PUT",
-        body: JSON.stringify(review),
-    });
-    const data = await response.json();
-    dispatch(updateReviewAction(data));
-    return data;
+    try {
+        console.log("Sending update request for review:", review); // Debugging
+        const response = await csrfFetch(`/api/reviews/${review.id}`, {
+            method: "PUT",
+            body: JSON.stringify(review),
+        });
+        const data = await response.json();
+        console.log("Updated review response:", data); // Debugging
+        dispatch(updateReviewAction(data));
+        return data;
+    } catch (err) {
+        console.error("Failed to update review:", err); // Debugging
+        throw err;
+    }
 };
 
 export const deleteReview = (reviewId) => async (dispatch) => {
-    await csrfFetch(`/api/reviews/${reviewId}`, {
-        method: "DELETE",
-    });
-    dispatch(deleteReviewAction(reviewId));
+    try {
+        console.log("Sending delete request for review ID:", reviewId); // Debugging
+        await csrfFetch(`/api/reviews/${reviewId}`, {
+            method: "DELETE",
+        });
+        console.log("Successfully deleted review with ID:", reviewId); // Debugging
+        dispatch(deleteReviewAction(reviewId));
+    } catch (err) {
+        console.error("Failed to delete review:", err); // Debugging
+        throw err;
+    }
 };
 
 // Reducer

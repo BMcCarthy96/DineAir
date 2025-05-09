@@ -16,6 +16,37 @@
     text-align: center;
 }
 
+.add-review {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.add-review textarea,
+.add-review input {
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    width: 100%;
+}
+
+.add-review-button {
+    background-color: #ff6f61;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 10px 15px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.add-review-button:hover {
+    background-color: #f84d3e;
+}
+
 .review-list {
     display: flex;
     flex-direction: column;
@@ -48,9 +79,31 @@
     color: #ffcc00;
 }
 
-.error-message {
-    color: red;
-    font-size: 16px;
-    margin-top: 10px;
-    text-align: center;
+.edit-button,
+.delete-button,
+.save-button,
+.cancel-button {
+    background-color: #ff6f61;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 10px 15px;
+    font-size: 14px;
+    cursor: pointer;
+    margin-right: 10px;
+    transition: background-color 0.3s ease;
+}
+
+.edit-button:hover,
+.save-button:hover {
+    background-color: #f84d3e;
+}
+
+.delete-button:hover {
+    background-color: #d9534f;
+}
+
+.cancel-button:hover {
+    background-color: #ccc;
+    color: #333;
 }
