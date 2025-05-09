@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import Cookies from "js-cookie";
 import "./EditRestaurantPage.css";
 
 function EditRestaurantPage() {
@@ -52,7 +53,7 @@ function EditRestaurantPage() {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json",
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
+                "XSRF-Token": Cookies.get("XSRF-TOKEN"),
             },
             body: JSON.stringify(updatedRestaurant),
         });
