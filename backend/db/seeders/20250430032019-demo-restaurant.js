@@ -14,7 +14,8 @@ module.exports = {
                     terminal: "T1",
                     gate: "A3",
                     cuisineType: "Mexican",
-                    imageUrl: "https://via.placeholder.com/150",
+                    imageUrl:
+                        "https://media.istockphoto.com/id/1349480436/photo/homemade-pork-carnitas-tacos.jpg?s=612x612&w=0&k=20&c=CJkpVp7g_qnhW5G0CpjWGLES1SzGE3yu2S8f9KV3jDo=",
                     createdAt: new Date(),
                     updatedAt: new Date(),
                 },
@@ -26,7 +27,8 @@ module.exports = {
                     terminal: "T2",
                     gate: "C4",
                     cuisineType: "Asian Fusion",
-                    imageUrl: "https://via.placeholder.com/150",
+                    imageUrl:
+                        "https://media.istockphoto.com/id/1434408830/photo/freeze-motion-of-wok-pan-and-flying-ingredients-in-the-air.jpg?s=612x612&w=0&k=20&c=mJJjrA8-TOcnsWJNei4yjjEP1ZUwmmUtMqoPwBYgU-g=",
                     createdAt: new Date(),
                     updatedAt: new Date(),
                 },
@@ -38,7 +40,8 @@ module.exports = {
                     terminal: "T1",
                     gate: "B2",
                     cuisineType: "Italian",
-                    imageUrl: "https://via.placeholder.com/150",
+                    imageUrl:
+                        "https://media.istockphoto.com/id/637214478/photo/pasta-plate.jpg?s=612x612&w=0&k=20&c=oebCQG_Zfv2zJpobSzpF6JFNdsBQUjG6MdQh-En5l3c=",
                     createdAt: new Date(),
                     updatedAt: new Date(),
                 },
@@ -50,7 +53,8 @@ module.exports = {
                     terminal: "T3",
                     gate: "D2",
                     cuisineType: "Breakfast",
-                    imageUrl: "https://via.placeholder.com/150",
+                    imageUrl:
+                        "https://media.istockphoto.com/id/148003375/photo/bagels-with-cream-cheese.jpg?s=612x612&w=0&k=20&c=gJQIsh__oVKzAEICJdz39dG1491IiM9iAu1HqW4WWkk=",
                     createdAt: new Date(),
                     updatedAt: new Date(),
                 },
@@ -62,7 +66,8 @@ module.exports = {
                     terminal: "T1",
                     gate: "A1",
                     cuisineType: "Cafe",
-                    imageUrl: "https://via.placeholder.com/150",
+                    imageUrl:
+                        "https://media.istockphoto.com/id/1467199060/photo/cup-of-coffee-with-smoke-and-coffee-beans-on-old-wooden-background.jpg?s=612x612&w=0&k=20&c=OnS8_6FM5ussfSGmjpDD-GofERg2UbItdxShIAA90sQ=",
                     createdAt: new Date(),
                     updatedAt: new Date(),
                 },
@@ -74,7 +79,8 @@ module.exports = {
                     terminal: "T1",
                     gate: "C3",
                     cuisineType: "American",
-                    imageUrl: "https://via.placeholder.com/150",
+                    imageUrl:
+                        "https://media.istockphoto.com/id/617759204/photo/steakhouse-double-bacon-cheeseburger.jpg?s=612x612&w=0&k=20&c=QRaHtrxJsmNKOlOTkvxyE-o-3kM-Me1zU320yPT8ycI=",
                     createdAt: new Date(),
                     updatedAt: new Date(),
                 },
@@ -86,7 +92,8 @@ module.exports = {
                     terminal: "T2",
                     gate: "B5",
                     cuisineType: "Vietnamese",
-                    imageUrl: "https://via.placeholder.com/150",
+                    imageUrl:
+                        "https://media.istockphoto.com/id/1687829797/photo/pho-bo-for-breakfast-in-vietnam-stock-photo.jpg?s=612x612&w=0&k=20&c=5aWVkSBZikSPsZMPoAJZWXGKiw3ZvlxrcaldJx0w0_c=",
                     createdAt: new Date(),
                     updatedAt: new Date(),
                 },
@@ -98,7 +105,8 @@ module.exports = {
                     terminal: "T3",
                     gate: "A7",
                     cuisineType: "Indian",
-                    imageUrl: "https://via.placeholder.com/150",
+                    imageUrl:
+                        "https://media.istockphoto.com/id/177043240/photo/indian-butter-chicken-curry.jpg?s=612x612&w=0&k=20&c=GnqnIWq99zDdjmOWQg0L7p3eKJTQO_bxnJTVbf8PlpM=",
                     createdAt: new Date(),
                     updatedAt: new Date(),
                 },
@@ -110,7 +118,8 @@ module.exports = {
                     terminal: "T1",
                     gate: "D4",
                     cuisineType: "Hawaiian",
-                    imageUrl: "https://via.placeholder.com/150",
+                    imageUrl:
+                        "https://media.istockphoto.com/id/1304027187/photo/hawaiian-tuna-poke-bowl-with-seaweed-avocado-mango-cucumber.jpg?s=612x612&w=0&k=20&c=kUfPqMxAP0LggJHdqBGFNtE0ThL4jaSe1HKScsII-3c=",
                     createdAt: new Date(),
                     updatedAt: new Date(),
                 },
@@ -122,7 +131,8 @@ module.exports = {
                     terminal: "T2",
                     gate: "E2",
                     cuisineType: "French",
-                    imageUrl: "https://via.placeholder.com/150",
+                    imageUrl:
+                        "https://media.istockphoto.com/id/1210773494/photo/chocolate-pancake-with-bananas.jpg?s=612x612&w=0&k=20&c=dIj_EfOxKKOnWYU4GdfvKGgePRiKB__YZPHHfsRfPb4=",
                     createdAt: new Date(),
                     updatedAt: new Date(),
                 },
