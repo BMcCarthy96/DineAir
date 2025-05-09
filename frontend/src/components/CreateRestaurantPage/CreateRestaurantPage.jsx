@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import Cookies from "js-cookie";
 import "./CreateRestaurantPage.css";
 
 function CreateRestaurantPage() {
@@ -29,7 +30,7 @@ function CreateRestaurantPage() {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
+                "XSRF-Token": Cookies.get("XSRF-TOKEN"),
             },
             body: JSON.stringify(newRestaurant),
         });
