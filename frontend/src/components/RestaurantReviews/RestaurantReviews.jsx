@@ -34,7 +34,7 @@ function RestaurantReviews({ restaurantId }) {
     const handleEditReview = async (review) => {
         try {
             console.log("Editing review:", { ...review, ...editingReview }); // Debugging
-            await dispatch(updateReview({ ...review, ...editingReview }));
+            await dispatch(updateReview(restaurantId, { ...review, ...editingReview }));
             setEditingReview(null);
         } catch (err) {
             setError("Failed to edit review. Please try again.");
@@ -42,10 +42,11 @@ function RestaurantReviews({ restaurantId }) {
     };
 
     const handleDeleteReview = async (reviewId) => {
+        console.log("Review ID passed to handleDeleteReview:", reviewId); // Debugging
         if (window.confirm("Are you sure you want to delete this review?")) {
             try {
                 console.log("Deleting review with ID:", reviewId); // Debugging
-                await dispatch(deleteReview(reviewId));
+                await dispatch(deleteReview(restaurantId, reviewId));
             } catch (err) {
                 setError("Failed to delete review. Please try again.");
             }

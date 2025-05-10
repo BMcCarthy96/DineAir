@@ -55,13 +55,16 @@ export const createReview = (restaurantId, review) => async (dispatch) => {
     return data;
 };
 
-export const updateReview = (review) => async (dispatch) => {
+export const updateReview = (restaurantId, review) => async (dispatch) => {
     try {
         console.log("Sending update request for review:", review); // Debugging
-        const response = await csrfFetch(`/api/reviews/${review.id}`, {
-            method: "PUT",
-            body: JSON.stringify(review),
-        });
+        const response = await csrfFetch(
+            `/api/restaurants/${restaurantId}/reviews/${review.id}`,
+            {
+                method: "PUT",
+                body: JSON.stringify(review),
+            }
+        );
         const data = await response.json();
         console.log("Updated review response:", data); // Debugging
         dispatch(updateReviewAction(data));
@@ -72,12 +75,15 @@ export const updateReview = (review) => async (dispatch) => {
     }
 };
 
-export const deleteReview = (reviewId) => async (dispatch) => {
+export const deleteReview = (restaurantId, reviewId) => async (dispatch) => {
     try {
         console.log("Sending delete request for review ID:", reviewId); // Debugging
-        await csrfFetch(`/api/reviews/${reviewId}`, {
-            method: "DELETE",
-        });
+        await csrfFetch(
+            `/api/restaurants/${restaurantId}/reviews/${reviewId}`,
+            {
+                method: "DELETE",
+            }
+        );
         console.log("Successfully deleted review with ID:", reviewId); // Debugging
         dispatch(deleteReviewAction(reviewId));
     } catch (err) {

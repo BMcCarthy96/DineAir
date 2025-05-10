@@ -37,12 +37,23 @@ exports.createReview = async (req, res, next) => {
 
 exports.updateReview = async (req, res, next) => {
     try {
-        const { reviewId } = req.params;
+        const { restaurantId, reviewId } = req.params;
         const { rating, comment } = req.body;
 
         console.log("Updating review with ID:", reviewId); // Debugging
-        const review = await Review.findByPk(reviewId);
-        if (!review || review.userId !== req.user.id) {
+        console.log("Restaurant ID from request params:", restaurantId); // Debugging
+
+        const review = await Review.findOne({
+            where: { id: reviewId, restaurantId },
+        });
+        console.log("Review found in database:", review); // Debugging
+
+        if (!review) {
+            return res.status(404).json({ error: "Review not found" });
+        }
+
+        // Allow admins to update any review
+        if (req.user.userType !== "admin" && review.userId !== req.user.id) {
             return res.status(403).json({ error: "Forbidden" });
         }
 
@@ -50,8 +61,13 @@ exports.updateReview = async (req, res, next) => {
         review.comment = comment;
         await review.save();
 
-        console.log("Updated review:", review); // Debugging
-        res.json(review);
+        // Fetch the updated review with the associated User data
+        const updatedReview = await Review.findByPk(review.id, {
+            include: [{ model: User, attributes: ["id", "username"] }],
+        });
+
+        console.log("Updated review with User data:", updatedReview); // Debugging
+        res.json(updatedReview);
     } catch (err) {
         console.error("Error updating review:", err); // Debugging
         next(err);
@@ -60,12 +76,15 @@ exports.updateReview = async (req, res, next) => {
 
 exports.deleteReview = async (req, res, next) => {
     try {
-        const { reviewId } = req.params;
-        console.log("Review ID from request params:", reviewId); // Debugging: Log reviewId
-        console.log("User making the request:", req.user); // Debugging: Log user info
+        const { restaurantId, reviewId } = req.params;
+        console.log("Restaurant ID from request params:", restaurantId); // Debugging
+        console.log("Review ID from request params:", reviewId); // Debugging
+        console.log("User making the request:", req.user); // Debugging
 
-        const review = await Review.findByPk(reviewId);
-        console.log("Review found in database:", review); // Debugging: Log the review
+        const review = await Review.findOne({
+            where: { id: reviewId, restaurantId },
+        });
+        console.log("Review found in database:", review); // Debugging
 
         if (!review) {
             return res.status(404).json({ error: "Review not found" });
@@ -76,8 +95,10 @@ exports.deleteReview = async (req, res, next) => {
         }
 
         await review.destroy();
+        console.log("Deleted review with ID:", reviewId); // Debugging
         res.status(204).end();
     } catch (err) {
+        console.error("Error deleting review:", err); // Debugging
         next(err);
     }
 };
