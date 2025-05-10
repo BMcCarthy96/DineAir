@@ -9,6 +9,7 @@ module.exports = {
         await Airport.bulkCreate(
             [
                 {
+                    id: 1,
                     name: "Sky High Airport",
                     code: "SHA",
                     city: "Cloud City",
@@ -16,11 +17,20 @@ module.exports = {
                     country: "Fictionland",
                 },
                 {
+                    id: 2,
                     name: "JetStream Hub",
                     code: "JSH",
                     city: "Windyville",
                     state: "Breeze",
                     country: "Zephyria",
+                },
+                {
+                    id: 3,
+                    name: "Terminal City Airport",
+                    code: "TCA",
+                    city: "Terminal City",
+                    state: "Transit",
+                    country: "Layoverland",
                 },
             ],
             { validate: true }

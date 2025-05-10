@@ -2,10 +2,8 @@ import { useState, useEffect, useRef } from 'react';
 import { useDispatch } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import * as sessionActions from '../../store/session';
-// import LoginFormPage from '../LoginFormPage';
-// import SignupFormPage from '../SignupFormPage';
 import { HiBars3 } from "react-icons/hi2";
-import './ProfileButton.css'
+import './ProfileButton.css';
 
 function ProfileButton({ user }) {
   const dispatch = useDispatch();
@@ -38,7 +36,7 @@ function ProfileButton({ user }) {
     e.preventDefault();
     dispatch(sessionActions.logout());
     closeMenu();
-    navigate('/') // Navigates to home page after logging out
+    navigate('/'); // Navigates to home page after logging out
   };
 
   const getRestaurantsLink = () => {
@@ -85,6 +83,17 @@ function ProfileButton({ user }) {
                     onClick={closeMenu}
                   >
                     Restaurants
+                  </Link>
+                </div>
+              )}
+              {user.userType === "runner" && (
+                <div>
+                  <Link
+                    to="/runner-dashboard"
+                    className="manage-link"
+                    onClick={closeMenu}
+                  >
+                    Runner Dashboard
                   </Link>
                 </div>
               )}

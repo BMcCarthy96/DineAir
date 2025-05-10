@@ -1,0 +1,18 @@
+.delivery-tracking-page {
+    padding: 20px;
+    background-color: #f9f9f9;
+    min-height: 100vh;
+    text-align: center;
+}
+
+.delivery-tracking-page h1 {
+    font-size: 36px;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.delivery-tracking-page p {
+    font-size: 18px;
+    color: #666;
+    margin-bottom: 20px;
+}

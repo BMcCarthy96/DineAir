@@ -2,9 +2,40 @@
 require("dotenv").config();
 
 const { port } = require("../config");
-
 const app = require("../app");
 const db = require("../db/models");
+const http = require("http");
+const { Server } = require("socket.io");
+
+// Create the HTTP server
+const server = http.createServer(app);
+
+// Set up the WebSocket server
+const io = new Server(server, {
+    cors: {
+        origin: "http://localhost:5173",
+        methods: ["GET", "POST"],
+    },
+});
+
+io.on("connection", (socket) => {
+    console.log("A user connected:", socket.id);
+
+    // Listen for runner location updates
+    socket.on("runnerLocationUpdate", ({ runnerId, location }) => {
+        console.log(`Runner ${runnerId} location updated:`, location);
+
+        // Broadcast the updated location to customers
+        io.emit("runnerLocationUpdate", { runnerId, location });
+    });
+
+    socket.on("disconnect", () => {
+        console.log("A user disconnected:", socket.id);
+    });
+});
+
+// Export the WebSocket server for use in other files
+module.exports = { server, io };
 
 // Check the database connection before starting the app
 db.sequelize
@@ -15,7 +46,7 @@ db.sequelize
         );
 
         // Start listening for connections
-        app.listen(port, () => console.log(`Listening on port ${port}...`));
+        server.listen(port, () => console.log(`Listening on port ${port}...`));
     })
     .catch((err) => {
         console.log("Database connection failure.");

@@ -1,0 +1,33 @@
+.runner-dashboard-page {
+    padding: 20px;
+    background-color: #f9f9f9;
+    min-height: 100vh;
+}
+
+.runner-dashboard-page h1 {
+    text-align: center;
+    font-size: 36px;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.deliveries {
+    margin-bottom: 30px;
+}
+
+.deliveries ul {
+    list-style: none;
+    padding: 0;
+}
+
+.deliveries li {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 15px;
+    margin-bottom: 10px;
+}
+
+.runner-map {
+    margin-top: 30px;
+}

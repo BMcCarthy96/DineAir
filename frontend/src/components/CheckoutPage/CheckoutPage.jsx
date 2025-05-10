@@ -43,7 +43,7 @@ function CheckoutPage() {
             }
 
             alert("Order placed successfully!");
-            navigate("/orders");
+            navigate("/delivery-tracking");
         } catch (err) {
             console.error(err);
             alert("Failed to place order.");

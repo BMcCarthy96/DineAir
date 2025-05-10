@@ -11,6 +11,7 @@ const deliveryRouter = require("./deliveries.js");
 const restaurantRouter = require("./restaurants.js");
 const reviewRouter = require("./reviews.js");
 const menuItemRouter = require("./menuItems.js");
+const flightsRouter = require("./flights");
 const { restoreUser } = require("../../utils/auth.js");
 
 // Connect restoreUser middleware to the API router
@@ -28,6 +29,9 @@ router.use("/carts/items", cartItemsRouter);
 router.use("/orders", ordersRouter);
 router.use("/deliveries", deliveryRouter);
 router.use("/restaurants", restaurantRouter);
+
+// Flights
+router.use("/flights", flightsRouter);
 
 // Add routes for reviews and menu items (under restaurants.js)
 router.use("/restaurants/:restaurantId/reviews", reviewRouter);

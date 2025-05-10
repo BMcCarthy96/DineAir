@@ -1,0 +1,69 @@
+.flight-search {
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    max-width: 600px;
+    margin: 20px auto;
+    text-align: center;
+}
+
+.flight-search h2 {
+    font-size: 28px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.flight-search input {
+    width: calc(50% - 10px);
+    padding: 10px;
+    margin: 5px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 16px;
+}
+
+.flight-search input:focus {
+    border-color: #ff6f61;
+    outline: none;
+}
+
+.flight-search button {
+    background-color: #ff6f61;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-top: 10px;
+}
+
+.flight-search button:hover {
+    background-color: #f84d3e;
+}
+
+.flight-data {
+    margin-top: 20px;
+    text-align: left;
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+}
+
+.flight-data h3 {
+    font-size: 20px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.flight-data p {
+    font-size: 16px;
+    color: #666;
+    margin-bottom: 5px;
+}

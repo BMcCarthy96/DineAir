@@ -16,6 +16,13 @@ import AdminRestaurantsPage from "./components/AdminRestaurantsPage/AdminRestaur
 import OwnerRestaurantsPage from "./components/OwnerRestaurantsPage/OwnerRestaurantsPage";
 import CreateRestaurantPage from "./components/CreateRestaurantPage/CreateRestaurantPage";
 import EditRestaurantPage from "./components/EditRestaurantPage/EditRestaurantPage";
+import DeliveryTrackingPage from "./components/DeliveryTrackingPage/DeliveryTrackingPage";
+import RunnerDashboardPage from "./components/RunnerDashboardPage/RunnerDashboardPage";
+import { io } from "socket.io-client";
+import { notifyGateChange } from "./utils/Notifications";
+import "./utils/WebSocket";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function Layout() {
   const dispatch = useDispatch();
@@ -89,6 +96,14 @@ const router = createBrowserRouter([
         path: "/restaurants/new",
         element: <CreateRestaurantPage /> },
       {
+        path: "/delivery-tracking",
+        element: <DeliveryTrackingPage />,
+      },
+      {
+        path: "/runner-dashboard",
+        element: <RunnerDashboardPage />,
+      },
+      {
         path: '*',
         element: <h1>Page Not Found</h1>
       }
@@ -97,7 +112,24 @@ const router = createBrowserRouter([
 ]);
 
 function App() {
-  return <RouterProvider router={router} />;
+    useEffect(() => {
+        const socket = io("http://localhost:8000");
+
+        socket.on("gateChange", ({ gate, terminal }) => {
+            notifyGateChange(gate, terminal);
+        });
+
+        return () => {
+            socket.disconnect();
+        };
+    }, []);
+
+    return (
+      <>
+        <RouterProvider router={router} />;
+        <ToastContainer />
+      </>
+    )
 }
 
 export default App;
