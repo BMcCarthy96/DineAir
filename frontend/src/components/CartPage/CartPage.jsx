@@ -9,9 +9,22 @@ function CartPage() {
 
     useEffect(() => {
         async function fetchCartItems() {
-            const response = await fetch("/api/carts/items");
-            const data = await response.json();
-            setCartItems(data);
+            try {
+                const response = await fetch("/api/carts/items", {
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem("token")}`,
+                        "XSRF-Token": Cookies.get("XSRF-TOKEN"),
+                    },
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    setCartItems(data);
+                } else {
+                    console.error("Failed to fetch cart items");
+                }
+            } catch (err) {
+                console.error("Error fetching cart items:", err);
+            }
         }
 
         fetchCartItems();
@@ -27,22 +40,53 @@ function CartPage() {
                 },
             });
 
-            if (!response.ok) {
-                const errorData = await response.json();
-                console.error("Error removing item from cart:", errorData);
-                throw new Error("Failed to remove item from cart.");
+            if (response.ok) {
+                setCartItems(cartItems.filter((item) => item.id !== itemId));
+            } else {
+                console.error("Failed to remove item from cart");
             }
-
-            setCartItems(cartItems.filter((item) => item.id !== itemId));
         } catch (err) {
-            console.error(err);
-            alert("Failed to remove item from cart.");
+            console.error("Error removing item from cart:", err);
+        }
+    };
+
+    const handleQuantityChange = async (itemId, newQuantity) => {
+        if (newQuantity < 1) return;
+
+        try {
+            const response = await fetch(`/api/carts/items/${itemId}`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${localStorage.getItem("token")}`,
+                    "XSRF-Token": Cookies.get("XSRF-TOKEN"),
+                },
+                body: JSON.stringify({ quantity: newQuantity }),
+            });
+
+            if (response.ok) {
+                const updatedItem = await response.json();
+                setCartItems((prevItems) =>
+                    prevItems.map((item) =>
+                        item.id === itemId ? { ...item, quantity: updatedItem.quantity } : item
+                    )
+                );
+            } else {
+                console.error("Failed to update item quantity");
+            }
+        } catch (err) {
+            console.error("Error updating item quantity:", err);
         }
     };
 
     const handleCheckout = () => {
         navigate("/checkout");
     };
+
+    const subtotal = cartItems.reduce(
+        (total, item) => total + item.quantity * item.MenuItem.price,
+        0
+    );
 
     return (
         <div className="cart-page">
@@ -61,7 +105,25 @@ function CartPage() {
                             <div className="cart-item-info">
                                 <h3>{item.MenuItem.name}</h3>
                                 <p>{item.MenuItem.description}</p>
-                                <p>Quantity: {item.quantity}</p>
+                                <div className="quantity-controls">
+                                    <button
+                                        className="quantity-button"
+                                        onClick={() =>
+                                            handleQuantityChange(item.id, item.quantity - 1)
+                                        }
+                                    >
+                                        -
+                                    </button>
+                                    <span>{item.quantity}</span>
+                                    <button
+                                        className="quantity-button"
+                                        onClick={() =>
+                                            handleQuantityChange(item.id, item.quantity + 1)
+                                        }
+                                    >
+                                        +
+                                    </button>
+                                </div>
                                 <p>Price: ${(item.MenuItem.price * item.quantity).toFixed(2)}</p>
                                 <button
                                     className="remove-button"
@@ -75,9 +137,12 @@ function CartPage() {
                 </div>
             )}
             {cartItems.length > 0 && (
-                <button className="checkout-button" onClick={handleCheckout}>
-                    Proceed to Checkout
-                </button>
+                <div className="cart-summary">
+                    <h3>Subtotal: ${subtotal.toFixed(2)}</h3>
+                    <button className="checkout-button" onClick={handleCheckout}>
+                        Proceed to Checkout
+                    </button>
+                </div>
             )}
         </div>
     );

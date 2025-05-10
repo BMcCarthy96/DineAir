@@ -3,12 +3,12 @@ const router = express.Router();
 const {
     requireAuth,
     requireAdmin,
-    requireCustomer,
+    requireAnyUser,
 } = require("../../utils/auth");
 const cartController = require("../../controllers/cartController");
 
 // Get current user's cart (Customer only)
-router.get("/", requireAuth, requireCustomer, cartController.getUserCart);
+router.get("/", requireAuth, requireAnyUser, cartController.getUserCart);
 
 // Admin: Get all carts
 router.get("/admin", requireAuth, requireAdmin, cartController.getAllCarts);

@@ -3,34 +3,29 @@ const router = express.Router();
 const {
     requireAuth,
     requireAdmin,
-    requireCustomer,
+    requireAnyUser,
 } = require("../../utils/auth");
 const cartItemController = require("../../controllers/cartItemController");
 
-// Get all items in the current user's cart (Customer only)
-router.get("/", requireAuth, requireCustomer, cartItemController.getCartItems);
+// Get all items in the current user's cart
+router.get("/", requireAuth, requireAnyUser, cartItemController.getCartItems);
 
-// Add an item to the current user's cart (Customer only)
-router.post(
-    "/",
-    requireAuth,
-    requireCustomer,
-    cartItemController.addItemToCart
-);
+// Add an item to the current user's cart
+router.post("/", requireAuth, requireAnyUser, cartItemController.addItemToCart);
 
-// Update a cart item in the current user's cart (Customer only)
+// Update a cart item in the current user's cart
 router.put(
     "/:id",
     requireAuth,
-    requireCustomer,
+    requireAnyUser,
     cartItemController.updateCartItem
 );
 
-// Delete a cart item in the current user's cart (Customer only)
+// Delete a cart item in the current user's cart
 router.delete(
     "/:id",
     requireAuth,
-    requireCustomer,
+    requireAnyUser,
     cartItemController.deleteCartItem
 );
 

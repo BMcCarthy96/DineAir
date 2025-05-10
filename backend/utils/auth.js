@@ -121,6 +121,14 @@ const requireCustomer = (req, res, next) => {
     res.status(403).json({ error: "Forbidden: Customer access required" });
 };
 
+// Middleware to allow access for all user types
+const requireAnyUser = (req, res, next) => {
+    if (req.user) {
+        return next();
+    }
+    res.status(403).json({ error: "Forbidden: User access required" });
+};
+
 module.exports = {
     setTokenCookie,
     restoreUser,
@@ -130,4 +138,5 @@ module.exports = {
     requireAdminOrRestaurantOwner,
     requireRunner,
     requireCustomer,
+    requireAnyUser,
 };
