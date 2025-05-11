@@ -1,141 +1,172 @@
 .login-page {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  background: linear-gradient(to bottom, #ff6f61, #ff9a85);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: linear-gradient(to bottom, #ff6f61, #ff9a85);
 }
 
 .login-box {
-  background-color: white;
-  border-radius: 12px;
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-  padding: 40px;
-  width: 400px;
-  text-align: center;
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    padding: 40px;
+    width: 400px;
+    text-align: center;
 }
 
 .login-box h1 {
-  font-size: 32px;
-  font-weight: bold;
-  color: #333;
-  margin-bottom: 10px;
+    font-size: 32px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 10px;
 }
 
 .login-subtitle {
-  font-size: 16px;
-  color: #666;
-  margin-bottom: 20px;
+    font-size: 16px;
+    color: #666;
+    margin-bottom: 20px;
 }
 
 .login-form input {
-  width: 100%;
-  padding: 12px;
-  margin-bottom: 15px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  font-size: 16px;
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 16px;
 }
 
 .login-form input:focus {
-  border-color: #ff6f61;
-  outline: none;
+    border-color: #ff6f61;
+    outline: none;
 }
 
 .login-button {
-  width: 100%;
-  padding: 12px;
-  background-color: #ff6f61;
-  color: white;
-  font-size: 16px;
-  font-weight: bold;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background-color 0.3s;
+    width: 100%;
+    padding: 12px;
+    background-color: #ff6f61;
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s;
 }
 
 .login-button:hover {
-  background-color: #f84d3e;
+    background-color: #f84d3e;
 }
 
 .role-toggle-container {
-  margin-top: 20px;
-  text-align: center;
+    margin-top: 20px;
+    text-align: center;
 }
 
 .role-toggle-container p {
-  font-size: 16px;
-  color: #666;
-  margin-bottom: 10px;
+    font-size: 16px;
+    color: #666;
+    margin-bottom: 10px;
 }
 
 .role-toggle-buttons {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-  margin-bottom: 15px;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 15px;
 }
 
 .role-button {
-  padding: 10px 20px;
-  border: 2px solid #ccc;
-  border-radius: 8px;
-  background-color: white;
-  color: #333;
-  font-size: 14px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: all 0.3s ease;
+    padding: 10px 20px;
+    border: 2px solid #ccc;
+    border-radius: 8px;
+    background-color: white;
+    color: #333;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
 }
 
 .role-button.active {
-  background-color: #ff6f61;
-  color: white;
-  border-color: #ff6f61;
+    background-color: #ff6f61;
+    color: white;
+    border-color: #ff6f61;
 }
 
 .role-button:hover {
-  background-color: #f84d3e;
-  color: white;
-  border-color: #f84d3e;
+    background-color: #f84d3e;
+    color: rgb(0, 0, 0);
+    border-color: #f84d3e;
 }
 
 .demo-user-button {
-  width: 100%;
-  padding: 12px;
-  background-color: #f1f4f0;
-  color: #333;
-  font-size: 16px;
-  font-weight: bold;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
+    width: 100%;
+    padding: 12px;
+    background-color: #f1f4f0;
+    color: #333;
+    font-size: 16px;
+    font-weight: bold;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
 }
 
 .demo-user-button:hover {
-  background-color: #e5ede4;
+    background-color: #f84d3e;
 }
 
 .signup-link {
-  margin-top: 20px;
-  font-size: 14px;
-  color: #666;
+    margin-top: 20px;
+    font-size: 14px;
+    color: #666;
 }
 
 .signup-link a {
-  color: #ff6f61;
-  text-decoration: none;
-  font-weight: bold;
+    color: #ff6f61;
+    text-decoration: none;
+    font-weight: bold;
 }
 
 .signup-link a:hover {
-  text-decoration: underline;
+    text-decoration: underline;
 }
 
 .error-message {
-  color: red;
-  font-size: 14px;
-  margin-bottom: 10px;
+    color: red;
+    font-size: 14px;
+    margin-bottom: 10px;
+}
+
+.login-button,
+.demo-user-button,
+.signup-button {
+    width: 100%;
+    padding: 12px;
+    background-color: #ff6f61; /* Tomato Red */
+    color: #333333; /* Dark text for visibility */
+    font-size: 16px;
+    font-weight: bold;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Hover effect for buttons */
+.login-button:hover,
+.demo-user-button:hover,
+.signup-button:hover {
+    background-color: #f84d3e; /* Slightly darker red for hover */
+    color: white; /* White text on hover */
+}
+
+/* Ensure buttons remain visible in dark mode */
+body.dark .login-button,
+body.dark .demo-user-button,
+body.dark .signup-button {
+    background-color: #ff6f61; /* Retain the same color in dark mode */
+    color: #333333; /* Ensure text remains dark */
 }

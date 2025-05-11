@@ -1,33 +1,40 @@
 :root {
     /* Background Colors */
-    --background-light: #FFF8F0; /* Soft Cream */
-    --background-dark: #2D2D2D; /* Charcoal for dark mode */
+    --background-light: #fff8f0; /* Soft Cream */
+    --background-dark: #2d2d2d; /* Charcoal for dark mode */
 
     /* Text Colors */
-    --text-primary: #2D2D2D; /* Charcoal */
-    --text-secondary: #6E6E6E; /* Warm Gray */
-    --text-on-dark: #FFFFFA; /* Ivory for text on dark backgrounds */
+    --text-primary: #2d2d2d; /* Charcoal */
+    --text-secondary: #6e6e6e; /* Warm Gray */
+    --text-on-dark: #fffffa; /* Ivory for text on dark backgrounds */
 
     /* Button Colors */
-    --button-primary: #E94E3C; /* Tomato Red */
-    --button-primary-hover: #D43C2A; /* Slightly darker red for hover */
-    --button-secondary: #FFD166; /* Golden Yellow */
-    --button-secondary-hover: #FFC34D; /* Slightly darker yellow for hover */
-    --button-success: #88B04B; /* Sage Green */
+    --button-primary: #e94e3c; /* Tomato Red */
+    --button-primary-hover: #d43c2a; /* Slightly darker red for hover */
+    --button-secondary: #ffd166; /* Golden Yellow */
+    --button-secondary-hover: #ffc34d; /* Slightly darker yellow for hover */
+    --button-success: #88b04b; /* Sage Green */
 
     /* Accent Colors */
-    --accent-highlight: #FFD166; /* Golden Yellow */
-    --accent-success: #88B04B; /* Sage Green */
+    --accent-highlight: #ffd166; /* Golden Yellow */
+    --accent-success: #88b04b; /* Sage Green */
+
+    /* Button Colors for Dark Mode */
+    --button-dark: #ff6f61; /* Tomato Red for dark mode */
+    --button-hover-dark: #ffffff; /* White background on hover in dark mode */
+    --button-hover-dark-text: #333333; /* Black text on hover in dark mode */
+    --button-selected-dark: #ffffff; /* White background for selected buttons in dark mode */
+    --button-selected-dark-border: #ff6f61; /* Border color for selected buttons in dark mode */
 }
 
 body.light {
     background-color: var(--background-light);
-    color: var(--text-light);
+    color: var(--text-primary);
 }
 
 body.dark {
     background-color: var(--background-dark);
-    color: var(--text-dark);
+    color: var(--text-on-dark);
 }
 
 .navbar {
@@ -68,10 +75,45 @@ button:hover {
 
 body.dark button {
     background-color: var(--button-dark);
+    color: white;
+    border: none;
 }
 
 body.dark button:hover {
     background-color: var(--button-hover-dark);
+    color: var(--button-hover-dark-text);
+    border: 2px solid var(--button-selected-dark-border);
+}
+
+.role-button:hover {
+    background-color: #ff6f61; /* Tomato Red on hover */
+    color: white; /* White text on hover */
+}
+
+.role-button.active {
+    background-color: #ff6f61; /* Tomato Red for active state */
+    color: white; /* White text for active state */
+    border: 2px solid #ff6f61; /* Add border for active state */
+}
+
+/* Dark Mode Role Button Styles */
+body.dark .role-button {
+    background-color: var(--button-dark); /* Default to Tomato Red */
+    color: white; /* White text */
+}
+
+body.dark .role-button:hover {
+    background-color: var(--button-hover-dark); /* White background on hover */
+    color: var(--button-hover-dark-text); /* Black text on hover */
+    border: 2px solid var(--button-selected-dark-border); /* Add border on hover */
+}
+
+body.dark .role-button.active {
+    background-color: var(
+        --button-selected-dark
+    ); /* White background for selected */
+    color: var(--button-hover-dark-text); /* Black text for selected */
+    border: 2px solid var(--button-selected-dark-border); /* Add border for selected */
 }
 
 p {

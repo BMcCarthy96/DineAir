@@ -97,6 +97,11 @@
     background-color: #f84d3e;
   }
 
+  body.dark .logout-button {
+    background-color: #FF6F61; /* Retain the same color in dark mode */
+    color: black; /* Ensure text remains black */
+}
+
   .sidebar {
     position: fixed;
     top: 0;
