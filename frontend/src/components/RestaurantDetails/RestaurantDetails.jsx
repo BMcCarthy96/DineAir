@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import Cookies from "js-cookie";
 import "./RestaurantDetails.css";
 
@@ -25,7 +25,8 @@ function RestaurantDetails() {
         fetchMenuItems();
     }, [restaurantId]);
 
-    const handleAddToCart = async (menuItemId) => {
+    const handleAddToCart = async (menuItemId, e) => {
+        e.preventDefault(); // Prevent navigation when the button is clicked
         try {
             const response = await fetch("/api/carts/items", {
                 method: "POST",
@@ -55,39 +56,53 @@ function RestaurantDetails() {
     return (
         <div className="restaurant-details">
             {restaurant && (
-                <div className="restaurant-info">
-                    <h1>{restaurant.name}</h1>
-                    <p>{restaurant.description}</p>
-                    <p>
-                        <strong>Terminal:</strong> {restaurant.terminal} |{" "}
-                        <strong>Gate:</strong> {restaurant.gate}
-                    </p>
-                    <p>
-                        <strong>Cuisine:</strong> {restaurant.cuisineType}
-                    </p>
+                <div className="restaurant-header">
+                    <div
+                        className="restaurant-banner"
+                        style={{
+                            backgroundImage: `url(${restaurant.imageUrl || "https://via.placeholder.com/1200x400"})`,
+                        }}
+                    >
+                        <div className="restaurant-overlay">
+                            <h1 className="restaurant-name">{restaurant.name}</h1>
+                            <p className="restaurant-description">{restaurant.description}</p>
+                            <p className="restaurant-info">
+                                <strong>Terminal:</strong> {restaurant.terminal} |{" "}
+                                <strong>Gate:</strong> {restaurant.gate}
+                            </p>
+                            <p className="restaurant-info">
+                                <strong>Cuisine:</strong> {restaurant.cuisineType}
+                            </p>
+                        </div>
+                    </div>
                 </div>
             )}
-            <h2>Menu</h2>
+            <h2 className="menu-title">Menu</h2>
             <div className="menu-items">
                 {menuItems && menuItems.length > 0 ? (
                     menuItems.map((item) => (
                         <div key={item.id} className="menu-item-card">
-                            <img
-                                src={item.imageUrl || "https://via.placeholder.com/150"}
-                                alt={item.name}
-                                className="menu-item-image"
-                            />
-                            <div className="menu-item-info">
-                                <h3>{item.name}</h3>
-                                <p>{item.description}</p>
-                                <p className="price">${item.price.toFixed(2)}</p>
-                                <button
-                                    className="add-to-cart-button"
-                                    onClick={() => handleAddToCart(item.id)}
-                                >
-                                    Add to Cart
-                                </button>
-                            </div>
+                            <Link
+                                to={`/restaurants/${restaurantId}/menu-items/${item.id}`}
+                                className="menu-item-link"
+                            >
+                                <img
+                                    src={item.imageUrl || "https://via.placeholder.com/150"}
+                                    alt={item.name}
+                                    className="menu-item-image"
+                                />
+                                <div className="menu-item-info">
+                                    <h3>{item.name}</h3>
+                                    <p>{item.description}</p>
+                                    <p className="price">${item.price.toFixed(2)}</p>
+                                </div>
+                            </Link>
+                            <button
+                                className="add-to-cart-button"
+                                onClick={(e) => handleAddToCart(item.id, e)}
+                            >
+                                Add to Cart
+                            </button>
                         </div>
                     ))
                 ) : (

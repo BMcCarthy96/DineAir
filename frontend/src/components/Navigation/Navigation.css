@@ -23,6 +23,10 @@
   text-decoration: none;
 }
 
+body.light .logo {
+  color: black; /* Change to black in light mode */
+}
+
 .nav-center {
   flex: 1;
   display: flex;
@@ -123,12 +127,19 @@
   text-decoration: none;
   transition: background-color 0.3s, color 0.3s, transform 0.2s;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  margin-right: 10px;
 }
 
 .cart-icon:hover {
   background-color: #ff6f61;
   color: white;
   transform: scale(1.1);
+}
+
+/* Light mode cart icon */
+body.light .cart-icon {
+    background-color: black; /* Black bubble */
+    color: white; /* White cart icon */
 }
 
 .nav-button {
@@ -147,4 +158,32 @@
 .nav-button:hover {
   background-color: #ff6f61;
   color: white;
+}
+
+.theme-toggle-button {
+    background-color: var(--navbar-light); /* Default to light navbar color */
+    border: none;
+    cursor: pointer;
+    padding: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Dark mode theme toggle button */
+body.dark .theme-toggle-button {
+    background-color: var(--navbar-dark); /* Match dark navbar color */
+}
+
+.theme-toggle-icon {
+    width: 30px;
+    height: 30px;
+    transition: transform 0.3s ease;
+}
+
+.theme-toggle-button:hover .theme-toggle-icon {
+    transform: scale(1.1);
 }

@@ -100,3 +100,42 @@ exports.deleteOrder = async (req, res, next) => {
         next(err);
     }
 };
+
+exports.reorderOrder = async (req, res) => {
+    try {
+        const { orderId } = req.params;
+
+        // Fetch the original order
+        const originalOrder = await Order.findByPk(orderId, {
+            include: [
+                {
+                    model: CartItem,
+                    include: [MenuItem], // Ensure MenuItem is included
+                },
+            ],
+        });
+
+        if (!originalOrder || originalOrder.userId !== req.user.id) {
+            return res.status(404).json({ error: "Order not found" });
+        }
+
+        // Create a new cart for the user
+        const [cart] = await Cart.findOrCreate({
+            where: { userId: req.user.id },
+        });
+
+        // Add the items from the original order to the cart
+        for (const item of originalOrder.CartItems) {
+            await CartItem.create({
+                cartId: cart.id,
+                menuItemId: item.menuItemId,
+                quantity: item.quantity,
+            });
+        }
+
+        res.status(201).json({ message: "Order has been reordered." });
+    } catch (err) {
+        console.error("Error reordering order:", err);
+        res.status(500).json({ error: "Failed to reorder order." });
+    }
+};

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
+import { motion } from "framer-motion";
 import "./CartPage.css";
 
 function CartPage() {
@@ -96,7 +97,13 @@ function CartPage() {
             ) : (
                 <div className="cart-items">
                     {cartItems.map((item) => (
-                        <div key={item.id} className="cart-item">
+                        <motion.div
+                            key={item.id}
+                            className="cart-item"
+                            initial={{ opacity: 0, y: -20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: 20 }}
+                        >
                             <img
                                 src={item.MenuItem.imageUrl || "https://via.placeholder.com/150"}
                                 alt={item.MenuItem.name}
@@ -132,7 +139,7 @@ function CartPage() {
                                     Remove
                                 </button>
                             </div>
-                        </div>
+                        </motion.div>
                     ))}
                 </div>
             )}

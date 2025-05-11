@@ -18,6 +18,7 @@ import CreateRestaurantPage from "./components/CreateRestaurantPage/CreateRestau
 import EditRestaurantPage from "./components/EditRestaurantPage/EditRestaurantPage";
 import DeliveryTrackingPage from "./components/DeliveryTrackingPage/DeliveryTrackingPage";
 import RunnerDashboardPage from "./components/RunnerDashboardPage/RunnerDashboardPage";
+import FavoritesPage from "./components/FavoritesPage/FavoritesPage";
 import { io } from "socket.io-client";
 import { notifyGateChange } from "./utils/Notifications";
 import "./utils/WebSocket";
@@ -103,6 +104,9 @@ const router = createBrowserRouter([
         path: "/runner-dashboard",
         element: <RunnerDashboardPage />,
       },
+      {
+        path: "/favorites",
+        element: <FavoritesPage /> },
       {
         path: '*',
         element: <h1>Page Not Found</h1>

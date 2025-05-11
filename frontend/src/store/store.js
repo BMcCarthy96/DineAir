@@ -5,6 +5,7 @@ import usersReducer from "./users";
 import reviewsReducer from "./reviews";
 import menuItemsReducer from "./menuItems";
 import searchReducer from "./search";
+import favoritesReducer from "./favorites";
 
 const rootReducer = combineReducers({
     session: sessionReducer,
@@ -12,6 +13,7 @@ const rootReducer = combineReducers({
     reviews: reviewsReducer,
     menuItems: menuItemsReducer,
     search: searchReducer,
+    favorites: favoritesReducer,
 });
 
 let enhancer;

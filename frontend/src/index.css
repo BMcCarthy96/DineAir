@@ -1,1 +1,79 @@
-/* TODO: Add sitewide styles */
+:root {
+    /* Light Theme Variables */
+    --background-light: #f9f9f9;
+    --text-light: #333;
+    --navbar-light: #ffffff;
+    --card-light: #ffffff;
+    --button-light: #ff6f61;
+    --button-hover-light: #f84d3e;
+
+    /* Dark Theme Variables */
+    --background-dark: #1e1e1e;
+    --text-dark: #f9f9f9;
+    --navbar-dark: #2c2c2c;
+    --card-dark: #333333;
+    --button-dark: #ff6f61;
+    --button-hover-dark: #f84d3e;
+}
+
+body.light {
+    background-color: var(--background-light);
+    color: var(--text-light);
+}
+
+body.dark {
+    background-color: var(--background-dark);
+    color: var(--text-dark);
+}
+
+.navbar {
+    background-color: var(--navbar-light);
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+body.dark .navbar {
+    background-color: var(--navbar-dark);
+}
+
+.card {
+    background-color: var(--card-light);
+    color: var(--text-light);
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+body.dark .card {
+    background-color: var(--card-dark);
+    color: var(--text-dark);
+}
+
+button {
+    background-color: var(--button-light);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 10px 15px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+button:hover {
+    background-color: var(--button-hover-light);
+}
+
+body.dark button {
+    background-color: var(--button-dark);
+}
+
+body.dark button:hover {
+    background-color: var(--button-hover-dark);
+}
+
+p {
+    color: black;
+}
+
+span {
+    color: black;
+}

@@ -1,0 +1,48 @@
+.order-tracking {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 20px 0;
+}
+
+.step {
+    text-align: center;
+    flex: 1;
+    position: relative;
+}
+
+.step .circle {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background-color: #ccc;
+    margin: 0 auto;
+    line-height: 30px;
+    color: white;
+    font-weight: bold;
+}
+
+.step.active .circle {
+    background-color: #ff6f61;
+}
+
+.step p {
+    margin-top: 10px;
+    font-size: 14px;
+    color: #666;
+}
+
+.step:not(:last-child)::after {
+    content: "";
+    position: absolute;
+    top: 15px;
+    left: 50%;
+    width: 100%;
+    height: 4px;
+    background-color: #ccc;
+    z-index: -1;
+}
+
+.step.active:not(:last-child)::after {
+    background-color: #ff6f61;
+}

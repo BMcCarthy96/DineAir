@@ -113,3 +113,15 @@ exports.deleteRestaurant = async (req, res) => {
         res.status(500).json({ error: "Failed to delete restaurant" });
     }
 };
+
+exports.getFastPrepRestaurants = async (req, res) => {
+    const { timeBeforeBoarding } = req.query;
+
+    const restaurants = await Restaurant.findAll({
+        where: {
+            prepTime: { [Op.lte]: timeBeforeBoarding },
+        },
+    });
+
+    res.json(restaurants);
+};

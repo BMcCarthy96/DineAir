@@ -6,6 +6,7 @@ import './index.css';
 import configureStore from './store';
 import { restoreCSRF, csrfFetch } from './store/csrf';
 import * as sessionActions from './store/session';
+import { ThemeProvider } from "./context/ThemeContext";
 
 
 const store = configureStore();
@@ -20,8 +21,10 @@ if (import.meta.env.MODE !== 'production') {
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
+    <ThemeProvider>
       <Provider store={store}>
         <App />
       </Provider>
+    </ThemeProvider>
   </React.StrictMode>
 );
