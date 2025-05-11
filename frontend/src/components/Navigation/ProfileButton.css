@@ -8,10 +8,17 @@
     font-size: 24px;
     position: relative;
     margin-left: 10px;
+    transition: background-color 0.3s ease, color 0.3s ease;
   }
 
   .profile-button:hover {
     color: #b2b2b2;
+  }
+
+  /* Dark mode profile button */
+  body.dark .profile-button {
+    background-color: #2D2D2D; /* Soft cream background in dark mode */
+    color: #FFF8F0; /* Charcoal text color for contrast */
   }
 
   .profile-dropdown {
@@ -75,7 +82,7 @@
     align-items: center;
     justify-content: center;
     background-color: #FF6F61;
-    color: white;
+    color: #333333;
     border: none;
     border-radius: 20px;
     height: 35px;

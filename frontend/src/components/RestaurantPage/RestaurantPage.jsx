@@ -8,9 +8,6 @@ function RestaurantPage() {
 
     return (
         <div className="restaurant-page">
-            <div className="restaurant-header">
-                <h1>Restaurant Details</h1>
-            </div>
             <div className="restaurant-content">
                 <RestaurantDetails restaurantId={restaurantId} />
                 <RestaurantReviews restaurantId={restaurantId} />

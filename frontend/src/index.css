@@ -1,19 +1,23 @@
 :root {
-    /* Light Theme Variables */
-    --background-light: #f9f9f9;
-    --text-light: #333;
-    --navbar-light: #ffffff;
-    --card-light: #ffffff;
-    --button-light: #ff6f61;
-    --button-hover-light: #f84d3e;
+    /* Background Colors */
+    --background-light: #FFF8F0; /* Soft Cream */
+    --background-dark: #2D2D2D; /* Charcoal for dark mode */
 
-    /* Dark Theme Variables */
-    --background-dark: #1e1e1e;
-    --text-dark: #f9f9f9;
-    --navbar-dark: #2c2c2c;
-    --card-dark: #333333;
-    --button-dark: #ff6f61;
-    --button-hover-dark: #f84d3e;
+    /* Text Colors */
+    --text-primary: #2D2D2D; /* Charcoal */
+    --text-secondary: #6E6E6E; /* Warm Gray */
+    --text-on-dark: #FFFFFA; /* Ivory for text on dark backgrounds */
+
+    /* Button Colors */
+    --button-primary: #E94E3C; /* Tomato Red */
+    --button-primary-hover: #D43C2A; /* Slightly darker red for hover */
+    --button-secondary: #FFD166; /* Golden Yellow */
+    --button-secondary-hover: #FFC34D; /* Slightly darker yellow for hover */
+    --button-success: #88B04B; /* Sage Green */
+
+    /* Accent Colors */
+    --accent-highlight: #FFD166; /* Golden Yellow */
+    --accent-success: #88B04B; /* Sage Green */
 }
 
 body.light {

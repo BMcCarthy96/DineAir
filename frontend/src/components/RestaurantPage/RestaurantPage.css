@@ -18,7 +18,7 @@
 .restaurant-header h1 {
     font-size: 36px;
     font-weight: bold;
-    color: var(--text-light);
+    color: var(--text-dark);
     transition: color 0.3s ease;
 }
 
