@@ -138,3 +138,7 @@
   .sidebar-link:hover {
     color: #FF6F61;
   }
+
+  .icon-padding {
+  margin-right: 8px;
+  }

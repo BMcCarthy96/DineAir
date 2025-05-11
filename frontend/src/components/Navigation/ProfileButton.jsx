@@ -3,6 +3,8 @@ import { useDispatch } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import * as sessionActions from '../../store/session';
 import { HiBars3 } from "react-icons/hi2";
+import { PiReceiptFill } from "react-icons/pi";
+import { IoIosHeart } from "react-icons/io";
 import './ProfileButton.css';
 
 function ProfileButton({ user }) {
@@ -66,12 +68,12 @@ function ProfileButton({ user }) {
             <hr />
             <div className="manage-div">
               <div>
-                <Link to="/orders" className="manage-link">
-                  My Orders
+                <Link to="/orders" className="manage-link"> <PiReceiptFill size={20} className="icon-padding"/>
+                  Orders
                 </Link>
               </div>
               <div>
-                <Link to="/favorites" className="manage-link">
+                <Link to="/favorites" className="manage-link"> <IoIosHeart size={20} className="icon-padding"/>
                   Favorites
                 </Link>
               </div>

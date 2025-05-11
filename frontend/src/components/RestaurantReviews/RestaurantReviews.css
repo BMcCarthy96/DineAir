@@ -54,10 +54,35 @@
 }
 
 .review-card {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
     background-color: #f9f9f9;
     border-radius: 12px;
     padding: 15px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    gap: 10px;
+}
+
+.review-card.edit-mode {
+    gap: 15px;
+}
+
+.review-card textarea {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    resize: vertical;
+}
+
+.review-card input[type="number"] {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
 }
 
 .review-card h3 {
@@ -79,31 +104,45 @@
     color: #ffcc00;
 }
 
+button,
+.add-to-cart-button,
+.add-review-button,
 .edit-button,
 .delete-button,
 .save-button,
 .cancel-button {
-    background-color: #ff6f61;
-    color: white;
+    background-color: #ff6f61; /* Tomato Red */
+    color: white; /* White text */
     border: none;
     border-radius: 6px;
     padding: 10px 15px;
     font-size: 14px;
     cursor: pointer;
-    margin-right: 10px;
-    transition: background-color 0.3s ease;
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
+/* Hover effects */
+button:hover,
+.add-to-cart-button:hover,
+.add-review-button:hover,
 .edit-button:hover,
+.delete-button:hover,
 .save-button:hover {
-    background-color: #f84d3e;
-}
-
-.delete-button:hover {
-    background-color: #d9534f;
+    background-color: #f84d3e; /* Slightly darker red for hover */
 }
 
 .cancel-button:hover {
     background-color: #ccc;
     color: #333;
+}
+
+body.dark button,
+body.dark .add-to-cart-button,
+body.dark .add-review-button,
+body.dark .edit-button,
+body.dark .delete-button,
+body.dark .save-button,
+body.dark .cancel-button {
+    background-color: #ff6f61; /* Retain the same color in dark mode */
+    color: white; /* Ensure text remains white */
 }

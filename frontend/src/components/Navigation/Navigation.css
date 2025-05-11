@@ -10,6 +10,18 @@
   z-index: 1000;
 }
 
+/* Light mode navbar */
+body.light .navbar {
+  background-color: var(--background-light); /* Solid background for light mode */
+  color: var(--text-primary);
+}
+
+/* Dark mode navbar */
+body.dark .navbar {
+  background-color: var(--background-dark); /* Solid background for dark mode */
+  color: var(--text-on-dark);
+}
+
 .nav-left {
   display: flex;
   align-items: center;
@@ -182,6 +194,7 @@ body.dark .theme-toggle-button {
     width: 30px;
     height: 30px;
     transition: transform 0.3s ease;
+    margin-left: 5px;
 }
 
 .theme-toggle-button:hover .theme-toggle-icon {
