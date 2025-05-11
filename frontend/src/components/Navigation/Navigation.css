@@ -1,151 +1,155 @@
 .navbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background-color: #ff6f61;
-  padding: 10px 20px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  position: sticky;
-  top: 0;
-  z-index: 1000;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #ff6f61;
+    padding: 10px 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
 }
 
 /* Light mode navbar */
 body.light .navbar {
-  background-color: var(--background-light); /* Solid background for light mode */
-  color: var(--text-primary);
+    background-color: var(
+        --background-light
+    ); /* Solid background for light mode */
+    color: var(--text-primary);
 }
 
 /* Dark mode navbar */
 body.dark .navbar {
-  background-color: var(--background-dark); /* Solid background for dark mode */
-  color: var(--text-on-dark);
+    background-color: var(
+        --background-dark
+    ); /* Solid background for dark mode */
+    color: var(--text-on-dark);
 }
 
 .nav-left {
-  display: flex;
-  align-items: center;
-  gap: 15px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
 }
 
 .logo {
-  font-size: 24px;
-  font-weight: bold;
-  color: white;
-  text-decoration: none;
+    font-size: 24px;
+    font-weight: bold;
+    color: white;
+    text-decoration: none;
 }
 
 body.light .logo {
-  color: black; /* Change to black in light mode */
+    color: black; /* Change to black in light mode */
 }
 
 .nav-center {
-  flex: 1;
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  margin-right: 60px;
-  position: relative;
+    flex: 1;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    margin-right: 60px;
+    position: relative;
 }
 
 .search-bar {
-  display: flex;
-  align-items: center;
-  background-color: white;
-  border-radius: 30px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
-  width: 800px;
-  max-width: 100%;
-  padding: 0 15px;
+    display: flex;
+    align-items: center;
+    background-color: white;
+    border-radius: 30px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    width: 800px;
+    max-width: 100%;
+    padding: 0 15px;
 }
 
 .search-icon {
-  color: #666;
-  font-size: 18px;
-  margin-right: 10px;
+    color: #666;
+    font-size: 18px;
+    margin-right: 10px;
 }
 
 .search-bar input {
-  flex: 1;
-  padding: 12px 0;
-  border: none;
-  outline: none;
-  font-size: 16px;
+    flex: 1;
+    padding: 12px 0;
+    border: none;
+    outline: none;
+    font-size: 16px;
 }
 
 .search-dropdown {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  width: 100%;
-  background-color: white;
-  border-radius: 8px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  z-index: 1000;
-  max-height: 300px;
-  overflow-y: auto;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    max-height: 300px;
+    overflow-y: auto;
 }
 
 .dropdown-section {
-  padding: 10px;
+    padding: 10px;
 }
 
 .dropdown-section h4 {
-  font-size: 14px;
-  font-weight: bold;
-  color: #333;
-  margin-bottom: 5px;
+    font-size: 14px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 5px;
 }
 
 .dropdown-section ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
+    list-style: none;
+    padding: 0;
+    margin: 0;
 }
 
 .dropdown-section li {
-  padding: 8px 10px;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
+    padding: 8px 10px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
 }
 
 .dropdown-section li:hover {
-  background-color: #f1f1f1;
+    background-color: #f1f1f1;
 }
 
 .no-results {
-  padding: 10px;
-  text-align: center;
-  color: #666;
-  font-size: 14px;
+    padding: 10px;
+    text-align: center;
+    color: #666;
+    font-size: 14px;
 }
 
 .nav-right {
-  display: flex;
-  align-items: center;
-  gap: 15px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
 }
 
 .cart-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: white;
-  color: #ff6f61;
-  border-radius: 50%;
-  width: 40px;
-  height: 40px;
-  text-decoration: none;
-  transition: background-color 0.3s, color 0.3s, transform 0.2s;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  margin-right: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: white;
+    color: #ff6f61;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    text-decoration: none;
+    transition: background-color 0.3s, color 0.3s, transform 0.2s;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin-right: 10px;
 }
 
 .cart-icon:hover {
-  background-color: #ff6f61;
-  color: white;
-  transform: scale(1.1);
+    background-color: #ff6f61;
+    color: white;
+    transform: scale(1.1);
 }
 
 /* Light mode cart icon */
@@ -155,48 +159,76 @@ body.light .cart-icon {
 }
 
 .nav-button {
-  background-color: white;
-  color: #ff6f61;
-  border: none;
-  border-radius: 20px;
-  padding: 10px 20px;
-  font-size: 16px;
-  font-weight: bold;
-  text-decoration: none;
-  cursor: pointer;
-  transition: background-color 0.3s, color 0.3s;
+    background-color: white;
+    color: #ff6f61;
+    border: none;
+    border-radius: 20px;
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
 }
 
 .nav-button:hover {
-  background-color: #ff6f61;
-  color: white;
+    background-color: #ff6f61;
+    color: white;
 }
 
 .theme-toggle-button {
-    background-color: var(--navbar-light); /* Default to light navbar color */
-    border: none;
-    cursor: pointer;
-    padding: 5px;
     display: flex;
     align-items: center;
     justify-content: center;
+    background-color: white; /* Default background for light mode */
+    color: #ff6f61; /* Default icon color */
     border-radius: 50%;
-    transition: background-color 0.3s ease, transform 0.3s ease;
+    width: 40px;
+    height: 40px;
+    text-decoration: none;
+    transition: background-color 0.3s, color 0.3s, transform 0.2s;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin-right: 10px;
 }
 
-/* Dark mode theme toggle button */
+/* Hover Effect for Theme Toggle Button */
+.theme-toggle-button:hover {
+    background-color: #ff6f61; /* Tomato Red on hover */
+    color: white; /* White icon on hover */
+    transform: scale(1.1); /* Slight zoom effect */
+}
+
+/* Light Mode Theme Toggle Button */
+body.light .theme-toggle-button {
+    background-color: black; /* Black bubble */
+    color: white; /* White icon */
+}
+
+body.light .theme-toggle-button:hover {
+    background-color: #ff6f61; /* Tomato Red on hover */
+    color: white; /* White icon on hover */
+    transform: scale(1.1); /* Slight zoom effect */
+}
+
+/* Dark Mode Theme Toggle Button */
 body.dark .theme-toggle-button {
-    background-color: var(--navbar-dark); /* Match dark navbar color */
+    background-color: white; /* White bubble */
+    color: #ff6f61; /* Tomato Red icon */
 }
 
+body.dark .theme-toggle-button:hover {
+    background-color: #ff6f61; /* Tomato Red on hover */
+    color: white; /* White icon on hover */
+    transform: scale(1.1); /* Slight zoom effect */
+}
+
+/* Theme Toggle Icon */
 .theme-toggle-icon {
-    width: 30px;
-    height: 30px;
-    transition: transform 0.3s ease;
-    margin-left: 5px;
+    width: 24px;
+    height: 24px;
+    transition: transform 0.3s ease, color 0.3s ease;
 }
 
 .theme-toggle-button:hover .theme-toggle-icon {
-    transform: scale(1.1);
+    transform: scale(1.1); /* Slight zoom effect for the icon */
 }

@@ -40,10 +40,15 @@ body.dark {
 .navbar {
     background-color: var(--navbar-light);
     transition: background-color 0.3s ease, color 0.3s ease;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
 }
 
 body.dark .navbar {
-    background-color: var(--navbar-dark);
+    background-color: var(
+        --background-dark
+    ); /* Ensure navbar stays dark while scrolling */
 }
 
 .card {

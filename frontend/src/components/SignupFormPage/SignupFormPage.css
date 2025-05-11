@@ -6,45 +6,45 @@
     background: linear-gradient(to bottom, #ff6f61, #ff9a85);
     /* background: url('/path/to/your/background-image.jpg') no-repeat center center fixed;
     background-size: cover; */
-  }
+}
 
-  .signup-box {
+.signup-box {
     background-color: white;
     border-radius: 12px;
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
     padding: 40px;
     width: 500px;
     text-align: center;
-  }
+}
 
-  .signup-box h1 {
+.signup-box h1 {
     font-size: 32px;
     font-weight: bold;
     color: #333;
     margin-bottom: 10px;
-  }
+}
 
-  .signup-subtitle {
+.signup-subtitle {
     font-size: 16px;
     color: #666;
     margin-bottom: 20px;
-  }
+}
 
-  .signup-form input {
-    width: 100%;
+.signup-form input {
+    width: 90%;
     padding: 12px;
     margin-bottom: 15px;
     border: 1px solid #ccc;
     border-radius: 8px;
     font-size: 16px;
-  }
+}
 
-  .signup-form input:focus {
+.signup-form input:focus {
     border-color: #ff6f61;
     outline: none;
-  }
+}
 
-  .signup-form select {
+.signup-form select {
     width: 100%;
     padding: 12px;
     margin-bottom: 15px;
@@ -59,7 +59,7 @@
     outline: none;
 }
 
-  .signup-button {
+.signup-button {
     width: 100%;
     padding: 12px;
     background-color: #ff6f61;
@@ -70,30 +70,30 @@
     border-radius: 8px;
     cursor: pointer;
     transition: background-color 0.3s;
-  }
+}
 
-  .signup-button:hover {
+.signup-button:hover {
     background-color: #f84d3e;
-  }
+}
 
-  .login-link {
+.login-link {
     margin-top: 20px;
     font-size: 14px;
     color: #666;
-  }
+}
 
-  .login-link a {
+.login-link a {
     color: #ff6f61;
     text-decoration: none;
     font-weight: bold;
-  }
+}
 
-  .login-link a:hover {
+.login-link a:hover {
     text-decoration: underline;
-  }
+}
 
-  .error-message {
+.error-message {
     color: red;
     font-size: 14px;
     margin-bottom: 10px;
-  }
+}
