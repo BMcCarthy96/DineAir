@@ -42,4 +42,11 @@ router.get(
     deliveryController.getRunnerLocation
 );
 
+// Update order status
+router.post(
+    "/update-order-status",
+    requireAuth,
+    deliveryController.updateOrderStatus
+);
+
 module.exports = router;

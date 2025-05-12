@@ -1,7 +1,7 @@
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { useState, useEffect } from "react";
-import { FaShoppingCart, FaSearch } from "react-icons/fa";
+import { FaShoppingCart, FaSearch, FaLightbulb } from "react-icons/fa";
 import ProfileButton from "./ProfileButton";
 import { searchRestaurantsAndMenuItems } from "../../store/search";
 import { useTheme } from "../../context/ThemeContext";
@@ -17,7 +17,8 @@ function Navigation() {
     const [showDropdown, setShowDropdown] = useState(false);
     const { theme, toggleTheme } = useTheme();
 
-    const isAuthPage = location.pathname === "/login" || location.pathname === "/signup";
+    const isAuthPage =
+        location.pathname === "/login" || location.pathname === "/signup";
 
     // Debounce function to delay API calls
     useEffect(() => {
@@ -60,7 +61,10 @@ function Navigation() {
                             value={query}
                             onChange={(e) => setQuery(e.target.value)}
                             onFocus={() => {
-                                if (searchResults.restaurants.length || searchResults.menuItems.length) {
+                                if (
+                                    searchResults.restaurants.length ||
+                                    searchResults.menuItems.length
+                                ) {
                                     setShowDropdown(true); // Show dropdown when input is focused
                                 }
                             }}
@@ -72,14 +76,21 @@ function Navigation() {
                                 <div className="dropdown-section">
                                     <h4>Restaurants</h4>
                                     <ul>
-                                        {searchResults.restaurants.map((restaurant) => (
-                                            <li
-                                                key={restaurant.id}
-                                                onClick={() => handleResultClick("restaurant", restaurant.id)}
-                                            >
-                                                {restaurant.name}
-                                            </li>
-                                        ))}
+                                        {searchResults.restaurants.map(
+                                            (restaurant) => (
+                                                <li
+                                                    key={restaurant.id}
+                                                    onClick={() =>
+                                                        handleResultClick(
+                                                            "restaurant",
+                                                            restaurant.id
+                                                        )
+                                                    }
+                                                >
+                                                    {restaurant.name}
+                                                </li>
+                                            )
+                                        )}
                                     </ul>
                                 </div>
                             )}
@@ -87,22 +98,30 @@ function Navigation() {
                                 <div className="dropdown-section">
                                     <h4>Menu Items</h4>
                                     <ul>
-                                        {searchResults.menuItems.map((menuItem) => (
-                                            <li
-                                                key={menuItem.id}
-                                                onClick={() =>
-                                                    handleResultClick("menuItem", menuItem.id, menuItem.restaurantId)
-                                                }
-                                            >
-                                                {menuItem.name}
-                                            </li>
-                                        ))}
+                                        {searchResults.menuItems.map(
+                                            (menuItem) => (
+                                                <li
+                                                    key={menuItem.id}
+                                                    onClick={() =>
+                                                        handleResultClick(
+                                                            "menuItem",
+                                                            menuItem.id,
+                                                            menuItem.restaurantId
+                                                        )
+                                                    }
+                                                >
+                                                    {menuItem.name}
+                                                </li>
+                                            )
+                                        )}
                                     </ul>
                                 </div>
                             )}
                             {searchResults.restaurants.length === 0 &&
                                 searchResults.menuItems.length === 0 && (
-                                    <div className="no-results">No results found</div>
+                                    <div className="no-results">
+                                        No results found
+                                    </div>
                                 )}
                         </div>
                     )}
@@ -127,15 +146,7 @@ function Navigation() {
             )}
             <div className="nav-right">
                 <button onClick={toggleTheme} className="theme-toggle-button">
-                    <img
-                        src={
-                            theme === "light"
-                                ? "/images/darkThemeToggle-icon.png"
-                                : "/images/lightThemeToggle-icon.png"
-                        }
-                        alt={theme === "light" ? "Switch to Dark Mode" : "Switch to Light Mode"}
-                        className="theme-toggle-icon"
-                    />
+                    <FaLightbulb className="theme-toggle-icon" size={24} />
                 </button>
             </div>
         </nav>

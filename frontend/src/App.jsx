@@ -1,11 +1,11 @@
-import { useState, useEffect } from 'react';
-import { useDispatch } from 'react-redux';
-import { createBrowserRouter, RouterProvider, Outlet } from 'react-router-dom';
-import Navigation from './components/Navigation';
-import * as sessionActions from './store/session';
-import LoginFormPage from './components/LoginFormPage';
-import SignupFormPage from './components/SignupFormPage';
-import LandingPage from './components/LandingPage';
+import { useState, useEffect } from "react";
+import { useDispatch } from "react-redux";
+import { createBrowserRouter, RouterProvider, Outlet } from "react-router-dom";
+import Navigation from "./components/Navigation";
+import * as sessionActions from "./store/session";
+import LoginFormPage from "./components/LoginFormPage";
+import SignupFormPage from "./components/SignupFormPage";
+import LandingPage from "./components/LandingPage";
 import RestaurantPage from "./components/RestaurantPage/RestaurantPage";
 import RestaurantDetails from "./components/RestaurantDetails/RestaurantDetails";
 import MenuItemPage from "./components/MenuItemPage/MenuItemPage";
@@ -26,93 +26,97 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 function Layout() {
-  const dispatch = useDispatch();
-  const [isLoaded, setIsLoaded] = useState(false);
+    const dispatch = useDispatch();
+    const [isLoaded, setIsLoaded] = useState(false);
 
-  useEffect(() => {
-    dispatch(sessionActions.restoreUser()).then(() => {
-      setIsLoaded(true)
-    });
-  }, [dispatch]);
+    useEffect(() => {
+        dispatch(sessionActions.restoreUser()).then(() => {
+            setIsLoaded(true);
+        });
+    }, [dispatch]);
 
-  return (
-    <>
-      <Navigation isLoaded={isLoaded} />
-      {isLoaded && <Outlet />}
-    </>
-  );
+    return (
+        <>
+            <Navigation isLoaded={isLoaded} />
+            {isLoaded && <Outlet />}
+        </>
+    );
 }
 
 const router = createBrowserRouter([
-  {
-    element: <Layout />,
-    children: [
-      {
-        path: '/',
-        element: <LandingPage />
-      },
-      {
-        path: '/login',
-        element: <LoginFormPage />
-      },
-      {
-        path: '/signup',
-        element: <SignupFormPage />
-      },
-      {
-        path: "/cart",
-        element: <CartPage />,
-      },
-      {
-        path: "/checkout",
-        element: <CheckoutPage />,
-      },
-      {
-        path: "/orders",
-        element: <OrderHistoryPage />,
-      },
-      {
-        path: "/restaurants/:restaurantId",
-        element: <RestaurantPage />,
-      },
-      {
-        path: "/restaurants/:restaurantId/edit",
-        element: <EditRestaurantPage /> },
-      {
-        path: "/restaurants/:restaurantId/menu-items",
-        element: <RestaurantDetails />,
-      },
-      {
-        path: "/restaurants/:restaurantId/menu-items/:menuItemId",
-        element: <MenuItemPage /> },
-      {
-        path: "/restaurants/admin",
-        element: <AdminRestaurantsPage />,
-      },
-      {
-        path: "/restaurants/owner",
-        element: <OwnerRestaurantsPage />,
-      },
-      {
-        path: "/restaurants/new",
-        element: <CreateRestaurantPage /> },
-      {
-        path: "/delivery-tracking",
-        element: <DeliveryTrackingPage />,
-      },
-      {
-        path: "/runner-dashboard",
-        element: <RunnerDashboardPage />,
-      },
-      {
-        path: "/favorites",
-        element: <FavoritesPage /> },
-      {
-        path: '*',
-        element: <h1>Page Not Found</h1>
-      }
-    ]
-  }
+    {
+        element: <Layout />,
+        children: [
+            {
+                path: "/",
+                element: <LandingPage />,
+            },
+            {
+                path: "/login",
+                element: <LoginFormPage />,
+            },
+            {
+                path: "/signup",
+                element: <SignupFormPage />,
+            },
+            {
+                path: "/cart",
+                element: <CartPage />,
+            },
+            {
+                path: "/checkout",
+                element: <CheckoutPage />,
+            },
+            {
+                path: "/orders",
+                element: <OrderHistoryPage />,
+            },
+            {
+                path: "/restaurants/:restaurantId",
+                element: <RestaurantPage />,
+            },
+            {
+                path: "/restaurants/:restaurantId/edit",
+                element: <EditRestaurantPage />,
+            },
+            {
+                path: "/restaurants/:restaurantId/menu-items",
+                element: <RestaurantDetails />,
+            },
+            {
+                path: "/restaurants/:restaurantId/menu-items/:menuItemId",
+                element: <MenuItemPage />,
+            },
+            {
+                path: "/restaurants/admin",
+                element: <AdminRestaurantsPage />,
+            },
+            {
+                path: "/restaurants/owner",
+                element: <OwnerRestaurantsPage />,
+            },
+            {
+                path: "/restaurants/new",
+                element: <CreateRestaurantPage />,
+            },
+            {
+                path: "/delivery-tracking",
+                element: <DeliveryTrackingPage />,
+            },
+            {
+                path: "/runner-dashboard",
+                element: <RunnerDashboardPage />,
+            },
+            {
+                path: "/favorites",
+                element: <FavoritesPage />,
+            },
+            {
+                path: "*",
+                element: <h1>Page Not Found</h1>,
+            },
+        ],
+    },
 ]);
 
 function App() {
@@ -129,11 +133,21 @@ function App() {
     }, []);
 
     return (
-      <>
-        <RouterProvider router={router} />;
-        <ToastContainer />
-      </>
-    )
+        <>
+            <RouterProvider router={router} />;
+            <ToastContainer
+                position="top-center"
+                autoClose={3000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+            />
+        </>
+    );
 }
 
 export default App;

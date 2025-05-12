@@ -48,6 +48,20 @@ module.exports = {
         }
     },
 
+    async updateOrderStatus(req, res, next) {
+        try {
+            const { orderId, status } = req.body;
+
+            // Emit order status update to all clients
+            io.emit("orderStatusUpdate", { orderId, status });
+
+            res.json({ success: true, message: "Order status updated." });
+        } catch (err) {
+            console.error("Error updating order status:", err);
+            next(err);
+        }
+    },
+
     async notifyGateChange(req, res, next) {
         try {
             const { gate, terminal } = req.body;

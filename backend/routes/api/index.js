@@ -10,6 +10,7 @@ const ordersRouter = require("./orders.js");
 const deliveryRouter = require("./deliveries.js");
 const restaurantRouter = require("./restaurants.js");
 const reviewRouter = require("./reviews.js");
+const reviewLikesRouter = require("./reviewLikes");
 const menuItemRouter = require("./menuItems.js");
 const flightsRouter = require("./flights");
 const notificationsRouter = require("./notifications");
@@ -33,6 +34,7 @@ router.use("/deliveries", deliveryRouter);
 router.use("/restaurants", restaurantRouter);
 router.use("/notifications", notificationsRouter);
 router.use("/favorites", favoritesRouter);
+router.use("/reviewLikes", reviewLikesRouter);
 
 // Flights
 router.use("/flights", flightsRouter);

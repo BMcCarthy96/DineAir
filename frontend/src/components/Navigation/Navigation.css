@@ -131,33 +131,35 @@ body.light .logo {
     gap: 15px;
 }
 
-.cart-icon {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+.cart-icon,
+.theme-toggle-button {
     background-color: white;
     color: #ff6f61;
-    border-radius: 50%;
-    width: 40px;
-    height: 40px;
+    border: none;
+    border-radius: 20px;
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: bold;
     text-decoration: none;
-    transition: background-color 0.3s, color 0.3s, transform 0.2s;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
     margin-right: 10px;
 }
 
-.cart-icon:hover {
+.cart-icon:hover,
+.theme-toggle-button:hover {
     background-color: #ff6f61;
     color: white;
-    transform: scale(1.1);
 }
 
-/* Light mode cart icon */
-body.light .cart-icon {
-    background-color: black; /* Black bubble */
-    color: white; /* White cart icon */
+/* Light mode cart/toggle icon */
+body.light .cart-icon,
+.theme-toggle-button {
+    background-color: black;
+    color: white;
 }
 
+/* Login/Signup Button */
 .nav-button {
     background-color: white;
     color: #ff6f61;
@@ -169,66 +171,10 @@ body.light .cart-icon {
     text-decoration: none;
     cursor: pointer;
     transition: background-color 0.3s, color 0.3s;
+    margin-right: 10px;
 }
 
 .nav-button:hover {
     background-color: #ff6f61;
     color: white;
-}
-
-.theme-toggle-button {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: white; /* Default background for light mode */
-    color: #ff6f61; /* Default icon color */
-    border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    text-decoration: none;
-    transition: background-color 0.3s, color 0.3s, transform 0.2s;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    margin-right: 10px;
-}
-
-/* Hover Effect for Theme Toggle Button */
-.theme-toggle-button:hover {
-    background-color: #ff6f61; /* Tomato Red on hover */
-    color: white; /* White icon on hover */
-    transform: scale(1.1); /* Slight zoom effect */
-}
-
-/* Light Mode Theme Toggle Button */
-body.light .theme-toggle-button {
-    background-color: black; /* Black bubble */
-    color: white; /* White icon */
-}
-
-body.light .theme-toggle-button:hover {
-    background-color: #ff6f61; /* Tomato Red on hover */
-    color: white; /* White icon on hover */
-    transform: scale(1.1); /* Slight zoom effect */
-}
-
-/* Dark Mode Theme Toggle Button */
-body.dark .theme-toggle-button {
-    background-color: white; /* White bubble */
-    color: #ff6f61; /* Tomato Red icon */
-}
-
-body.dark .theme-toggle-button:hover {
-    background-color: #ff6f61; /* Tomato Red on hover */
-    color: white; /* White icon on hover */
-    transform: scale(1.1); /* Slight zoom effect */
-}
-
-/* Theme Toggle Icon */
-.theme-toggle-icon {
-    width: 24px;
-    height: 24px;
-    transition: transform 0.3s ease, color 0.3s ease;
-}
-
-.theme-toggle-button:hover .theme-toggle-icon {
-    transform: scale(1.1); /* Slight zoom effect for the icon */
 }

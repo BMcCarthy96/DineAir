@@ -1,6 +1,12 @@
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchReviewsByRestaurant, createReview, updateReview, deleteReview } from "../../store/reviews";
+import {
+    fetchReviewsByRestaurant,
+    createReview,
+    updateReview,
+    deleteReview,
+    toggleLike,
+} from "../../store/reviews";
 import "./RestaurantReviews.css";
 
 function RestaurantReviews({ restaurantId }) {
@@ -9,6 +15,12 @@ function RestaurantReviews({ restaurantId }) {
     const [error, setError] = useState(null);
     const [editingReview, setEditingReview] = useState(null);
     const [newReview, setNewReview] = useState({ rating: "", comment: "" });
+    const userId = useSelector((state) => state.session.user.id);
+
+    const handleToggleLike = (review) => {
+        const isLiked = review.likes?.includes(userId);
+        dispatch(toggleLike(review.id, userId, isLiked));
+    };
 
     useEffect(() => {
         const handleFetchReviews = async () => {
@@ -33,8 +45,9 @@ function RestaurantReviews({ restaurantId }) {
 
     const handleEditReview = async (review) => {
         try {
-            console.log("Editing review:", { ...review, ...editingReview }); // Debugging
-            await dispatch(updateReview(restaurantId, { ...review, ...editingReview }));
+            await dispatch(
+                updateReview(restaurantId, { ...review, ...editingReview })
+            );
             setEditingReview(null);
         } catch (err) {
             setError("Failed to edit review. Please try again.");
@@ -42,10 +55,8 @@ function RestaurantReviews({ restaurantId }) {
     };
 
     const handleDeleteReview = async (reviewId) => {
-        console.log("Review ID passed to handleDeleteReview:", reviewId); // Debugging
         if (window.confirm("Are you sure you want to delete this review?")) {
             try {
-                console.log("Deleting review with ID:", reviewId); // Debugging
                 await dispatch(deleteReview(restaurantId, reviewId));
             } catch (err) {
                 setError("Failed to delete review. Please try again.");
@@ -61,13 +72,17 @@ function RestaurantReviews({ restaurantId }) {
                 <textarea
                     placeholder="Write your review..."
                     value={newReview.comment}
-                    onChange={(e) => setNewReview({ ...newReview, comment: e.target.value })}
+                    onChange={(e) =>
+                        setNewReview({ ...newReview, comment: e.target.value })
+                    }
                 />
                 <input
                     type="number"
                     placeholder="Rating (1-5)"
                     value={newReview.rating}
-                    onChange={(e) => setNewReview({ ...newReview, rating: e.target.value })}
+                    onChange={(e) =>
+                        setNewReview({ ...newReview, rating: e.target.value })
+                    }
                     min="1"
                     max="5"
                 />
@@ -77,59 +92,86 @@ function RestaurantReviews({ restaurantId }) {
             </div>
             {reviews && Object.values(reviews).length > 0 ? (
                 <ul className="review-list">
-                    {Object.values(reviews).map((review) => (
-                        <li key={review.id} className="review-card">
-                            {editingReview?.id === review.id ? (
-                                <>
-                                    <textarea
-                                        value={editingReview.comment}
-                                        onChange={(e) =>
-                                            setEditingReview({ ...editingReview, comment: e.target.value })
-                                        }
-                                    />
-                                    <input
-                                        type="number"
-                                        value={editingReview.rating}
-                                        onChange={(e) =>
-                                            setEditingReview({ ...editingReview, rating: e.target.value })
-                                        }
-                                        min="1"
-                                        max="5"
-                                    />
+                    {Object.values(reviews).map((review) => {
+                        const isLiked = review.likes?.includes(userId); // Define isLiked here
+                        return (
+                            <li key={review.id} className="review-card">
+                                <h3>{review.User.username}</h3>
+                                <p className="comment">{review.comment}</p>
+                                <p className="rating">
+                                    Rating: {review.rating} / 5
                                     <button
-                                        onClick={() => handleEditReview(review)}
-                                        className="save-button"
+                                        onClick={() => handleToggleLike(review)}
+                                        className={`like-button ${
+                                            isLiked ? "liked" : ""
+                                        }`}
                                     >
-                                        Save
+                                        👍
                                     </button>
-                                    <button
-                                        onClick={() => setEditingReview(null)}
-                                        className="cancel-button"
-                                    >
-                                        Cancel
-                                    </button>
-                                </>
-                            ) : (
-                                <>
-                                    <h3>{review.User.username}</h3>
-                                    <p className="comment">{review.comment}</p>
-                                    <p className="rating">Rating: {review.rating} / 5</p>
-                                    <button
-                                        onClick={() => setEditingReview(review)}
-                                        className="edit-button"
-                                    >
-                                        Edit
-                                    </button>
-                                    <button
-                                        onClick={() => handleDeleteReview(review.id)}
-                                        className="delete-button"
-                                    >
-                                        Delete
-                                    </button>
-                                </>
-                            )}
-                        </li>
-                    ))}
+                                </p>
+                                {editingReview?.id === review.id ? (
+                                    <>
+                                        <textarea
+                                            value={editingReview.comment}
+                                            onChange={(e) =>
+                                                setEditingReview({
+                                                    ...editingReview,
+                                                    comment: e.target.value,
+                                                })
+                                            }
+                                        />
+                                        <input
+                                            type="number"
+                                            value={editingReview.rating}
+                                            onChange={(e) =>
+                                                setEditingReview({
+                                                    ...editingReview,
+                                                    rating: e.target.value,
+                                                })
+                                            }
+                                            min="1"
+                                            max="5"
+                                        />
+                                        <button
+                                            onClick={() =>
+                                                handleEditReview(review)
+                                            }
+                                            className="save-button"
+                                        >
+                                            Save
+                                        </button>
+                                        <button
+                                            onClick={() =>
+                                                setEditingReview(null)
+                                            }
+                                            className="cancel-button"
+                                        >
+                                            Cancel
+                                        </button>
+                                    </>
+                                ) : (
+                                    <>
+                                        <button
+                                            onClick={() =>
+                                                setEditingReview(review)
+                                            }
+                                            className="edit-button"
+                                        >
+                                            Edit
+                                        </button>
+                                        <button
+                                            onClick={() =>
+                                                handleDeleteReview(review.id)
+                                            }
+                                            className="delete-button"
+                                        >
+                                            Delete
+                                        </button>
+                                    </>
+                                )}
+                            </li>
+                        );
+                    })}
                 </ul>
             ) : (
                 <p>No reviews available for this restaurant.</p>

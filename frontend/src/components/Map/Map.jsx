@@ -1,7 +1,13 @@
 import { useState, useEffect, useCallback } from "react";
-import { GoogleMap, LoadScript, DirectionsRenderer, Marker } from "@react-google-maps/api";
+import {
+    GoogleMap,
+    LoadScript,
+    DirectionsRenderer,
+    Marker,
+} from "@react-google-maps/api";
 import { motion } from "framer-motion";
 import "./Map.css";
+import Cookies from "js-cookie";
 
 const containerStyle = {
     width: "100%",
@@ -18,6 +24,8 @@ function Map({ runnerLocation, gateLocation, isRunnerView }) {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
+                Authorization: `Bearer ${localStorage.getItem("token")}`,
+                "XSRF-Token": Cookies.get("XSRF-TOKEN"),
             },
             body: JSON.stringify({ runnerLocation, gateLocation }),
         });
@@ -38,7 +46,11 @@ function Map({ runnerLocation, gateLocation, isRunnerView }) {
 
     return (
         <LoadScript googleMapsApiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY}>
-            <GoogleMap mapContainerStyle={containerStyle} center={runnerLocation} zoom={12}>
+            <GoogleMap
+                mapContainerStyle={containerStyle}
+                center={runnerLocation}
+                zoom={12}
+            >
                 {/* Runner and Gate Markers */}
                 <Marker position={runnerLocation} label="Runner" />
                 <Marker position={gateLocation} label="Gate" />
@@ -63,7 +75,9 @@ function Map({ runnerLocation, gateLocation, isRunnerView }) {
                 </motion.div>
 
                 {/* Directions Renderer */}
-                {!isRunnerView && directions && <DirectionsRenderer directions={directions} />}
+                {!isRunnerView && directions && (
+                    <DirectionsRenderer directions={directions} />
+                )}
             </GoogleMap>
         </LoadScript>
     );

@@ -24,6 +24,7 @@ module.exports = (sequelize, DataTypes) => {
             sequelize,
             modelName: "ReviewLike",
             tableName: "ReviewLikes",
+            timestamps: true,
             indexes: [
                 {
                     unique: true,

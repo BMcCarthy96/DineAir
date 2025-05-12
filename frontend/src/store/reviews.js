@@ -5,6 +5,7 @@ const SET_REVIEWS = "reviews/setReviews";
 const ADD_REVIEW = "reviews/addReview";
 const UPDATE_REVIEW = "reviews/updateReview";
 const DELETE_REVIEW = "reviews/deleteReview";
+const TOGGLE_LIKE = "reviews/toggleLike";
 
 // Action Creators
 const setReviews = (reviews) => ({
@@ -25,6 +26,11 @@ const updateReviewAction = (review) => ({
 const deleteReviewAction = (reviewId) => ({
     type: DELETE_REVIEW,
     payload: reviewId,
+});
+
+const toggleLikeAction = (reviewId, userId) => ({
+    type: TOGGLE_LIKE,
+    payload: { reviewId, userId },
 });
 
 // Thunk Actions
@@ -92,6 +98,29 @@ export const deleteReview = (restaurantId, reviewId) => async (dispatch) => {
     }
 };
 
+export const toggleLike = (reviewId, userId, isLiked) => async (dispatch) => {
+    try {
+        if (isLiked) {
+            // Unlike the review
+            await csrfFetch(`/api/reviewLikes/${reviewId}`, {
+                method: "DELETE",
+            });
+        } else {
+            // Like the review
+            await csrfFetch(`/api/reviewLikes`, {
+                method: "POST",
+                body: JSON.stringify({ reviewId }),
+            });
+        }
+
+        // Dispatch the toggle action
+        dispatch(toggleLikeAction(reviewId, userId));
+    } catch (err) {
+        console.error("Failed to toggle like:", err);
+        throw err;
+    }
+};
+
 // Reducer
 const initialState = {};
 
@@ -113,6 +142,24 @@ const reviewsReducer = (state = initialState, action) => {
             const newState = { ...state };
             delete newState[action.payload];
             return newState;
+        }
+        case TOGGLE_LIKE: {
+            const { reviewId, userId } = action.payload;
+            const review = state[reviewId];
+
+            // Toggle the like state
+            const isLiked = review.likes?.includes(userId);
+            const updatedLikes = isLiked
+                ? review.likes.filter((id) => id !== userId)
+                : [...(review.likes || []), userId];
+
+            return {
+                ...state,
+                [reviewId]: {
+                    ...review,
+                    likes: updatedLikes,
+                },
+            };
         }
         default:
             return state;
