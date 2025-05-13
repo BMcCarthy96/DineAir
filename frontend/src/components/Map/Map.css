@@ -6,54 +6,32 @@
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     margin: 20px auto;
     max-width: 1200px;
+    position: relative;
 }
 
-.map-controls {
+.custom-marker {
     display: flex;
-    justify-content: space-between;
+    flex-direction: column;
     align-items: center;
-    margin: 10px auto;
-    max-width: 1200px;
-    padding: 10px 20px;
-    background-color: #fff;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    justify-content: center;
+    text-align: center;
+    transform: translate(-50%, -100%);
+    position: absolute;
 }
 
-.map-controls button {
-    background-color: #ff6f61;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    padding: 10px 15px;
+.marker-icon {
+    font-size: 24px;
+    line-height: 1;
+    margin-bottom: 5px;
+}
+
+.marker-label {
     font-size: 14px;
     font-weight: bold;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-.map-controls button:hover {
-    background-color: #f84d3e;
-}
-
-.map-legend {
-    font-size: 14px;
-    color: #666;
-    margin-left: 10px;
-}
-
-.map-marker-info {
-    background-color: white;
-    border-radius: 8px;
-    padding: 10px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    font-size: 14px;
     color: #333;
-}
-
-.runner-icon {
-    position: absolute;
-    z-index: 10; /* Ensure it appears above the map */
-    font-size: 24px;
-    pointer-events: none; /* Prevent interaction with the icon */
+    background-color: white;
+    padding: 5px 10px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    white-space: nowrap;
 }

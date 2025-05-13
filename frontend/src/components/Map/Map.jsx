@@ -1,85 +1,125 @@
-import { useState, useEffect, useCallback } from "react";
-import {
-    GoogleMap,
-    LoadScript,
-    DirectionsRenderer,
-    Marker,
-} from "@react-google-maps/api";
-import { motion } from "framer-motion";
+import { useEffect, useRef } from "react";
 import "./Map.css";
-import Cookies from "js-cookie";
 
 const containerStyle = {
     width: "100%",
     height: "400px",
 };
 
-function Map({ runnerLocation, gateLocation, isRunnerView }) {
-    const [directions, setDirections] = useState(null);
+function Map({ runnerLocation, gateLocation }) {
+    const mapRef = useRef(null);
+    const mapInstance = useRef(null);
+    const runnerMarker = useRef(null);
+    const gateMarker = useRef(null);
+    const directionsRenderer = useRef(null);
 
-    const fetchDirections = useCallback(async () => {
-        if (!runnerLocation || !gateLocation) return;
+    useEffect(() => {
+        // Initialize the map
+        if (!mapInstance.current && window.google) {
+            mapInstance.current = new window.google.maps.Map(mapRef.current, {
+                center: runnerLocation,
+                zoom: 12,
+            });
 
-        const response = await fetch("/api/deliveries/calculate-eta", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
-                "XSRF-Token": Cookies.get("XSRF-TOKEN"),
-            },
-            body: JSON.stringify({ runnerLocation, gateLocation }),
-        });
+            // Add the runner marker
+            if (window.google.maps.marker?.AdvancedMarkerElement) {
+                runnerMarker.current =
+                    new window.google.maps.marker.AdvancedMarkerElement({
+                        map: mapInstance.current,
+                        position: runnerLocation,
+                        title: "Runner",
+                        content: createCustomMarker("🏃", "Runner"),
+                    });
 
-        const data = await response.json();
-        setDirections(data.directions);
+                // Add the gate marker
+                gateMarker.current =
+                    new window.google.maps.marker.AdvancedMarkerElement({
+                        map: mapInstance.current,
+                        position: gateLocation,
+                        title: "Gate",
+                        content: createCustomMarker("📍", "Gate"),
+                    });
+            } else {
+                console.warn(
+                    "AdvancedMarkerElement is not available. Falling back to Marker."
+                );
+                runnerMarker.current = new window.google.maps.Marker({
+                    map: mapInstance.current,
+                    position: runnerLocation,
+                    title: "Runner",
+                });
+
+                gateMarker.current = new window.google.maps.Marker({
+                    map: mapInstance.current,
+                    position: gateLocation,
+                    title: "Gate",
+                });
+            }
+
+            // Initialize DirectionsRenderer
+            directionsRenderer.current =
+                new window.google.maps.DirectionsRenderer({
+                    map: mapInstance.current,
+                });
+        }
     }, [runnerLocation, gateLocation]);
 
     useEffect(() => {
-        if (!isRunnerView) {
-            fetchDirections();
+        // Update the runner marker position dynamically
+        if (runnerMarker.current) {
+            runnerMarker.current.position = runnerLocation;
         }
-    }, [fetchDirections, isRunnerView]);
+    }, [runnerLocation]);
 
-    if (!runnerLocation || !gateLocation) {
-        return <p>Loading map...</p>;
-    }
+    useEffect(() => {
+        // Update the gate marker position dynamically
+        if (gateMarker.current) {
+            gateMarker.current.position = gateLocation;
+        }
+    }, [gateLocation]);
+
+    useEffect(() => {
+        // Fetch and render directions
+        if (runnerLocation && gateLocation && directionsRenderer.current) {
+            const directionsService =
+                new window.google.maps.DirectionsService();
+            directionsService.route(
+                {
+                    origin: runnerLocation,
+                    destination: gateLocation,
+                    travelMode: window.google.maps.TravelMode.DRIVING,
+                },
+                (result, status) => {
+                    if (status === window.google.maps.DirectionsStatus.OK) {
+                        directionsRenderer.current.setDirections(result);
+                    } else {
+                        console.error(
+                            "Directions request failed due to",
+                            status
+                        );
+                    }
+                }
+            );
+        }
+    }, [runnerLocation, gateLocation]);
+
+    // Helper function to create custom marker content
+    const createCustomMarker = (icon, label) => {
+        const markerDiv = document.createElement("div");
+        markerDiv.className = "custom-marker";
+        markerDiv.innerHTML = `
+            <div class="marker-icon">${icon}</div>
+            <div class="marker-label">${label}</div>
+        `;
+        return markerDiv;
+    };
 
     return (
-        <LoadScript googleMapsApiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY}>
-            <GoogleMap
-                mapContainerStyle={containerStyle}
-                center={runnerLocation}
-                zoom={12}
-            >
-                {/* Runner and Gate Markers */}
-                <Marker position={runnerLocation} label="Runner" />
-                <Marker position={gateLocation} label="Gate" />
-
-                {/* Animated Runner Icon */}
-                <motion.div
-                    className="runner-icon"
-                    animate={{
-                        x: (gateLocation.lat - runnerLocation.lat) * 100000,
-                        y: (gateLocation.lng - runnerLocation.lng) * 100000,
-                    }}
-                    transition={{ duration: 2, ease: "easeInOut" }}
-                    style={{
-                        position: "absolute",
-                        top: "50%",
-                        left: "50%",
-                        transform: "translate(-50%, -50%)",
-                        fontSize: "24px",
-                    }}
-                >
-                    🏃
-                </motion.div>
-
-                {/* Directions Renderer */}
-                {!isRunnerView && directions && (
-                    <DirectionsRenderer directions={directions} />
-                )}
-            </GoogleMap>
-        </LoadScript>
+        <div
+            ref={mapRef}
+            style={containerStyle}
+            className="map-container"
+        ></div>
     );
 }
 
