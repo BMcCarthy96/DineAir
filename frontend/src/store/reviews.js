@@ -101,29 +101,31 @@ export const deleteReview = (restaurantId, reviewId) => async (dispatch) => {
     }
 };
 
-export const toggleLike = (reviewId, isLiked) => async (dispatch) => {
-    try {
-        let updatedReview;
+export const toggleLike = (reviewId, isLiked) => async (dispatch, getState) => {
+    const userId = getState().session.user.id;
 
+    // Debugging log to check the reviewId and userId
+    console.log(`Toggling like for review ID: ${reviewId}, User ID: ${userId}`);
+
+    dispatch(toggleLikeAction(reviewId, userId));
+
+    try {
         if (isLiked) {
             // Unlike the review
-            const response = await csrfFetch(`/api/reviewLikes/${reviewId}`, {
+            await csrfFetch(`/api/reviewLikes/${reviewId}`, {
                 method: "DELETE",
             });
-            updatedReview = await response.json(); // Fetch updated review data
         } else {
             // Like the review
-            const response = await csrfFetch(`/api/reviewLikes`, {
+            await csrfFetch(`/api/reviewLikes`, {
                 method: "POST",
                 body: JSON.stringify({ reviewId }),
             });
-            updatedReview = await response.json(); // Fetch updated review data
         }
-
-        // Dispatch the updated review to the Redux store
-        dispatch(updateReviewAction(updatedReview));
     } catch (err) {
         console.error("Failed to toggle like:", err);
+
+        dispatch(toggleLikeAction(reviewId, userId));
         throw err;
     }
 };
@@ -135,7 +137,12 @@ const reviewsReducer = (state = initialState, action) => {
     switch (action.type) {
         case SET_REVIEWS: {
             const reviews = action.payload;
-            return { ...state, ...reviews };
+            const reviewsById = {};
+            reviews.forEach((review) => {
+                reviewsById[review.id] = review;
+            });
+
+            return { ...state, ...reviewsById };
         }
         case ADD_REVIEW: {
             const review = action.payload;
@@ -169,6 +176,12 @@ const reviewsReducer = (state = initialState, action) => {
         case TOGGLE_LIKE: {
             const { reviewId, userId } = action.payload;
             const review = state[reviewId];
+
+            // Check if the review exists
+            if (!review) {
+                console.error(`Review with ID ${reviewId} not found in state.`);
+                return state; // Return the current state if the review does not exist
+            }
 
             // Toggle the like state
             const isLiked = review.likes?.includes(userId);
