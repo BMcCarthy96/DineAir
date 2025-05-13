@@ -6,7 +6,10 @@ import {
     notifyRunnerLocation,
 } from "./Notifications";
 
-const socket = io("http://localhost:8000");
+const socket = io("http://localhost:8000", {
+    transports: ["websocket", "polling"],
+    withCredentials: true,
+});
 
 // Handle gate change notifications
 socket.on("gateChange", ({ gate, terminal }) => {

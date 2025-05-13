@@ -1,5 +1,5 @@
 const { Delivery, Order, Restaurant } = require("../db/models");
-const { io } = require("../bin/www");
+const { getSocket } = require("../utils/socket");
 const axios = require("axios");
 
 module.exports = {
@@ -39,7 +39,14 @@ module.exports = {
         try {
             const { runnerId, location } = req.body;
 
+            // Log the data being emitted
+            console.log(
+                `Emitting runnerLocationUpdate for runnerId: ${runnerId}, location:`,
+                location
+            );
+
             // Emit runner location update to the customer
+            const io = getSocket();
             io.emit("runnerLocationUpdate", { runnerId, location });
 
             res.json({ success: true });
@@ -53,6 +60,7 @@ module.exports = {
             const { orderId, status } = req.body;
 
             // Emit order status update to all clients
+            const io = getSocket();
             io.emit("orderStatusUpdate", { orderId, status });
 
             res.json({ success: true, message: "Order status updated." });
@@ -67,6 +75,7 @@ module.exports = {
             const { gate, terminal } = req.body;
 
             // Emit gate change notification
+            const io = getSocket();
             io.emit("gateChange", { gate, terminal });
 
             res.json({
@@ -100,9 +109,23 @@ module.exports = {
         }
     },
 
+    async updateRunnerLocation(req, res, next) {
+        try {
+            const { runnerId, location } = req.body;
+
+            // Emit runner location update to the customer
+            const io = getSocket();
+            io.emit("runnerLocationUpdate", { runnerId, location });
+
+            res.json({ success: true });
+        } catch (err) {
+            next(err);
+        }
+    },
+
     async getRunnerLocation(req, res, next) {
         try {
-            const { runnerId } = req.query; // Assume runnerId is passed as a query parameter
+            const { runnerId } = req.query;
 
             // Fetch runner's location (mocked for now; replace with real data source)
             const runnerLocation = { lat: 37.7749, lng: -122.4194 }; // Example location

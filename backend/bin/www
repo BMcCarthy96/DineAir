@@ -5,13 +5,9 @@ const app = require("../app");
 const db = require("../db/models");
 const http = require("http");
 const { initSocket } = require("../utils/socket");
-const { Server } = require("socket.io");
 
 // Create the HTTP server
 const server = http.createServer(app);
-const io = new Server(server);
-
-module.exports.io = io;
 
 // Initialize WebSocket server
 initSocket(server);

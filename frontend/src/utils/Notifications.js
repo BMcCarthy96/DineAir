@@ -17,6 +17,8 @@ export const notifyFlightDelay = (flightNumber, delayTime) => {
 
 // Notify order status update
 export const notifyOrderStatus = (status) => {
+    console.log(`Displaying toast notification for order status: ${status}`);
+
     toast.success(`Order status updated: ${status}`, {
         position: toast.POSITION.TOP_CENTER,
     });
