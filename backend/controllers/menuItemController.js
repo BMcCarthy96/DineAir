@@ -31,7 +31,7 @@ exports.getMenuItemById = async (req, res, next) => {
         const menuItem = await MenuItem.findOne({
             where: {
                 id: menuItemId,
-                restaurantId: restaurantId, // Ensure the menu item belongs to the specified restaurant
+                restaurantId: restaurantId,
             },
         });
 
