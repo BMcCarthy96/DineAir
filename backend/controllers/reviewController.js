@@ -1,13 +1,23 @@
-const { Review, User } = require("../db/models");
+const { Review, User, ReviewLike } = require("../db/models");
 
 exports.getRestaurantReviews = async (req, res, next) => {
     try {
         const { restaurantId } = req.params;
         const reviews = await Review.findAll({
             where: { restaurantId },
-            include: [{ model: User, attributes: ["id", "username"] }],
+            include: [
+                { model: User, attributes: ["id", "username"] },
+                { model: ReviewLike },
+            ],
         });
-        res.json(reviews);
+
+        // Map the reviews to include the likes array
+        const reviewsWithLikes = reviews.map((review) => ({
+            ...review.toJSON(),
+            likes: review.ReviewLikes.map((like) => like.userId),
+        }));
+
+        res.json(reviewsWithLikes);
     } catch (err) {
         next(err);
     }
@@ -63,11 +73,14 @@ exports.updateReview = async (req, res, next) => {
 
         // Fetch the updated review with the associated User data
         const updatedReview = await Review.findByPk(review.id, {
-            include: [{ model: User, attributes: ["id", "username"] }],
+            include: [
+                { model: User, attributes: ["id", "username"] },
+                { model: ReviewLike },
+            ],
         });
 
         console.log("Updated review with User data:", updatedReview); // Debugging
-        res.json(updatedReview);
+        res.status(200).json(updatedReview);
     } catch (err) {
         console.error("Error updating review:", err); // Debugging
         next(err);

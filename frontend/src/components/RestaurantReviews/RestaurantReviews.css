@@ -147,19 +147,56 @@ body.dark .cancel-button {
     color: white; /* Ensure text remains white */
 }
 
+.like-section {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.like-count {
+    font-size: 14px;
+    color: #666;
+}
+
 .like-button {
     background: none;
     border: none;
-    font-size: 20px;
+    font-size: 16px;
     cursor: pointer;
-    color: #ccc;
+    color: #666;
     transition: color 0.3s ease;
 }
 
 .like-button.liked {
     color: #ff6f61;
+    font-weight: bold;
 }
 
 .like-button:hover {
     color: #ff6f61;
+}
+
+.review-actions {
+    display: flex;
+    justify-content: flex-start;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.edit-button,
+.delete-button {
+    background-color: #ff6f61;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.edit-button:hover,
+.delete-button:hover {
+    background-color: #f84d3e;
 }

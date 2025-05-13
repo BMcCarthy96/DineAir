@@ -40,6 +40,9 @@ export const fetchReviewsByRestaurant = (restaurantId) => async (dispatch) => {
             `/api/restaurants/${restaurantId}/reviews`
         );
         const data = await response.json();
+
+        // Ensure the reviews include the likes array
+        console.log("Fetched reviews with likes:", data); // Debugging
         dispatch(setReviews(data));
         return data;
     } catch (err) {
@@ -98,23 +101,27 @@ export const deleteReview = (restaurantId, reviewId) => async (dispatch) => {
     }
 };
 
-export const toggleLike = (reviewId, userId, isLiked) => async (dispatch) => {
+export const toggleLike = (reviewId, isLiked) => async (dispatch) => {
     try {
+        let updatedReview;
+
         if (isLiked) {
             // Unlike the review
-            await csrfFetch(`/api/reviewLikes/${reviewId}`, {
+            const response = await csrfFetch(`/api/reviewLikes/${reviewId}`, {
                 method: "DELETE",
             });
+            updatedReview = await response.json(); // Fetch updated review data
         } else {
             // Like the review
-            await csrfFetch(`/api/reviewLikes`, {
+            const response = await csrfFetch(`/api/reviewLikes`, {
                 method: "POST",
                 body: JSON.stringify({ reviewId }),
             });
+            updatedReview = await response.json(); // Fetch updated review data
         }
 
-        // Dispatch the toggle action
-        dispatch(toggleLikeAction(reviewId, userId));
+        // Dispatch the updated review to the Redux store
+        dispatch(updateReviewAction(updatedReview));
     } catch (err) {
         console.error("Failed to toggle like:", err);
         throw err;
@@ -136,7 +143,23 @@ const reviewsReducer = (state = initialState, action) => {
         }
         case UPDATE_REVIEW: {
             const review = action.payload;
-            return { ...state, [review.id]: review };
+
+            // Ensure the payload is a valid review object
+            if (!review.id) {
+                console.error("Invalid review payload:", review);
+                return state;
+            }
+
+            console.log("Updating review in reducer:", review);
+
+            // Update the existing review in the state
+            return {
+                ...state,
+                [review.id]: {
+                    ...state[review.id],
+                    ...review,
+                },
+            };
         }
         case DELETE_REVIEW: {
             const newState = { ...state };

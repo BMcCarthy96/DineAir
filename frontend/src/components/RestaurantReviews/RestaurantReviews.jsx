@@ -17,9 +17,19 @@ function RestaurantReviews({ restaurantId }) {
     const [newReview, setNewReview] = useState({ rating: "", comment: "" });
     const userId = useSelector((state) => state.session.user.id);
 
+    // Debugging log to check the reviews state
+    useEffect(() => {
+        console.log("Reviews state in component:", reviews);
+        Object.values(reviews).forEach((review) => {
+            console.log(
+                `Review ID: ${review.id}, Likes: ${review.likes?.length || 0}`
+            );
+        });
+    }, [reviews]);
+
     const handleToggleLike = (review) => {
         const isLiked = review.likes?.includes(userId);
-        dispatch(toggleLike(review.id, userId, isLiked));
+        dispatch(toggleLike(review.id, isLiked));
     };
 
     useEffect(() => {
@@ -92,27 +102,42 @@ function RestaurantReviews({ restaurantId }) {
             </div>
             {reviews && Object.values(reviews).length > 0 ? (
                 <ul className="review-list">
-                    {Object.values(reviews).map((review) => {
-                        const isLiked = review.likes?.includes(userId); // Define isLiked here
+                    {Object.values(reviews).map((review, index) => {
+                        console.log(
+                            `Rendering Review ID: ${review.id}, Likes: ${
+                                review.likes?.length || 0
+                            }`
+                        );
+                        const isLiked = review.likes?.includes(userId);
                         return (
-                            <li key={review.id} className="review-card">
-                                <h3>{review.User.username}</h3>
+                            <li
+                                key={`${review.id}-${index}`}
+                                className="review-card"
+                            >
+                                <h3>
+                                    {review.User?.username || "Unknown User"}
+                                </h3>
                                 <p className="comment">{review.comment}</p>
                                 <p className="rating">
                                     Rating: {review.rating} / 5
+                                </p>
+                                <div className="like-section">
+                                    <span className="like-count">
+                                        {review.likes?.length || 0} Likes
+                                    </span>
                                     <button
                                         onClick={() => handleToggleLike(review)}
                                         className={`like-button ${
                                             isLiked ? "liked" : ""
                                         }`}
                                     >
-                                        👍
+                                        👍 {isLiked ? "Liked" : "Like"}
                                     </button>
-                                </p>
+                                </div>
                                 {editingReview?.id === review.id ? (
                                     <>
                                         <textarea
-                                            value={editingReview.comment}
+                                            value={editingReview?.comment || ""}
                                             onChange={(e) =>
                                                 setEditingReview({
                                                     ...editingReview,
@@ -122,7 +147,7 @@ function RestaurantReviews({ restaurantId }) {
                                         />
                                         <input
                                             type="number"
-                                            value={editingReview.rating}
+                                            value={editingReview?.rating || ""}
                                             onChange={(e) =>
                                                 setEditingReview({
                                                     ...editingReview,
@@ -150,10 +175,15 @@ function RestaurantReviews({ restaurantId }) {
                                         </button>
                                     </>
                                 ) : (
-                                    <>
+                                    <div className="review-actions">
                                         <button
                                             onClick={() =>
-                                                setEditingReview(review)
+                                                setEditingReview({
+                                                    id: review.id,
+                                                    comment:
+                                                        review.comment || "",
+                                                    rating: review.rating || 1,
+                                                })
                                             }
                                             className="edit-button"
                                         >
@@ -167,7 +197,7 @@ function RestaurantReviews({ restaurantId }) {
                                         >
                                             Delete
                                         </button>
-                                    </>
+                                    </div>
                                 )}
                             </li>
                         );
