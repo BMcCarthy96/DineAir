@@ -10,7 +10,35 @@ const { initSocket } = require("../utils/socket");
 const server = http.createServer(app);
 
 // Initialize WebSocket server
-initSocket(server);
+const io = initSocket(server);
+
+// WebSocket event handlers
+io.on("connection", (socket) => {
+    console.log("A user connected:", socket.id);
+
+    // Handle runner location updates
+    socket.on("runnerLocationUpdate", ({ runnerId, location }) => {
+        console.log(`Runner ${runnerId} location updated:`, location);
+        io.emit("runnerLocationUpdate", { runnerId, location });
+    });
+
+    // Handle order status updates
+    socket.on("orderStatusUpdate", ({ orderId, status }) => {
+        console.log(`Order ${orderId} status updated: ${status}`);
+        io.emit("orderStatusUpdate", { orderId, status });
+    });
+
+    // Handle gate change notifications
+    socket.on("gateChange", ({ gate, terminal }) => {
+        console.log(`Gate changed to ${gate}, Terminal ${terminal}`);
+        io.emit("gateChange", { gate, terminal });
+    });
+
+    // Handle disconnection
+    socket.on("disconnect", () => {
+        console.log("A user disconnected:", socket.id);
+    });
+});
 
 // Check the database connection before starting the app
 db.sequelize

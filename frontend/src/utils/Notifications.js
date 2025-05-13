@@ -16,12 +16,15 @@ export const notifyFlightDelay = (flightNumber, delayTime) => {
 };
 
 // Notify order status update
-export const notifyOrderStatus = (status) => {
-    console.log(`Displaying toast notification for order status: ${status}`);
+let lastStatus = null;
 
-    toast.success(`Order status updated: ${status}`, {
-        position: toast.POSITION.TOP_CENTER,
-    });
+export const notifyOrderStatus = (status) => {
+    if (status !== lastStatus) {
+        toast.success(`Order status updated: ${status}`, {
+            position: toast.POSITION.TOP_CENTER,
+        });
+        lastStatus = status;
+    }
 };
 
 console.log(toast.POSITION); // Log the POSITION object
@@ -29,6 +32,6 @@ console.log(toast.POSITION); // Log the POSITION object
 // Notify runner location update
 export const notifyRunnerLocation = () => {
     toast.info("Runner is on the way!", {
-        position: "top-center",
+        position: toast.POSITION.TOP_CENTER,
     });
 };

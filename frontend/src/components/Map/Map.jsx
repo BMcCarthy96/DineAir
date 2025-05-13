@@ -66,8 +66,8 @@ function Map({ runnerLocation, gateLocation }) {
 
     useEffect(() => {
         // Update the runner marker position dynamically
-        if (runnerMarker.current) {
-            runnerMarker.current.position = runnerLocation;
+        if (runnerMarker.current && runnerLocation) {
+            runnerMarker.current.setPosition(runnerLocation);
         }
     }, [runnerLocation]);
 

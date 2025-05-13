@@ -1,13 +1,19 @@
-const { Delivery, Order, Restaurant } = require("../db/models");
+const { Delivery, Order, Restaurant, User, Airport } = require("../db/models");
 const { getSocket } = require("../utils/socket");
 const axios = require("axios");
 
 module.exports = {
+    // Fetch all deliveries assigned to the current runner
     async getRunnerDeliveries(req, res, next) {
         try {
             const deliveries = await Delivery.findAll({
                 where: { runnerId: req.user.id },
-                include: [{ model: Order, include: [Restaurant] }],
+                include: [
+                    {
+                        model: Order,
+                        include: [Restaurant],
+                    },
+                ],
             });
 
             res.json(deliveries);
@@ -16,6 +22,7 @@ module.exports = {
         }
     },
 
+    // Mark a delivery as completed
     async completeDelivery(req, res, next) {
         try {
             const { deliveryId } = req.params;
@@ -29,17 +36,21 @@ module.exports = {
             delivery.status = "delivered";
             await delivery.save();
 
+            // Emit delivery completion notification
+            const io = getSocket();
+            io.emit("deliveryCompleted", { deliveryId });
+
             res.json(delivery);
         } catch (err) {
             next(err);
         }
     },
 
+    // Update the runner's location and emit it to customers
     async updateRunnerLocation(req, res, next) {
         try {
             const { runnerId, location } = req.body;
 
-            // Log the data being emitted
             console.log(
                 `Emitting runnerLocationUpdate for runnerId: ${runnerId}, location:`,
                 location
@@ -55,11 +66,22 @@ module.exports = {
         }
     },
 
+    // Update the order status and emit it to customers
     async updateOrderStatus(req, res, next) {
         try {
             const { orderId, status } = req.body;
 
-            // Emit order status update to all clients
+            const order = await Order.findByPk(orderId);
+            if (!order) {
+                return res.status(404).json({ error: "Order not found" });
+            }
+
+            order.status = status;
+            await order.save();
+
+            console.log(`Order ${orderId} status updated: ${status}`);
+
+            // Emit order status update
             const io = getSocket();
             io.emit("orderStatusUpdate", { orderId, status });
 
@@ -70,9 +92,14 @@ module.exports = {
         }
     },
 
+    // Notify customers of a gate change
     async notifyGateChange(req, res, next) {
         try {
             const { gate, terminal } = req.body;
+
+            console.log(
+                `Notifying gate change: Gate ${gate}, Terminal ${terminal}`
+            );
 
             // Emit gate change notification
             const io = getSocket();
@@ -87,6 +114,7 @@ module.exports = {
         }
     },
 
+    // Calculate ETA using Google Maps Directions API
     async calculateETA(req, res, next) {
         try {
             const { runnerLocation, gateLocation } = req.body;
@@ -105,30 +133,18 @@ module.exports = {
             const eta = response.data.routes[0]?.legs[0]?.duration?.text;
             res.json({ eta });
         } catch (err) {
+            console.error("Error calculating ETA:", err);
             next(err);
         }
     },
 
-    async updateRunnerLocation(req, res, next) {
-        try {
-            const { runnerId, location } = req.body;
-
-            // Emit runner location update to the customer
-            const io = getSocket();
-            io.emit("runnerLocationUpdate", { runnerId, location });
-
-            res.json({ success: true });
-        } catch (err) {
-            next(err);
-        }
-    },
-
+    // Fetch the runner's current location (mocked for now)
     async getRunnerLocation(req, res, next) {
         try {
             const { runnerId } = req.query;
 
-            // Fetch runner's location (mocked for now; replace with real data source)
-            const runnerLocation = { lat: 37.7749, lng: -122.4194 }; // Example location
+            // Mocked runner location; replace with real data source
+            const runnerLocation = { lat: 37.7749, lng: -122.4194 };
 
             res.json({ location: runnerLocation });
         } catch (err) {
