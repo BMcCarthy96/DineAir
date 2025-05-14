@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { createBrowserRouter, RouterProvider, Outlet } from "react-router-dom";
 import Navigation from "./components/Navigation";
 import * as sessionActions from "./store/session";
@@ -19,6 +19,7 @@ import EditRestaurantPage from "./components/EditRestaurantPage/EditRestaurantPa
 import DeliveryTrackingPage from "./components/DeliveryTrackingPage/DeliveryTrackingPage";
 import RunnerDashboardPage from "./components/RunnerDashboardPage/RunnerDashboardPage";
 import FavoritesPage from "./components/FavoritesPage/FavoritesPage";
+import AccountPage from "./components/AccountPage/AccountPage";
 import { io } from "socket.io-client";
 import { notifyGateChange } from "./utils/Notifications";
 import "./utils/WebSocket";
@@ -28,6 +29,7 @@ import "react-toastify/dist/ReactToastify.css";
 function Layout() {
     const dispatch = useDispatch();
     const [isLoaded, setIsLoaded] = useState(false);
+    const sessionUser = useSelector((state) => state.session.user);
 
     useEffect(() => {
         dispatch(sessionActions.restoreUser()).then(() => {
@@ -38,7 +40,8 @@ function Layout() {
     return (
         <>
             <Navigation isLoaded={isLoaded} />
-            {isLoaded && <Outlet />}
+            {isLoaded && <Outlet context={{ sessionUser }} />}{" "}
+            {/* Pass sessionUser to child routes */}
         </>
     );
 }
@@ -112,6 +115,10 @@ const router = createBrowserRouter([
                 element: <FavoritesPage />,
             },
             {
+                path: "/account",
+                element: <AccountPage />,
+            },
+            {
                 path: "*",
                 element: <h1>Page Not Found</h1>,
             },
@@ -134,7 +141,7 @@ function App() {
 
     return (
         <>
-            <RouterProvider router={router} />;
+            <RouterProvider router={router} />
             <ToastContainer
                 position="top-center"
                 autoClose={3000}

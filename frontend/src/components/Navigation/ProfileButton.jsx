@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import * as sessionActions from "../../store/session";
 import { HiBars3 } from "react-icons/hi2";
@@ -7,16 +7,18 @@ import { PiReceiptFill } from "react-icons/pi";
 import { IoIosHeart } from "react-icons/io";
 import { RiRestaurantLine } from "react-icons/ri";
 import { FaRunning } from "react-icons/fa";
+import { MdAccountCircle } from "react-icons/md";
 import "./ProfileButton.css";
 
-function ProfileButton({ user }) {
+function ProfileButton() {
     const dispatch = useDispatch();
     const navigate = useNavigate();
+    const sessionUser = useSelector((state) => state.session.user); // Get the updated user
     const [showSideBar, setSideBar] = useState(false);
     const ulRef = useRef();
 
     const toggleMenu = (e) => {
-        e.stopPropagation(); // Keep from bubbling up to document and triggering closeMenu
+        e.stopPropagation(); // Prevent bubbling up to document and triggering closeMenu
         setSideBar(!showSideBar);
     };
 
@@ -40,13 +42,13 @@ function ProfileButton({ user }) {
         e.preventDefault();
         dispatch(sessionActions.logout());
         closeMenu();
-        navigate("/"); // Navigates to home page after logging out
+        navigate("/"); // Navigate to home page after logging out
     };
 
     const getRestaurantsLink = () => {
-        if (user.userType === "admin") {
+        if (sessionUser.userType === "admin") {
             return "/restaurants/admin"; // AdminRestaurantsPage
-        } else if (user.userType === "restaurantOwner") {
+        } else if (sessionUser.userType === "restaurantOwner") {
             return "/restaurants/owner"; // OwnerRestaurantsPage
         }
         return null;
@@ -61,17 +63,29 @@ function ProfileButton({ user }) {
             </button>
 
             <ul className={ulClassName} ref={ulRef}>
-                {user ? (
+                {sessionUser ? (
                     <>
                         <div className="options">
-                            <div>Hello, {user.firstName}</div>
-                            <div>{user.email}</div>
+                            <div>Hello, {sessionUser.firstName}</div>
+                            <div>{sessionUser.email}</div>
                         </div>
                         <hr />
                         <div className="manage-div">
                             <div>
+                                <Link
+                                    to="/account"
+                                    className="manage-link"
+                                    onClick={closeMenu}
+                                >
+                                    <MdAccountCircle
+                                        size={20}
+                                        className="icon-padding"
+                                    />
+                                    Account
+                                </Link>
+                            </div>
+                            <div>
                                 <Link to="/orders" className="manage-link">
-                                    {" "}
                                     <PiReceiptFill
                                         size={20}
                                         className="icon-padding"
@@ -81,7 +95,6 @@ function ProfileButton({ user }) {
                             </div>
                             <div>
                                 <Link to="/favorites" className="manage-link">
-                                    {" "}
                                     <IoIosHeart
                                         size={20}
                                         className="icon-padding"
@@ -89,15 +102,14 @@ function ProfileButton({ user }) {
                                     Favorites
                                 </Link>
                             </div>
-                            {(user.userType === "admin" ||
-                                user.userType === "restaurantOwner") && (
+                            {(sessionUser.userType === "admin" ||
+                                sessionUser.userType === "restaurantOwner") && (
                                 <div>
                                     <Link
                                         to={getRestaurantsLink()}
                                         className="manage-link"
                                         onClick={closeMenu}
                                     >
-                                        {" "}
                                         <RiRestaurantLine
                                             size={20}
                                             className="icon-padding"
@@ -106,7 +118,7 @@ function ProfileButton({ user }) {
                                     </Link>
                                 </div>
                             )}
-                            {user.userType === "runner" && (
+                            {sessionUser.userType === "runner" && (
                                 <div>
                                     <Link
                                         to="/runner-dashboard"
