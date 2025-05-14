@@ -11,7 +11,9 @@ function OrderHistoryPage() {
             try {
                 const response = await fetch("/api/orders", {
                     headers: {
-                        Authorization: `Bearer ${localStorage.getItem("token")}`,
+                        Authorization: `Bearer ${localStorage.getItem(
+                            "token"
+                        )}`,
                     },
                 });
                 if (response.ok) {
@@ -29,27 +31,35 @@ function OrderHistoryPage() {
     }, []);
 
     const handleReorder = async (orderId) => {
-    try {
-        const response = await fetch(`/api/orders/${orderId}/reorder`, {
-            method: "POST",
-            headers: {
-                Authorization: `Bearer ${localStorage.getItem("token")}`, // Ensure this token is valid
-                "Content-Type": "application/json",
-            },
-        });
+        try {
+            const csrfToken = document.cookie
+                .split("; ")
+                .find((row) => row.startsWith("XSRF-TOKEN="))
+                ?.split("=")[1];
 
-        if (response.ok) {
-            alert("Order has been reordered!");
-            navigate("/cart");
-        } else {
-            const errorData = await response.json();
-            alert(errorData.error || "Failed to reorder. Please try again.");
+            const response = await fetch(`/api/orders/${orderId}/reorder`, {
+                method: "POST",
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem("token")}`, // Ensure this token is valid
+                    "Content-Type": "application/json",
+                    "X-CSRF-Token": csrfToken,
+                },
+            });
+
+            if (response.ok) {
+                alert("Order has been reordered!");
+                navigate("/cart");
+            } else {
+                const errorData = await response.json();
+                alert(
+                    errorData.error || "Failed to reorder. Please try again."
+                );
+            }
+        } catch (err) {
+            console.error("Error reordering:", err);
+            alert("An error occurred. Please try again.");
         }
-    } catch (err) {
-        console.error("Error reordering:", err);
-        alert("An error occurred. Please try again.");
-    }
-};
+    };
 
     return (
         <div className="order-history-page">

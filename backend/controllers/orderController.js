@@ -1,4 +1,11 @@
-const { Order, Cart, CartItem, MenuItem, Restaurant } = require("../db/models");
+const {
+    Order,
+    Cart,
+    CartItem,
+    MenuItem,
+    Restaurant,
+    OrderItem,
+} = require("../db/models");
 
 exports.getUserOrders = async (req, res) => {
     const orders = await Order.findAll({ where: { userId: req.user.id } });
@@ -104,28 +111,39 @@ exports.deleteOrder = async (req, res, next) => {
 exports.reorderOrder = async (req, res) => {
     try {
         const { orderId } = req.params;
+        console.log("Reorder request received for orderId:", orderId);
 
-        // Fetch the original order
+        // Fetch the original order with its associated OrderItems
         const originalOrder = await Order.findByPk(orderId, {
             include: [
                 {
-                    model: CartItem,
+                    model: OrderItem,
                     include: [MenuItem], // Ensure MenuItem is included
                 },
             ],
         });
 
-        if (!originalOrder || originalOrder.userId !== req.user.id) {
+        if (!originalOrder) {
+            console.log("Original order not found.");
             return res.status(404).json({ error: "Order not found" });
         }
+
+        if (originalOrder.userId !== req.user.id) {
+            console.log("User is not authorized to reorder this order.");
+            return res.status(403).json({ error: "Forbidden" });
+        }
+
+        console.log("Original order fetched successfully:", originalOrder);
 
         // Create a new cart for the user
         const [cart] = await Cart.findOrCreate({
             where: { userId: req.user.id },
         });
 
+        console.log("Cart created or fetched successfully:", cart);
+
         // Add the items from the original order to the cart
-        for (const item of originalOrder.CartItems) {
+        for (const item of originalOrder.OrderItems) {
             await CartItem.create({
                 cartId: cart.id,
                 menuItemId: item.menuItemId,

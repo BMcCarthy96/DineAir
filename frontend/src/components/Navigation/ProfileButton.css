@@ -9,19 +9,19 @@
     position: relative;
     margin-left: 10px;
     transition: background-color 0.3s ease, color 0.3s ease;
-  }
+}
 
-  .profile-button:hover {
+.profile-button:hover {
     color: #b2b2b2;
-  }
+}
 
-  /* Dark mode profile button */
-  body.dark .profile-button {
-    background-color: #2D2D2D; /* Soft cream background in dark mode */
-    color: #FFF8F0; /* Charcoal text color for contrast */
-  }
+/* Dark mode profile button */
+body.dark .profile-button {
+    background-color: #2d2d2d; /* Soft cream background in dark mode */
+    color: #fff8f0; /* Charcoal text color for contrast */
+}
 
-  .profile-dropdown {
+.profile-dropdown {
     position: absolute;
     left: 0;
     top: 50px;
@@ -32,56 +32,56 @@
     width: 220px;
     z-index: 1000;
     /* border: 3px solid black; */
-    list-style: none
-  }
+    list-style: none;
+}
 
-  .profile-dropdown.hidden {
+.profile-dropdown.hidden {
     display: none;
-  }
+}
 
-  .profile-dropdown li {
+.profile-dropdown li {
     padding: 12px 20px;
     cursor: pointer;
     text-align: left;
     font-size: 14px;
-  }
+}
 
-  .profile-dropdown li:hover {
+.profile-dropdown li:hover {
     background-color: #ff6f61;
     color: white;
-  }
+}
 
-  .options {
+.options {
     display: flex;
     flex-direction: column;
     gap: 10px;
     text-align: center;
     padding: 10px 0;
     color: black;
-  }
+}
 
-  .manage-link {
+.manage-link {
     text-decoration: none;
     color: #333;
     padding: 8px 0;
-  }
+}
 
-  .manage-link:hover {
-    background-color: #FF6F61;
+.manage-link:hover {
+    background-color: #ff6f61;
     color: white;
     border-radius: 5px;
-  }
+}
 
-  .logout-button-div {
+.logout-button-div {
     display: flex;
     justify-content: center;
-  }
+}
 
-  .logout-button {
+.logout-button {
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: #FF6F61;
+    background-color: #ff6f61;
     color: #333333;
     border: none;
     border-radius: 20px;
@@ -91,18 +91,18 @@
     font-weight: bold;
     cursor: pointer;
     white-space: nowrap;
-  }
+}
 
-  .logout-button:hover {
+.logout-button:hover {
     background-color: #f84d3e;
-  }
+}
 
-  body.dark .logout-button {
-    background-color: #FF6F61; /* Retain the same color in dark mode */
+body.dark .logout-button {
+    background-color: #ff6f61; /* Retain the same color in dark mode */
     color: black; /* Ensure text remains black */
 }
 
-  .sidebar {
+.sidebar {
     position: fixed;
     top: 0;
     right: -300px;
@@ -113,37 +113,40 @@
     transition: right 0.3s ease;
     z-index: 1000;
     padding: 20px;
-  }
+}
 
-  .sidebar.open {
+.sidebar.open {
     right: 0;
-  }
+}
 
-  .close-sidebar {
+.close-sidebar {
     background: none;
     border: none;
     font-size: 20px;
     cursor: pointer;
     margin-bottom: 20px;
-  }
+}
 
-  .sidebar-content {
+.sidebar-content {
     display: flex;
     flex-direction: column;
     gap: 15px;
-  }
+}
 
-  .sidebar-link {
+.sidebar-link {
     text-decoration: none;
     color: black;
+    /* background-color: #ff6f61; */
     font-size: 16px;
     font-weight: bold;
-  }
+    border-radius: 6px;
+    text-align: center;
+}
 
-  .sidebar-link:hover {
-    color: #FF6F61;
-  }
+.sidebar-link:hover {
+    color: #f84d3e;
+}
 
-  .icon-padding {
-  margin-right: 8px;
-  }
+.icon-padding {
+    margin-right: 8px;
+}

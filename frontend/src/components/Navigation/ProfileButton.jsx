@@ -6,6 +6,7 @@ import { HiBars3 } from "react-icons/hi2";
 import { PiReceiptFill } from "react-icons/pi";
 import { IoIosHeart } from "react-icons/io";
 import { RiRestaurantLine } from "react-icons/ri";
+import { FaRunning } from "react-icons/fa";
 import "./ProfileButton.css";
 
 function ProfileButton({ user }) {
@@ -112,6 +113,10 @@ function ProfileButton({ user }) {
                                         className="manage-link"
                                         onClick={closeMenu}
                                     >
+                                        <FaRunning
+                                            size={20}
+                                            className="icon-padding"
+                                        />
                                         Runner Dashboard
                                     </Link>
                                 </div>
