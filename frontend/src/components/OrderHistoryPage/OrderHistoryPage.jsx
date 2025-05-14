@@ -73,7 +73,11 @@ function OrderHistoryPage() {
                             <h3>Order #{order.id}</h3>
                             <p>Status: {order.status}</p>
                             <p>Total Price: ${order.totalPrice.toFixed(2)}</p>
-                            <p>Restaurant: {order.restaurantId}</p>
+                            <p>
+                                Restaurant:{" "}
+                                {order.Restaurant?.name || "Unknown"}
+                            </p>
+                            <p>Gate: {order.gate || "Not specified"}</p>
                             <button
                                 className="reorder-button"
                                 onClick={() => handleReorder(order.id)}

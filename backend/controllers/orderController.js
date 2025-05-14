@@ -8,8 +8,24 @@ const {
 } = require("../db/models");
 
 exports.getUserOrders = async (req, res) => {
-    const orders = await Order.findAll({ where: { userId: req.user.id } });
-    res.json(orders);
+    try {
+        const orders = await Order.findAll({
+            where: { userId: req.user.id },
+            include: [
+                {
+                    model: Restaurant,
+                    attributes: ["name"], // Include only the restaurant name
+                },
+            ],
+            attributes: ["id", "status", "totalPrice", "gate", "createdAt"],
+            order: [["createdAt", "DESC"]],
+        });
+
+        res.json(orders);
+    } catch (err) {
+        console.error("Error fetching user orders:", err);
+        res.status(500).json({ error: "Failed to fetch orders" });
+    }
 };
 
 exports.createOrder = async (req, res) => {
