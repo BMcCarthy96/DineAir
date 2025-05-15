@@ -70,35 +70,6 @@ function DeliveryTrackingPage() {
         }
     }, [orderStepIndex, restaurantLocation, gateLocation]);
 
-    // Fetch the runner's initial location from the backend
-    useEffect(() => {
-        async function fetchRunnerLocation() {
-            try {
-                const response = await fetch(
-                    "/api/deliveries/runner-location",
-                    {
-                        headers: {
-                            Authorization: `Bearer ${localStorage.getItem(
-                                "token"
-                            )}`,
-                        },
-                    }
-                );
-                if (response.ok) {
-                    const data = await response.json();
-                    setRunnerLocation(data.location);
-                } else {
-                    throw new Error("Failed to fetch runner location");
-                }
-            } catch (err) {
-                console.error(err);
-                setError("Unable to fetch runner location.");
-            }
-        }
-
-        fetchRunnerLocation();
-    }, []);
-
     // Fetch restaurant location for the current order
     useEffect(() => {
         async function fetchRestaurantLocation() {
@@ -106,10 +77,12 @@ function DeliveryTrackingPage() {
                 const response = await fetch("/api/orders/current");
                 if (response.ok) {
                     const data = await response.json();
-                    setRestaurantLocation({
+                    const restLoc = {
                         lat: data.restaurant.latitude,
                         lng: data.restaurant.longitude,
-                    });
+                    };
+                    setRestaurantLocation(restLoc);
+                    setRunnerLocation(restLoc);
                 }
             } catch (err) {
                 console.error(err);
