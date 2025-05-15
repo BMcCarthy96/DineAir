@@ -6,81 +6,145 @@ const containerStyle = {
     height: "400px",
 };
 
-function Map({ runnerLocation, gateLocation }) {
+function Map({ runnerLocation, gateLocation, restaurants = [] }) {
     const mapRef = useRef(null);
     const mapInstance = useRef(null);
     const runnerMarker = useRef(null);
     const gateMarker = useRef(null);
+    const restaurantMarkers = useRef([]);
     const directionsRenderer = useRef(null);
 
+    // Helper function to create custom marker content
+    const createCustomMarker = (icon, label) => {
+        const markerDiv = document.createElement("div");
+        markerDiv.className = "custom-marker";
+        markerDiv.innerHTML = `
+            <div class="marker-icon">${icon}</div>
+            <div class="marker-label">${label}</div>
+        `;
+        return markerDiv;
+    };
+
     useEffect(() => {
-        // Initialize the map
-        if (!mapInstance.current && window.google) {
+        if (
+            !mapInstance.current &&
+            window.google &&
+            (runnerLocation || gateLocation)
+        ) {
             mapInstance.current = new window.google.maps.Map(mapRef.current, {
-                center: runnerLocation,
-                zoom: 12,
+                center: runnerLocation || gateLocation,
+                zoom: 15,
             });
 
-            // Add the runner marker
-            if (window.google.maps.marker?.AdvancedMarkerElement) {
-                runnerMarker.current =
-                    new window.google.maps.marker.AdvancedMarkerElement({
+            // Runner marker
+            if (runnerLocation) {
+                if (window.google.maps.marker?.AdvancedMarkerElement) {
+                    runnerMarker.current =
+                        new window.google.maps.marker.AdvancedMarkerElement({
+                            map: mapInstance.current,
+                            position: runnerLocation,
+                            title: "Runner",
+                            content: createCustomMarker("🏃‍♂️", "Runner"),
+                        });
+                } else {
+                    runnerMarker.current = new window.google.maps.Marker({
                         map: mapInstance.current,
                         position: runnerLocation,
                         title: "Runner",
-                        content: createCustomMarker("🏃", "Runner"),
+                        label: {
+                            text: "🏃‍♂️",
+                            fontSize: "24px",
+                        },
                     });
+                }
+            }
 
-                // Add the gate marker
-                gateMarker.current =
-                    new window.google.maps.marker.AdvancedMarkerElement({
+            // Gate marker
+            if (gateLocation) {
+                if (window.google.maps.marker?.AdvancedMarkerElement) {
+                    gateMarker.current =
+                        new window.google.maps.marker.AdvancedMarkerElement({
+                            map: mapInstance.current,
+                            position: gateLocation,
+                            title: "Gate",
+                            content: createCustomMarker("📍", "Gate"),
+                        });
+                } else {
+                    gateMarker.current = new window.google.maps.Marker({
                         map: mapInstance.current,
                         position: gateLocation,
                         title: "Gate",
-                        content: createCustomMarker("📍", "Gate"),
+                        label: {
+                            text: "📍",
+                            fontSize: "24px",
+                        },
                     });
-            } else {
-                console.warn(
-                    "AdvancedMarkerElement is not available. Falling back to Marker."
-                );
-                runnerMarker.current = new window.google.maps.Marker({
-                    map: mapInstance.current,
-                    position: runnerLocation,
-                    title: "Runner",
-                });
-
-                gateMarker.current = new window.google.maps.Marker({
-                    map: mapInstance.current,
-                    position: gateLocation,
-                    title: "Gate",
-                });
+                }
             }
 
-            // Initialize DirectionsRenderer
+            // DirectionsRenderer for route line
             directionsRenderer.current =
                 new window.google.maps.DirectionsRenderer({
                     map: mapInstance.current,
+                    suppressMarkers: true,
+                    polylineOptions: {
+                        strokeColor: "#ff6f61",
+                        strokeWeight: 5,
+                    },
                 });
         }
     }, [runnerLocation, gateLocation]);
 
+    // Update runner marker position
     useEffect(() => {
-        // Update the runner marker position dynamically
         if (runnerMarker.current && runnerLocation) {
             runnerMarker.current.setPosition(runnerLocation);
+            if (mapInstance.current) {
+                mapInstance.current.setCenter(runnerLocation);
+            }
         }
     }, [runnerLocation]);
 
+    // Update gate marker position
     useEffect(() => {
-        // Update the gate marker position dynamically
-        if (gateMarker.current) {
-            gateMarker.current.position = gateLocation;
+        if (gateMarker.current && gateLocation) {
+            gateMarker.current.setPosition(gateLocation);
         }
     }, [gateLocation]);
 
+    // Add restaurant markers
     useEffect(() => {
-        // Fetch and render directions
-        if (runnerLocation && gateLocation && directionsRenderer.current) {
+        if (mapInstance.current && restaurants.length > 0) {
+            // Remove old markers
+            restaurantMarkers.current.forEach((marker) => marker.setMap(null));
+            restaurantMarkers.current = [];
+
+            restaurants.forEach((restaurant) => {
+                const marker = new window.google.maps.Marker({
+                    map: mapInstance.current,
+                    position: {
+                        lat: parseFloat(restaurant.latitude),
+                        lng: parseFloat(restaurant.longitude),
+                    },
+                    icon: {
+                        url: "/images/restaurant-icon.png", // Use your own icon or comment out for default
+                        scaledSize: new window.google.maps.Size(32, 32),
+                    },
+                    title: restaurant.name,
+                });
+                restaurantMarkers.current.push(marker);
+            });
+        }
+    }, [restaurants]);
+
+    // Fetch and render directions
+    useEffect(() => {
+        if (
+            runnerLocation &&
+            gateLocation &&
+            directionsRenderer.current &&
+            window.google
+        ) {
             const directionsService =
                 new window.google.maps.DirectionsService();
             directionsService.route(
@@ -102,17 +166,6 @@ function Map({ runnerLocation, gateLocation }) {
             );
         }
     }, [runnerLocation, gateLocation]);
-
-    // Helper function to create custom marker content
-    const createCustomMarker = (icon, label) => {
-        const markerDiv = document.createElement("div");
-        markerDiv.className = "custom-marker";
-        markerDiv.innerHTML = `
-            <div class="marker-icon">${icon}</div>
-            <div class="marker-label">${label}</div>
-        `;
-        return markerDiv;
-    };
 
     return (
         <div

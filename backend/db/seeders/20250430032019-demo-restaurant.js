@@ -16,6 +16,8 @@ module.exports = {
                     cuisineType: "Mexican",
                     imageUrl:
                         "https://media.istockphoto.com/id/1349480436/photo/homemade-pork-carnitas-tacos.jpg?s=612x612&w=0&k=20&c=CJkpVp7g_qnhW5G0CpjWGLES1SzGE3yu2S8f9KV3jDo=",
+                    latitude: 37.615223 + Math.random() * 0.005, // SFO region
+                    longitude: -122.389977 + Math.random() * 0.005,
                     createdAt: new Date(),
                     updatedAt: new Date(),
                 },
@@ -29,6 +31,8 @@ module.exports = {
                     cuisineType: "Asian Fusion",
                     imageUrl:
                         "https://media.istockphoto.com/id/1434408830/photo/freeze-motion-of-wok-pan-and-flying-ingredients-in-the-air.jpg?s=612x612&w=0&k=20&c=mJJjrA8-TOcnsWJNei4yjjEP1ZUwmmUtMqoPwBYgU-g=",
+                    latitude: 37.616,
+                    longitude: -122.3885,
                     createdAt: new Date(),
                     updatedAt: new Date(),
                 },
@@ -42,6 +46,8 @@ module.exports = {
                     cuisineType: "Italian",
                     imageUrl:
                         "https://media.istockphoto.com/id/637214478/photo/pasta-plate.jpg?s=612x612&w=0&k=20&c=oebCQG_Zfv2zJpobSzpF6JFNdsBQUjG6MdQh-En5l3c=",
+                    latitude: 37.6145,
+                    longitude: -122.391,
                     createdAt: new Date(),
                     updatedAt: new Date(),
                 },
@@ -55,6 +61,8 @@ module.exports = {
                     cuisineType: "Breakfast",
                     imageUrl:
                         "https://media.istockphoto.com/id/148003375/photo/bagels-with-cream-cheese.jpg?s=612x612&w=0&k=20&c=gJQIsh__oVKzAEICJdz39dG1491IiM9iAu1HqW4WWkk=",
+                    latitude: 37.6158,
+                    longitude: -122.3922,
                     createdAt: new Date(),
                     updatedAt: new Date(),
                 },
@@ -68,6 +76,8 @@ module.exports = {
                     cuisineType: "Cafe",
                     imageUrl:
                         "https://media.istockphoto.com/id/1467199060/photo/cup-of-coffee-with-smoke-and-coffee-beans-on-old-wooden-background.jpg?s=612x612&w=0&k=20&c=OnS8_6FM5ussfSGmjpDD-GofERg2UbItdxShIAA90sQ=",
+                    latitude: 37.617,
+                    longitude: -122.3905,
                     createdAt: new Date(),
                     updatedAt: new Date(),
                 },
@@ -81,6 +91,8 @@ module.exports = {
                     cuisineType: "American",
                     imageUrl:
                         "https://media.istockphoto.com/id/617759204/photo/steakhouse-double-bacon-cheeseburger.jpg?s=612x612&w=0&k=20&c=QRaHtrxJsmNKOlOTkvxyE-o-3kM-Me1zU320yPT8ycI=",
+                    latitude: 37.6139,
+                    longitude: -122.3888,
                     createdAt: new Date(),
                     updatedAt: new Date(),
                 },
@@ -94,6 +106,8 @@ module.exports = {
                     cuisineType: "Vietnamese",
                     imageUrl:
                         "https://media.istockphoto.com/id/1687829797/photo/pho-bo-for-breakfast-in-vietnam-stock-photo.jpg?s=612x612&w=0&k=20&c=5aWVkSBZikSPsZMPoAJZWXGKiw3ZvlxrcaldJx0w0_c=",
+                    latitude: 37.6167,
+                    longitude: -122.3879,
                     createdAt: new Date(),
                     updatedAt: new Date(),
                 },
@@ -107,6 +121,8 @@ module.exports = {
                     cuisineType: "Indian",
                     imageUrl:
                         "https://media.istockphoto.com/id/177043240/photo/indian-butter-chicken-curry.jpg?s=612x612&w=0&k=20&c=GnqnIWq99zDdjmOWQg0L7p3eKJTQO_bxnJTVbf8PlpM=",
+                    latitude: 37.6142,
+                    longitude: -122.3891,
                     createdAt: new Date(),
                     updatedAt: new Date(),
                 },
@@ -120,6 +136,8 @@ module.exports = {
                     cuisineType: "Hawaiian",
                     imageUrl:
                         "https://media.istockphoto.com/id/1304027187/photo/hawaiian-tuna-poke-bowl-with-seaweed-avocado-mango-cucumber.jpg?s=612x612&w=0&k=20&c=kUfPqMxAP0LggJHdqBGFNtE0ThL4jaSe1HKScsII-3c=",
+                    latitude: 37.6156,
+                    longitude: -122.3875,
                     createdAt: new Date(),
                     updatedAt: new Date(),
                 },
@@ -133,6 +151,8 @@ module.exports = {
                     cuisineType: "French",
                     imageUrl:
                         "https://media.istockphoto.com/id/1210773494/photo/chocolate-pancake-with-bananas.jpg?s=612x612&w=0&k=20&c=dIj_EfOxKKOnWYU4GdfvKGgePRiKB__YZPHHfsRfPb4=",
+                    latitude: 37.6163,
+                    longitude: -122.3918,
                     createdAt: new Date(),
                     updatedAt: new Date(),
                 },

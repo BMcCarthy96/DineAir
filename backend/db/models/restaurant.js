@@ -49,6 +49,14 @@ module.exports = (sequelize, DataTypes) => {
             imageUrl: {
                 type: DataTypes.STRING,
             },
+            latitude: {
+                type: DataTypes.DECIMAL(9, 6),
+                allowNull: false,
+            },
+            longitude: {
+                type: DataTypes.DECIMAL(9, 6),
+                allowNull: false,
+            },
         },
         {
             sequelize,
