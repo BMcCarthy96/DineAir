@@ -142,7 +142,7 @@ const reviewsReducer = (state = initialState, action) => {
                 reviewsById[review.id] = review;
             });
 
-            return { ...state, ...reviewsById };
+            return reviewsById;
         }
         case ADD_REVIEW: {
             const review = action.payload;
