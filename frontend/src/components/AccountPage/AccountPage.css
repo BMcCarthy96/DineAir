@@ -49,3 +49,67 @@
 .submit-button:hover {
     background-color: #f84d3e;
 }
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+/* Modal content text color for both themes */
+.modal-content {
+    background: white;
+    padding: 32px;
+    border-radius: 8px;
+    text-align: center;
+    color: #333; /* Always dark text */
+}
+
+/* Yes, Delete button */
+.confirm-delete {
+    background-color: #ff6f61;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    margin-right: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.confirm-delete:hover {
+    background-color: #ccc;
+    color: #333;
+}
+
+/* Cancel button */
+.cancel-delete {
+    background-color: #ccc;
+    color: #333;
+    border: none;
+    border-radius: 6px;
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.cancel-delete:hover {
+    background-color: #ff6f61;
+    color: white;
+}
+
+/* Dark mode modal text stays dark */
+body.dark .modal-content {
+    color: #333;
+}

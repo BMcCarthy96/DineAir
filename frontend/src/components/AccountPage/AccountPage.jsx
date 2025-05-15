@@ -13,6 +13,7 @@ function AccountPage() {
     const [username, setUsername] = useState(sessionUser.username || "");
     const [phone, setPhone] = useState(sessionUser.phone || "");
     const [password, setPassword] = useState("");
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
@@ -54,6 +55,32 @@ function AccountPage() {
             }
         } catch (err) {
             console.error("Error updating profile:", err);
+            alert("An error occurred. Please try again.");
+        }
+    };
+
+    const handleDeleteAccount = async () => {
+        try {
+            const response = await fetch(`/api/users/${sessionUser.id}`, {
+                method: "DELETE",
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem("token")}`,
+                    "XSRF-Token": Cookies.get("XSRF-TOKEN"),
+                },
+            });
+            if (response.ok) {
+                alert("Account deleted successfully.");
+                dispatch({ type: "session/removeUser" });
+                navigate("/signup");
+            } else {
+                const errorData = await response.json();
+                alert(
+                    `Failed to delete account: ${
+                        errorData.error || "Unknown error"
+                    }`
+                );
+            }
+        } catch (err) {
             alert("An error occurred. Please try again.");
         }
     };
@@ -117,7 +144,43 @@ function AccountPage() {
                 <button type="submit" className="submit-button">
                     Save Changes
                 </button>
+                <button
+                    type="button"
+                    className="delete-account-button"
+                    style={{
+                        backgroundColor: "#ff6f61",
+                        color: "white",
+                        marginTop: "16px",
+                    }}
+                    onClick={() => setShowDeleteModal(true)}
+                >
+                    Delete Account
+                </button>
             </form>
+            {showDeleteModal && (
+                <div className="modal-overlay">
+                    <div className="modal-content">
+                        <h3>Are you sure you want to delete your account?</h3>
+                        <button
+                            className="confirm-delete"
+                            style={{
+                                backgroundColor: "#ff6f61",
+                                color: "white",
+                                marginRight: "8px",
+                            }}
+                            onClick={handleDeleteAccount}
+                        >
+                            Yes, Delete
+                        </button>
+                        <button
+                            className="cancel-delete"
+                            onClick={() => setShowDeleteModal(false)}
+                        >
+                            Cancel
+                        </button>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
