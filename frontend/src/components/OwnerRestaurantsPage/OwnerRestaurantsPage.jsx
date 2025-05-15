@@ -12,7 +12,6 @@ function OwnerRestaurantsPage() {
             const data = await response.json();
             setRestaurants(data);
         }
-
         fetchOwnedRestaurants();
     }, []);
 
@@ -25,9 +24,17 @@ function OwnerRestaurantsPage() {
     };
 
     const handleDelete = async (restaurantId) => {
-        if (window.confirm("Are you sure you want to delete this restaurant?")) {
-            await fetch(`/api/restaurants/${restaurantId}`, { method: "DELETE" });
-            setRestaurants(restaurants.filter((restaurant) => restaurant.id !== restaurantId));
+        if (
+            window.confirm("Are you sure you want to delete this restaurant?")
+        ) {
+            await fetch(`/api/restaurants/${restaurantId}`, {
+                method: "DELETE",
+            });
+            setRestaurants(
+                restaurants.filter(
+                    (restaurant) => restaurant.id !== restaurantId
+                )
+            );
         }
     };
 
@@ -37,17 +44,33 @@ function OwnerRestaurantsPage() {
             <button onClick={handleCreate} className="create-button">
                 Create New Restaurant
             </button>
-            <div className="restaurant-list">
+            <div className="restaurant-carousel">
                 {restaurants.map((restaurant) => (
                     <div key={restaurant.id} className="restaurant-card">
+                        <img
+                            src={
+                                restaurant.imageUrl ||
+                                "https://via.placeholder.com/300x200"
+                            }
+                            alt={restaurant.name}
+                            className="restaurant-card-image"
+                        />
                         <h2>{restaurant.name}</h2>
                         <p>{restaurant.description}</p>
-                        <button onClick={() => handleEdit(restaurant.id)} className="edit-button">
-                            Edit
-                        </button>
-                        <button onClick={() => handleDelete(restaurant.id)} className="delete-button">
-                            Delete
-                        </button>
+                        <div className="restaurant-card-actions">
+                            <button
+                                onClick={() => handleEdit(restaurant.id)}
+                                className="edit-button"
+                            >
+                                Edit
+                            </button>
+                            <button
+                                onClick={() => handleDelete(restaurant.id)}
+                                className="delete-button"
+                            >
+                                Delete
+                            </button>
+                        </div>
                     </div>
                 ))}
             </div>

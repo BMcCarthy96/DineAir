@@ -16,7 +16,9 @@ function RestaurantDetails() {
         }
 
         async function fetchMenuItems() {
-            const response = await fetch(`/api/restaurants/${restaurantId}/menu-items`);
+            const response = await fetch(
+                `/api/restaurants/${restaurantId}/menu-items`
+            );
             const data = await response.json();
             setMenuItems(data.items);
         }
@@ -60,18 +62,26 @@ function RestaurantDetails() {
                     <div
                         className="restaurant-banner"
                         style={{
-                            backgroundImage: `url(${restaurant.imageUrl || "https://via.placeholder.com/1200x400"})`,
+                            backgroundImage: `url(${
+                                restaurant.imageUrl ||
+                                "https://via.placeholder.com/1200x400"
+                            })`,
                         }}
                     >
-                        <div className="restaurant-overlay">
-                            <h1 className="restaurant-name">{restaurant.name}</h1>
-                            <p className="restaurant-description">{restaurant.description}</p>
-                            <p className="restaurant-info">
-                                <strong>Terminal:</strong> {restaurant.terminal} |{" "}
-                                <strong>Gate:</strong> {restaurant.gate}
+                        <div className="restaurant-banner-overlay">
+                            <h1 className="restaurant-name">
+                                {restaurant.name}
+                            </h1>
+                            <p className="restaurant-description">
+                                {restaurant.description}
                             </p>
                             <p className="restaurant-info">
-                                <strong>Cuisine:</strong> {restaurant.cuisineType}
+                                <strong>Terminal:</strong> {restaurant.terminal}{" "}
+                                | <strong>Gate:</strong> {restaurant.gate}
+                            </p>
+                            <p className="restaurant-info">
+                                <strong>Cuisine:</strong>{" "}
+                                {restaurant.cuisineType}
                             </p>
                         </div>
                     </div>
@@ -87,14 +97,19 @@ function RestaurantDetails() {
                                 className="menu-item-link"
                             >
                                 <img
-                                    src={item.imageUrl || "https://via.placeholder.com/150"}
+                                    src={
+                                        item.imageUrl ||
+                                        "https://via.placeholder.com/150"
+                                    }
                                     alt={item.name}
                                     className="menu-item-image"
                                 />
                                 <div className="menu-item-info">
                                     <h3>{item.name}</h3>
                                     <p>{item.description}</p>
-                                    <p className="price">${item.price.toFixed(2)}</p>
+                                    <p className="price">
+                                        ${item.price.toFixed(2)}
+                                    </p>
                                 </div>
                             </Link>
                             <button
