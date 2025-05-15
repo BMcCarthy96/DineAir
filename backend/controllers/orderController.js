@@ -32,17 +32,11 @@ exports.createOrder = async (req, res) => {
     try {
         const { gate } = req.body;
 
-        console.log("Gate:", gate); // Debugging: Log the gate value
-        console.log("User ID:", req.user.id); // Debugging: Log the user ID
-
         // Fetch the user's cart
         const cart = await Cart.findOne({ where: { userId: req.user.id } });
-
         if (!cart) {
             return res.status(400).json({ error: "Cart not found" });
         }
-
-        console.log("Cart ID:", cart.id); // Debugging: Log the cart ID
 
         // Fetch the user's cart items
         const cartItems = await CartItem.findAll({
@@ -56,8 +50,6 @@ exports.createOrder = async (req, res) => {
             },
         });
 
-        console.log("Cart Items:", cartItems); // Debugging: Log the cart items
-
         if (cartItems.length === 0) {
             return res.status(400).json({ error: "Cart is empty" });
         }
@@ -68,12 +60,10 @@ exports.createOrder = async (req, res) => {
             0
         );
 
-        console.log("Total Price:", totalPrice); // Debugging: Log the total price
-
         // Create the order
         const newOrder = await Order.create({
             userId: req.user.id,
-            runnerId: null, // Runner will be assigned later
+            runnerId: null,
             airportId: cartItems[0].MenuItem.Restaurant.airportId,
             restaurantId: cartItems[0].MenuItem.restaurantId,
             gate,
@@ -81,14 +71,22 @@ exports.createOrder = async (req, res) => {
             status: "pending",
         });
 
-        console.log("New Order:", newOrder); // Debugging: Log the created order
+        // **Create OrderItems for each cart item**
+        for (const cartItem of cartItems) {
+            await OrderItem.create({
+                orderId: newOrder.id,
+                menuItemId: cartItem.menuItemId,
+                quantity: cartItem.quantity,
+                priceAtPurchase: cartItem.MenuItem.price,
+            });
+        }
 
         // Clear the user's cart
         await CartItem.destroy({ where: { cartId: cart.id } });
 
         res.status(201).json(newOrder);
     } catch (err) {
-        console.error("Error creating order:", err); // Debugging: Log the error
+        console.error("Error creating order:", err);
         res.status(500).json({ error: "Failed to create order" });
     }
 };
@@ -129,34 +127,33 @@ exports.reorderOrder = async (req, res) => {
         const { orderId } = req.params;
         console.log("Reorder request received for orderId:", orderId);
 
-        // Fetch the original order with its associated OrderItems
+        // Fetch the original order with its associated OrderItems and MenuItems
         const originalOrder = await Order.findByPk(orderId, {
             include: [
                 {
                     model: OrderItem,
-                    include: [MenuItem], // Ensure MenuItem is included
+                    include: [MenuItem],
                 },
             ],
         });
 
         if (!originalOrder) {
-            console.log("Original order not found.");
             return res.status(404).json({ error: "Order not found" });
         }
 
         if (originalOrder.userId !== req.user.id) {
-            console.log("User is not authorized to reorder this order.");
             return res.status(403).json({ error: "Forbidden" });
         }
 
-        console.log("Original order fetched successfully:", originalOrder);
+        console.log("OrderItems for reorder:", originalOrder.OrderItems);
 
-        // Create a new cart for the user
+        // Find or create the user's cart
         const [cart] = await Cart.findOrCreate({
             where: { userId: req.user.id },
         });
 
-        console.log("Cart created or fetched successfully:", cart);
+        // **Clear the cart before adding new items**
+        await CartItem.destroy({ where: { cartId: cart.id } });
 
         // Add the items from the original order to the cart
         for (const item of originalOrder.OrderItems) {
@@ -167,7 +164,16 @@ exports.reorderOrder = async (req, res) => {
             });
         }
 
-        res.status(201).json({ message: "Order has been reordered." });
+        // Fetch the updated cart items to return to the frontend
+        const cartItems = await CartItem.findAll({
+            where: { cartId: cart.id },
+            include: {
+                model: MenuItem,
+                attributes: ["id", "name", "description", "price", "imageUrl"],
+            },
+        });
+
+        res.status(201).json(cartItems);
     } catch (err) {
         console.error("Error reordering order:", err);
         res.status(500).json({ error: "Failed to reorder order." });

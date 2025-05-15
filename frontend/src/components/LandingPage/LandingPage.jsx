@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { FaStar } from "react-icons/fa";
 import { addFavorite, removeFavorite } from "../../store/favorites";
 import "./LandingPage.css";
@@ -10,6 +10,7 @@ function LandingPage() {
     const [fastPrepRestaurants, setFastPrepRestaurants] = useState([]);
     const favorites = useSelector((state) => state.favorites); // Get favorites from Redux
     const dispatch = useDispatch();
+    const navigate = useNavigate();
 
     // Fetch all restaurants
     useEffect(() => {
@@ -34,7 +35,9 @@ function LandingPage() {
     useEffect(() => {
         async function fetchFastPrepRestaurants() {
             try {
-                const response = await fetch("/api/restaurants?timeBeforeBoarding=15");
+                const response = await fetch(
+                    "/api/restaurants?timeBeforeBoarding=15"
+                );
                 if (response.ok) {
                     const data = await response.json();
                     setFastPrepRestaurants(data);
@@ -59,6 +62,11 @@ function LandingPage() {
         }
     };
 
+    // Navigate to restaurant page
+    const handleCardClick = (restaurantId) => {
+        navigate(`/restaurants/${restaurantId}`);
+    };
+
     return (
         <div className="landing-page">
             <div className="landing-header">
@@ -71,31 +79,43 @@ function LandingPage() {
                     <h2>Fast Prep Restaurants (15-min prep guaranteed)</h2>
                     <div className="restaurant-list">
                         {fastPrepRestaurants.map((restaurant) => (
-                            <div key={restaurant.id} className="restaurant-card">
-                                <Link to={`/restaurants/${restaurant.id}`}>
-                                    <img
-                                        src={restaurant.imageUrl || "https://via.placeholder.com/300x200"}
-                                        alt={restaurant.name}
-                                        className="restaurant-image"
-                                    />
-                                </Link>
+                            <div
+                                key={restaurant.id}
+                                className="restaurant-card"
+                                onClick={() => handleCardClick(restaurant.id)}
+                            >
+                                <img
+                                    src={
+                                        restaurant.imageUrl ||
+                                        "https://via.placeholder.com/300x200"
+                                    }
+                                    alt={restaurant.name}
+                                    className="restaurant-image"
+                                />
                                 <div className="restaurant-info">
                                     <h2>{restaurant.name}</h2>
                                     <p>{restaurant.description}</p>
                                     <p>
-                                        <strong>Cuisine:</strong> {restaurant.cuisineType}
+                                        <strong>Cuisine:</strong>{" "}
+                                        {restaurant.cuisineType}
                                     </p>
                                     <p>
-                                        <strong>Terminal:</strong> {restaurant.terminal} |{" "}
+                                        <strong>Terminal:</strong>{" "}
+                                        {restaurant.terminal} |{" "}
                                         <strong>Gate:</strong> {restaurant.gate}
                                     </p>
                                     <FaStar
                                         className={`favorite-icon ${
-                                            favorites.some((fav) => fav.id === restaurant.id)
+                                            favorites.some(
+                                                (fav) =>
+                                                    fav.id === restaurant.id
+                                            )
                                                 ? "active"
                                                 : ""
                                         }`}
-                                        onClick={(event) => toggleFavorite(restaurant, event)}
+                                        onClick={(event) =>
+                                            toggleFavorite(restaurant, event)
+                                        }
                                     />
                                 </div>
                             </div>
@@ -107,29 +127,41 @@ function LandingPage() {
             {/* All Restaurants Section */}
             <div className="restaurant-list">
                 {restaurants.map((restaurant) => (
-                    <div key={restaurant.id} className="restaurant-card">
-                        <Link to={`/restaurants/${restaurant.id}`}>
-                            <img
-                                src={restaurant.imageUrl || "https://via.placeholder.com/300x200"}
-                                alt={restaurant.name}
-                                className="restaurant-image"
-                            />
-                        </Link>
+                    <div
+                        key={restaurant.id}
+                        className="restaurant-card"
+                        onClick={() => handleCardClick(restaurant.id)}
+                    >
+                        <img
+                            src={
+                                restaurant.imageUrl ||
+                                "https://via.placeholder.com/300x200"
+                            }
+                            alt={restaurant.name}
+                            className="restaurant-image"
+                        />
                         <div className="restaurant-info">
                             <h2>{restaurant.name}</h2>
                             <p>{restaurant.description}</p>
                             <p>
-                                <strong>Cuisine:</strong> {restaurant.cuisineType}
+                                <strong>Cuisine:</strong>{" "}
+                                {restaurant.cuisineType}
                             </p>
                             <p>
-                                <strong>Terminal:</strong> {restaurant.terminal} |{" "}
-                                <strong>Gate:</strong> {restaurant.gate}
+                                <strong>Terminal:</strong> {restaurant.terminal}{" "}
+                                | <strong>Gate:</strong> {restaurant.gate}
                             </p>
                             <FaStar
                                 className={`favorite-icon ${
-                                    favorites.some((fav) => fav.id === restaurant.id) ? "active" : ""
+                                    favorites.some(
+                                        (fav) => fav.id === restaurant.id
+                                    )
+                                        ? "active"
+                                        : ""
                                 }`}
-                                onClick={(event) => toggleFavorite(restaurant, event)}
+                                onClick={(event) =>
+                                    toggleFavorite(restaurant, event)
+                                }
                             />
                         </div>
                     </div>

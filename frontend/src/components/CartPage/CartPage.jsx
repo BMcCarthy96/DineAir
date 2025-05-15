@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import Cookies from "js-cookie";
 import { motion } from "framer-motion";
 import "./CartPage.css";
@@ -7,29 +7,34 @@ import "./CartPage.css";
 function CartPage() {
     const [cartItems, setCartItems] = useState([]);
     const navigate = useNavigate();
+    const location = useLocation();
+
+    async function fetchCartItems() {
+        try {
+            const response = await fetch("/api/carts/items", {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem("token")}`,
+                    "XSRF-Token": Cookies.get("XSRF-TOKEN"),
+                },
+            });
+            if (response.ok) {
+                const data = await response.json();
+                setCartItems(data);
+            } else {
+                console.error("Failed to fetch cart items");
+            }
+        } catch (err) {
+            console.error("Error fetching cart items:", err);
+        }
+    }
 
     useEffect(() => {
-        async function fetchCartItems() {
-            try {
-                const response = await fetch("/api/carts/items", {
-                    headers: {
-                        Authorization: `Bearer ${localStorage.getItem("token")}`,
-                        "XSRF-Token": Cookies.get("XSRF-TOKEN"),
-                    },
-                });
-                if (response.ok) {
-                    const data = await response.json();
-                    setCartItems(data);
-                } else {
-                    console.error("Failed to fetch cart items");
-                }
-            } catch (err) {
-                console.error("Error fetching cart items:", err);
-            }
+        if (location.state?.cartItems) {
+            setCartItems(location.state.cartItems);
+        } else {
+            fetchCartItems();
         }
-
-        fetchCartItems();
-    }, []);
+    }, [location.state]);
 
     const handleRemoveItem = async (itemId) => {
         try {
@@ -69,7 +74,9 @@ function CartPage() {
                 const updatedItem = await response.json();
                 setCartItems((prevItems) =>
                     prevItems.map((item) =>
-                        item.id === itemId ? { ...item, quantity: updatedItem.quantity } : item
+                        item.id === itemId
+                            ? { ...item, quantity: updatedItem.quantity }
+                            : item
                     )
                 );
             } else {
@@ -105,7 +112,10 @@ function CartPage() {
                             exit={{ opacity: 0, y: 20 }}
                         >
                             <img
-                                src={item.MenuItem.imageUrl || "https://via.placeholder.com/150"}
+                                src={
+                                    item.MenuItem.imageUrl ||
+                                    "https://via.placeholder.com/150"
+                                }
                                 alt={item.MenuItem.name}
                                 className="cart-item-image"
                             />
@@ -116,7 +126,10 @@ function CartPage() {
                                     <button
                                         className="quantity-button"
                                         onClick={() =>
-                                            handleQuantityChange(item.id, item.quantity - 1)
+                                            handleQuantityChange(
+                                                item.id,
+                                                item.quantity - 1
+                                            )
                                         }
                                     >
                                         -
@@ -125,13 +138,21 @@ function CartPage() {
                                     <button
                                         className="quantity-button"
                                         onClick={() =>
-                                            handleQuantityChange(item.id, item.quantity + 1)
+                                            handleQuantityChange(
+                                                item.id,
+                                                item.quantity + 1
+                                            )
                                         }
                                     >
                                         +
                                     </button>
                                 </div>
-                                <p>Price: ${(item.MenuItem.price * item.quantity).toFixed(2)}</p>
+                                <p>
+                                    Price: $
+                                    {(
+                                        item.MenuItem.price * item.quantity
+                                    ).toFixed(2)}
+                                </p>
                                 <button
                                     className="remove-button"
                                     onClick={() => handleRemoveItem(item.id)}
@@ -146,7 +167,10 @@ function CartPage() {
             {cartItems.length > 0 && (
                 <div className="cart-summary">
                     <h3>Subtotal: ${subtotal.toFixed(2)}</h3>
-                    <button className="checkout-button" onClick={handleCheckout}>
+                    <button
+                        className="checkout-button"
+                        onClick={handleCheckout}
+                    >
                         Proceed to Checkout
                     </button>
                 </div>

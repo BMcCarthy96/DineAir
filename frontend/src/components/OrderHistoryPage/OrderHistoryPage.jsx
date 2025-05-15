@@ -40,15 +40,16 @@ function OrderHistoryPage() {
             const response = await fetch(`/api/orders/${orderId}/reorder`, {
                 method: "POST",
                 headers: {
-                    Authorization: `Bearer ${localStorage.getItem("token")}`, // Ensure this token is valid
+                    Authorization: `Bearer ${localStorage.getItem("token")}`,
                     "Content-Type": "application/json",
                     "X-CSRF-Token": csrfToken,
                 },
             });
 
             if (response.ok) {
+                const cartItems = await response.json();
                 alert("Order has been reordered!");
-                navigate("/cart");
+                navigate("/cart", { state: { cartItems } });
             } else {
                 const errorData = await response.json();
                 alert(
