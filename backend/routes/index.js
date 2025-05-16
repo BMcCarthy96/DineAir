@@ -1,4 +1,5 @@
 const express = require("express");
+const path = require("path");
 const router = express.Router();
 const apiRouter = require("./api");
 
@@ -40,8 +41,8 @@ if (process.env.NODE_ENV !== "production") {
 }
 
 // Root route for '/'
-router.get("/", (req, res) => {
-    res.send("Welcome to the root of the API");
-});
+// router.get("/", (req, res) => {
+//     res.send("Welcome to the root of the API");
+// });
 
 module.exports = router;
