@@ -1,12 +1,17 @@
 "use strict";
 
-const { Airport } = require("../models");
+let options = {};
+if (process.env.NODE_ENV === "production") {
+    options.schema = process.env.SCHEMA;
+}
 
 /** @type {import('sequelize-cli').Migration} */
 
 module.exports = {
     async up(queryInterface, Sequelize) {
-        await Airport.bulkCreate(
+        options.tableName = "Airports";
+        await queryInterface.bulkInsert(
+            options,
             [
                 {
                     id: 1,
@@ -38,6 +43,7 @@ module.exports = {
     },
 
     async down(queryInterface, Sequelize) {
-        await queryInterface.bulkDelete("Airports", null, {});
+        options.tableName = "Airports";
+        await queryInterface.bulkDelete(options, null, {});
     },
 };

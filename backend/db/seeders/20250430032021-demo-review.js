@@ -1,12 +1,17 @@
 "use strict";
 
-const { Review } = require("../models");
+let options = {};
+if (process.env.NODE_ENV === "production") {
+    options.schema = process.env.SCHEMA;
+}
 
 /** @type {import('sequelize-cli').Migration} */
 
 module.exports = {
     async up(queryInterface, Sequelize) {
-        await Review.bulkCreate(
+        options.tableName = "Reviews";
+        await queryInterface.bulkInsert(
+            options,
             [
                 // Taco 'Bout It
                 {
@@ -285,6 +290,7 @@ module.exports = {
     },
 
     async down(queryInterface, Sequelize) {
-        await queryInterface.bulkDelete("Reviews", null, {});
+        options.tableName = "Reviews";
+        await queryInterface.bulkDelete(options, null, {});
     },
 };

@@ -1,12 +1,17 @@
 "use strict";
 
-const { MenuItem } = require("../models");
+let options = {};
+if (process.env.NODE_ENV === "production") {
+    options.schema = process.env.SCHEMA;
+}
 
 /** @type {import('sequelize-cli').Migration} */
 
 module.exports = {
     async up(queryInterface, Sequelize) {
-        await MenuItem.bulkCreate(
+        options.tableName = "MenuItems";
+        await queryInterface.bulkInsert(
+            options,
             [
                 // Taco 'Bout It
                 {
@@ -312,6 +317,7 @@ module.exports = {
     },
 
     async down(queryInterface, Sequelize) {
-        await queryInterface.bulkDelete("MenuItems", null, {});
+        options.tableName = "MenuItems";
+        await queryInterface.bulkDelete(options, null, {});
     },
 };

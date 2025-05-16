@@ -1,19 +1,20 @@
 "use strict";
 
-const { User } = require("../models");
 const bcrypt = require("bcryptjs");
 const { Op } = require("sequelize");
 
 let options = {};
 if (process.env.NODE_ENV === "production") {
-    options.schema = process.env.SCHEMA; // define your schema in options object
+    options.schema = process.env.SCHEMA;
 }
 
 /** @type {import('sequelize-cli').Migration} */
 
 module.exports = {
     async up(queryInterface, Sequelize) {
-        await User.bulkCreate(
+        options.tableName = "Users";
+        await queryInterface.bulkInsert(
+            options,
             [
                 {
                     email: "JustinTyme@dineair.com",

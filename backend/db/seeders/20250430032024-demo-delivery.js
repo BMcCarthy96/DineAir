@@ -1,12 +1,17 @@
 "use strict";
 
-const { Delivery } = require("../models");
+let options = {};
+if (process.env.NODE_ENV === "production") {
+    options.schema = process.env.SCHEMA;
+}
 
 /** @type {import('sequelize-cli').Migration} */
 
 module.exports = {
     async up(queryInterface, Sequelize) {
-        await Delivery.bulkCreate(
+        options.tableName = "Deliveries";
+        await queryInterface.bulkInsert(
+            options,
             [
                 {
                     orderId: 1,
@@ -26,6 +31,7 @@ module.exports = {
     },
 
     async down(queryInterface, Sequelize) {
-        await queryInterface.bulkDelete("Deliveries", null, {});
+        options.tableName = "Deliveries";
+        await queryInterface.bulkDelete(options, null, {});
     },
 };

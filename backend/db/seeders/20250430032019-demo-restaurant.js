@@ -1,10 +1,17 @@
 "use strict";
 
-const { Restaurant } = require("../models");
+let options = {};
+if (process.env.NODE_ENV === "production") {
+    options.schema = process.env.SCHEMA;
+}
+
+/** @type {import('sequelize-cli').Migration} */
 
 module.exports = {
     async up(queryInterface, Sequelize) {
-        await Restaurant.bulkCreate(
+        options.tableName = "Restaurants";
+        await queryInterface.bulkInsert(
+            options,
             [
                 {
                     name: "Taco 'Bout It",
@@ -162,6 +169,7 @@ module.exports = {
     },
 
     async down(queryInterface, Sequelize) {
-        await queryInterface.bulkDelete("Restaurants", null, {});
+        options.tableName = "Restaurants";
+        await queryInterface.bulkDelete(options, null, {});
     },
 };

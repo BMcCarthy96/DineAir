@@ -1,11 +1,17 @@
 "use strict";
 
-const { Flight } = require("../models");
+let options = {};
+if (process.env.NODE_ENV === "production") {
+    options.schema = process.env.SCHEMA;
+}
 
 /** @type {import('sequelize-cli').Migration} */
+
 module.exports = {
     async up(queryInterface, Sequelize) {
-        await Flight.bulkCreate(
+        options.tableName = "Flights";
+        await queryInterface.bulkInsert(
+            options,
             [
                 {
                     flightNumber: "DL123",
@@ -33,6 +39,7 @@ module.exports = {
     },
 
     async down(queryInterface, Sequelize) {
-        await queryInterface.bulkDelete("Flights", null, {});
+        options.tableName = "Flights";
+        await queryInterface.bulkDelete(options, null, {});
     },
 };

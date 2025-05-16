@@ -1,10 +1,17 @@
 "use strict";
 
+let options = {};
+if (process.env.NODE_ENV === "production") {
+    options.schema = process.env.SCHEMA;
+}
+
 /** @type {import('sequelize-cli').Migration} */
+
 module.exports = {
     async up(queryInterface, Sequelize) {
+        options.tableName = "Favorites";
         await queryInterface.bulkInsert(
-            "Favorites",
+            options,
             [
                 {
                     userId: 1,
@@ -19,11 +26,12 @@ module.exports = {
                     updatedAt: new Date(),
                 },
             ],
-            {}
+            { validate: true }
         );
     },
 
     async down(queryInterface, Sequelize) {
-        await queryInterface.bulkDelete("Favorites", null, {});
+        options.tableName = "Favorites";
+        await queryInterface.bulkDelete(options, null, {});
     },
 };

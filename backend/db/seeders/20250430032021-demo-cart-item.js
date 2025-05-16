@@ -1,12 +1,17 @@
 "use strict";
 
-const { CartItem } = require("../models");
+let options = {};
+if (process.env.NODE_ENV === "production") {
+    options.schema = process.env.SCHEMA;
+}
 
 /** @type {import('sequelize-cli').Migration} */
 
 module.exports = {
     async up(queryInterface, Sequelize) {
-        await CartItem.bulkCreate(
+        options.tableName = "CartItems";
+        await queryInterface.bulkInsert(
+            options,
             [
                 {
                     cartId: 1,
@@ -24,6 +29,7 @@ module.exports = {
     },
 
     async down(queryInterface, Sequelize) {
-        await queryInterface.bulkDelete("CartItems", null, {});
+        options.tableName = "CartItems";
+        await queryInterface.bulkDelete(options, null, {});
     },
 };

@@ -1,12 +1,17 @@
 "use strict";
 
-const { OrderItem } = require("../models");
+let options = {};
+if (process.env.NODE_ENV === "production") {
+    options.schema = process.env.SCHEMA;
+}
 
 /** @type {import('sequelize-cli').Migration} */
 
 module.exports = {
     async up(queryInterface, Sequelize) {
-        await OrderItem.bulkCreate(
+        options.tableName = "OrderItems";
+        await queryInterface.bulkInsert(
+            options,
             [
                 {
                     orderId: 1,
@@ -80,6 +85,7 @@ module.exports = {
     },
 
     async down(queryInterface, Sequelize) {
-        await queryInterface.bulkDelete("OrderItems", null, {});
+        options.tableName = "OrderItems";
+        await queryInterface.bulkDelete(options, null, {});
     },
 };
