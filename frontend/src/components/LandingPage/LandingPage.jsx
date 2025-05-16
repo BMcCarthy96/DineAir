@@ -8,7 +8,7 @@ import "./LandingPage.css";
 function LandingPage() {
     const [restaurants, setRestaurants] = useState([]);
     const [fastPrepRestaurants, setFastPrepRestaurants] = useState([]);
-    const favorites = useSelector((state) => state.favorites); // Get favorites from Redux
+    const favorites = useSelector((state) => state.favorites);
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
@@ -27,34 +27,20 @@ function LandingPage() {
                 console.error("Error fetching restaurants:", err);
             }
         }
-
         fetchRestaurants();
     }, []);
 
-    // Fetch fast prep restaurants
+    // Filter for the select fast prep restaurants by ID
     useEffect(() => {
-        async function fetchFastPrepRestaurants() {
-            try {
-                const response = await fetch(
-                    "/api/restaurants?timeBeforeBoarding=15"
-                );
-                if (response.ok) {
-                    const data = await response.json();
-                    setFastPrepRestaurants(data);
-                } else {
-                    console.error("Failed to fetch fast prep restaurants");
-                }
-            } catch (err) {
-                console.error("Error fetching fast prep restaurants:", err);
-            }
-        }
+        // IDs for fast prep restaurants
+        const fastPrepIds = [4, 5, 9, 10];
+        setFastPrepRestaurants(
+            restaurants.filter((r) => fastPrepIds.includes(r.id))
+        );
+    }, [restaurants]);
 
-        fetchFastPrepRestaurants();
-    }, []);
-
-    // Toggle favorite status
     const toggleFavorite = (restaurant, event) => {
-        event.stopPropagation(); // Prevent navigation to the restaurant page
+        event.stopPropagation();
         if (favorites.some((fav) => fav.id === restaurant.id)) {
             dispatch(removeFavorite(restaurant.id));
         } else {
@@ -62,7 +48,6 @@ function LandingPage() {
         }
     };
 
-    // Navigate to restaurant page
     const handleCardClick = (restaurantId) => {
         navigate(`/restaurants/${restaurantId}`);
     };
@@ -125,6 +110,7 @@ function LandingPage() {
             )}
 
             {/* All Restaurants Section */}
+            <h2>All Restaurants</h2>
             <div className="restaurant-list">
                 {restaurants.map((restaurant) => (
                     <div
