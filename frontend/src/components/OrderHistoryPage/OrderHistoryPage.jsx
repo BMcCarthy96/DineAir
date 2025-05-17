@@ -75,7 +75,9 @@ function OrderHistoryPage() {
                             <p>Status: {order.status}</p>
                             <p>
                                 Total Price: $
-                                {Number(order.totalPrice).toFixed(2)}
+                                {!isNaN(Number(order.totalPrice))
+                                    ? Number(order.totalPrice).toFixed(2)
+                                    : "0.00"}
                             </p>
                             <p>
                                 Restaurant:{" "}

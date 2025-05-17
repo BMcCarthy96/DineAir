@@ -149,9 +149,13 @@ function CartPage() {
                                 </div>
                                 <p>
                                     Price: $
-                                    {Number(
-                                        item.MenuItem.price * item.quantity
-                                    ).toFixed(2)}
+                                    {!isNaN(Number(item.MenuItem.price)) &&
+                                    !isNaN(Number(item.quantity))
+                                        ? (
+                                              Number(item.MenuItem.price) *
+                                              Number(item.quantity)
+                                          ).toFixed(2)
+                                        : "0.00"}
                                 </p>
                                 <button
                                     className="remove-button"
@@ -166,7 +170,12 @@ function CartPage() {
             )}
             {cartItems.length > 0 && (
                 <div className="cart-summary">
-                    <h3>Subtotal: ${Number(subtotal).toFixed(2)}</h3>
+                    <h3>
+                        Subtotal: $
+                        {!isNaN(Number(subtotal))
+                            ? Number(subtotal).toFixed(2)
+                            : "0.00"}
+                    </h3>
                     <button
                         className="checkout-button"
                         onClick={handleCheckout}

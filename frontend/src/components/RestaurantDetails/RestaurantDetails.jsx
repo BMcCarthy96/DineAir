@@ -108,7 +108,10 @@ function RestaurantDetails() {
                                     <h3>{item.name}</h3>
                                     <p>{item.description}</p>
                                     <p className="price">
-                                        ${Number(item.price).toFixed(2)}
+                                        $
+                                        {!isNaN(Number(item.price))
+                                            ? Number(item.price).toFixed(2)
+                                            : "0.00"}
                                     </p>
                                 </div>
                             </Link>

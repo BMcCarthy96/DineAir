@@ -73,9 +73,13 @@ function CheckoutPage() {
                                 <p>Quantity: {item.quantity}</p>
                                 <p>
                                     Price: $
-                                    {Number(
-                                        item.MenuItem.price * item.quantity
-                                    ).toFixed(2)}
+                                    {!isNaN(Number(item.MenuItem.price)) &&
+                                    !isNaN(Number(item.quantity))
+                                        ? (
+                                              Number(item.MenuItem.price) *
+                                              Number(item.quantity)
+                                          ).toFixed(2)
+                                        : "0.00"}
                                 </p>
                             </div>
                         </div>

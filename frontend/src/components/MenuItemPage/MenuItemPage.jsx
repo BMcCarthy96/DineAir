@@ -27,7 +27,12 @@ function MenuItemPage() {
         <div className="menu-item-page">
             <h1>{menuItem.name}</h1>
             <p>{menuItem.description}</p>
-            <p>Price: ${Number(menuItem.price).toFixed(2)}</p>
+            <p>
+                Price: $
+                {!isNaN(Number(menuItem.price))
+                    ? Number(menuItem.price).toFixed(2)
+                    : "0.00"}
+            </p>
             <img
                 src={menuItem.imageUrl || "https://via.placeholder.com/150"}
                 alt={menuItem.name}
