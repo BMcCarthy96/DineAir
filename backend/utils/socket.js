@@ -2,6 +2,13 @@ const { Server } = require("socket.io");
 
 let io;
 
+function setSocket(socketInstance) {
+    io = socketInstance;
+}
+function getSocket() {
+    return io;
+}
+
 function initSocket(server) {
     io = new Server(server, {
         cors: {
@@ -34,4 +41,4 @@ function getSocket() {
     return io;
 }
 
-module.exports = { initSocket, getSocket };
+module.exports = { initSocket, getSocket, setSocket };

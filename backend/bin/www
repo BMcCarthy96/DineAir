@@ -4,13 +4,25 @@ const { port } = require("../config");
 const app = require("../app");
 const db = require("../db/models");
 const http = require("http");
-const { initSocket } = require("../utils/socket");
+const { initSocket, setSocket } = require("../utils/socket");
 
 // Create the HTTP server
 const server = http.createServer(app);
 
-// Initialize WebSocket server
-const io = initSocket(server);
+// Initialize WebSocket server with proper CORS
+const io = initSocket(server, {
+    cors: {
+        origin:
+            process.env.NODE_ENV === "production"
+                ? "https://dineair.onrender.com"
+                : "http://localhost:5174",
+        methods: ["GET", "POST"],
+        credentials: true,
+    },
+});
+
+// Make io accessible in controllers
+setSocket(io);
 
 // WebSocket event handlers
 io.on("connection", (socket) => {
