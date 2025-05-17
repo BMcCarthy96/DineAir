@@ -6,7 +6,13 @@ import {
     notifyRunnerLocation,
 } from "./Notifications";
 
-const socket = io("http://localhost:8000", {
+// Use relative URL in production, localhost in development
+const backendUrl =
+    import.meta.env.MODE === "production"
+        ? undefined // relative, same origin as frontend
+        : "http://localhost:8000";
+
+const socket = io(backendUrl, {
     transports: ["websocket", "polling"],
     withCredentials: true,
 });
