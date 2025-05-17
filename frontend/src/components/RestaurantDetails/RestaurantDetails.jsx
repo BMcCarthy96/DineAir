@@ -108,7 +108,7 @@ function RestaurantDetails() {
                                     <h3>{item.name}</h3>
                                     <p>{item.description}</p>
                                     <p className="price">
-                                        ${item.price.toFixed(2)}
+                                        ${Number(item.price).toFixed(2)}
                                     </p>
                                 </div>
                             </Link>

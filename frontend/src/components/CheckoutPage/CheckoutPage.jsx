@@ -60,7 +60,10 @@ function CheckoutPage() {
                     {cartItems.map((item) => (
                         <div key={item.id} className="checkout-item">
                             <img
-                                src={item.MenuItem.imageUrl || "https://via.placeholder.com/150"}
+                                src={
+                                    item.MenuItem.imageUrl ||
+                                    "https://via.placeholder.com/150"
+                                }
                                 alt={item.MenuItem.name}
                                 className="checkout-item-image"
                             />
@@ -68,7 +71,12 @@ function CheckoutPage() {
                                 <h3>{item.MenuItem.name}</h3>
                                 <p>{item.MenuItem.description}</p>
                                 <p>Quantity: {item.quantity}</p>
-                                <p>Price: ${(item.MenuItem.price * item.quantity).toFixed(2)}</p>
+                                <p>
+                                    Price: $
+                                    {Number(
+                                        item.MenuItem.price * item.quantity
+                                    ).toFixed(2)}
+                                </p>
                             </div>
                         </div>
                     ))}
@@ -86,7 +94,10 @@ function CheckoutPage() {
                             required
                         />
                     </label>
-                    <button className="place-order-button" onClick={handlePlaceOrder}>
+                    <button
+                        className="place-order-button"
+                        onClick={handlePlaceOrder}
+                    >
                         Place Order
                     </button>
                 </div>
