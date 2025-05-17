@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import Map from "../Map/Map";
 import RunnerETA from "../RunnerETA/RunnerETA";
 import FlightInfoSidebar from "../FlightInfoSidebar/FlightInfoSidebar";
@@ -20,12 +20,10 @@ function DeliveryTrackingPage() {
     const [date, setDate] = useState(null);
     const [orderStatus, setOrderStatus] = useState("");
     const [error, setError] = useState(null);
-    const orderSteps = [
-        "Order Received",
-        "Preparing",
-        "On the Way",
-        "Delivered",
-    ];
+    const orderSteps = useMemo(
+        () => ["Order Received", "Preparing", "On the Way", "Delivered"],
+        []
+    );
     const [orderStepIndex, setOrderStepIndex] = useState(0);
 
     useEffect(() => {
@@ -35,7 +33,7 @@ function DeliveryTrackingPage() {
             }, 4000); // 4 seconds per step
             return () => clearTimeout(timer);
         }
-    }, [orderStepIndex]);
+    }, [orderStepIndex, orderSteps.length]);
 
     // Simulate runner movement
     function interpolatePosition(start, end, t) {
@@ -68,7 +66,7 @@ function DeliveryTrackingPage() {
             animateRunner();
             return () => cancelAnimationFrame(animationFrame);
         }
-    }, [orderStepIndex, restaurantLocation, gateLocation]);
+    }, [orderStepIndex, orderSteps, restaurantLocation, gateLocation]);
 
     // Fetch restaurant location for the current order
     useEffect(() => {

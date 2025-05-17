@@ -128,7 +128,12 @@ const router = createBrowserRouter([
 
 function App() {
     useEffect(() => {
-        const socket = io("http://localhost:8000");
+        const backendUrl =
+            import.meta.env.MODE === "production"
+                ? undefined // relative, same origin as frontend
+                : "http://localhost:8000";
+
+        const socket = io(backendUrl);
 
         socket.on("gateChange", ({ gate, terminal }) => {
             notifyGateChange(gate, terminal);
