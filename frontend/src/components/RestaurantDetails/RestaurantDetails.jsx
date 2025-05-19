@@ -1,12 +1,15 @@
 import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import { useParams, Link } from "react-router-dom";
 import Cookies from "js-cookie";
+import AddMenuItemForm from "../AddMenuItemForm/AddMenuItemForm";
 import "./RestaurantDetails.css";
 
 function RestaurantDetails() {
     const { restaurantId } = useParams();
     const [restaurant, setRestaurant] = useState(null);
     const [menuItems, setMenuItems] = useState([]);
+    const sessionUser = useSelector((state) => state.session.user);
 
     useEffect(() => {
         async function fetchRestaurantDetails() {
@@ -55,6 +58,48 @@ function RestaurantDetails() {
         }
     };
 
+    const handleMenuItemAdded = (newItem) => {
+        setMenuItems((prev) => [...prev, newItem]);
+    };
+
+    const handleDeleteMenuItem = async (menuItemId) => {
+        if (window.confirm("Are you sure you want to delete this menu item?")) {
+            try {
+                const response = await fetch(
+                    `/api/restaurants/${restaurantId}/menu-items/${menuItemId}`,
+                    {
+                        method: "DELETE",
+                        headers: {
+                            Authorization: `Bearer ${localStorage.getItem(
+                                "token"
+                            )}`,
+                            "XSRF-Token": Cookies.get("XSRF-TOKEN"),
+                        },
+                    }
+                );
+                if (response.ok) {
+                    setMenuItems((prev) =>
+                        prev.filter((item) => item.id !== menuItemId)
+                    );
+                } else {
+                    alert("Failed to delete menu item.");
+                }
+            } catch (err) {
+                alert("Error deleting menu item.");
+            }
+        }
+    };
+
+    const canAddMenuItem =
+        sessionUser &&
+        (sessionUser.userType === "admin" ||
+            (restaurant && sessionUser.id === restaurant.ownerId));
+
+    const canDeleteMenuItem =
+        sessionUser &&
+        (sessionUser.userType === "admin" ||
+            (restaurant && sessionUser.id === restaurant.ownerId));
+
     return (
         <div className="restaurant-details">
             {restaurant && (
@@ -88,6 +133,12 @@ function RestaurantDetails() {
                 </div>
             )}
             <h2 className="menu-title">Menu</h2>
+            {canAddMenuItem && (
+                <AddMenuItemForm
+                    restaurantId={restaurantId}
+                    onMenuItemAdded={handleMenuItemAdded}
+                />
+            )}
             <div className="menu-items">
                 {menuItems && menuItems.length > 0 ? (
                     menuItems.map((item) => (
@@ -121,6 +172,16 @@ function RestaurantDetails() {
                             >
                                 Add to Cart
                             </button>
+                            {canDeleteMenuItem && (
+                                <button
+                                    className="delete-menu-item-button"
+                                    onClick={() =>
+                                        handleDeleteMenuItem(item.id)
+                                    }
+                                >
+                                    Delete
+                                </button>
+                            )}
                         </div>
                     ))
                 ) : (

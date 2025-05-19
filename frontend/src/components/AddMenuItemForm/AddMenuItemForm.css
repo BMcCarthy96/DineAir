@@ -1,0 +1,38 @@
+.add-menu-item-form {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    padding: 20px;
+    margin-bottom: 24px;
+    max-width: 400px;
+}
+
+.add-menu-item-form label {
+    display: block;
+    margin-bottom: 10px;
+    font-size: 16px;
+}
+
+.add-menu-item-form input,
+.add-menu-item-form textarea {
+    width: 100%;
+    padding: 8px;
+    margin-top: 4px;
+    margin-bottom: 12px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+}
+
+.add-menu-item-form button {
+    background-color: #ff6f61;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.add-menu-item-form button:hover {
+    background-color: #f84d3e;
+}

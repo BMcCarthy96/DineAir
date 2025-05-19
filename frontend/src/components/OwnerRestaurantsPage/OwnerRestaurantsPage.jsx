@@ -38,6 +38,10 @@ function OwnerRestaurantsPage() {
         }
     };
 
+    const handleCardClick = (restaurantId) => {
+        navigate(`/restaurants/${restaurantId}/menu-items`);
+    };
+
     return (
         <div className="owner-restaurants-page">
             <h1>My Restaurants</h1>
@@ -46,7 +50,12 @@ function OwnerRestaurantsPage() {
             </button>
             <div className="restaurant-carousel">
                 {restaurants.map((restaurant) => (
-                    <div key={restaurant.id} className="restaurant-card">
+                    <div
+                        key={restaurant.id}
+                        className="restaurant-card"
+                        onClick={() => handleCardClick(restaurant.id)}
+                        style={{ cursor: "pointer" }}
+                    >
                         <img
                             src={
                                 restaurant.imageUrl ||
