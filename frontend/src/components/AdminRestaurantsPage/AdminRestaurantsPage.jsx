@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import Cookies from "js-cookie";
 import "./AdminRestaurantsPage.css";
 
 function AdminRestaurantsPage() {
@@ -29,6 +30,11 @@ function AdminRestaurantsPage() {
         ) {
             await fetch(`/api/admin/restaurants/${restaurantId}`, {
                 method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json",
+                    "XSRF-Token": Cookies.get("XSRF-TOKEN"),
+                },
+                credentials: "include",
             });
             setRestaurants(
                 restaurants.filter(

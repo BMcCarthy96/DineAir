@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import Cookies from "js-cookie";
 import "./OwnerRestaurantsPage.css";
 
 function OwnerRestaurantsPage() {
@@ -29,6 +30,11 @@ function OwnerRestaurantsPage() {
         ) {
             await fetch(`/api/restaurants/${restaurantId}`, {
                 method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json",
+                    "XSRF-Token": Cookies.get("XSRF-TOKEN"),
+                },
+                credentials: "include",
             });
             setRestaurants(
                 restaurants.filter(
@@ -68,13 +74,19 @@ function OwnerRestaurantsPage() {
                         <p>{restaurant.description}</p>
                         <div className="restaurant-card-actions">
                             <button
-                                onClick={() => handleEdit(restaurant.id)}
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleEdit(restaurant.id);
+                                }}
                                 className="edit-button"
                             >
                                 Edit
                             </button>
                             <button
-                                onClick={() => handleDelete(restaurant.id)}
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleDelete(restaurant.id);
+                                }}
                                 className="delete-button"
                             >
                                 Delete
