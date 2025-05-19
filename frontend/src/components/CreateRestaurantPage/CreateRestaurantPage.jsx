@@ -11,6 +11,8 @@ function CreateRestaurantPage() {
     const [cuisineType, setCuisineType] = useState("");
     const [imageUrl, setImageUrl] = useState("");
     const [airportId, setAirportId] = useState(1);
+    const [latitude, setLatitude] = useState("");
+    const [longitude, setLongitude] = useState("");
     const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
@@ -24,6 +26,8 @@ function CreateRestaurantPage() {
             cuisineType,
             imageUrl,
             airportId,
+            latitude: latitude === "" ? null : Number(latitude),
+            longitude: longitude === "" ? null : Number(longitude),
         };
 
         const response = await fetch("/api/restaurants", {
@@ -41,7 +45,11 @@ function CreateRestaurantPage() {
             navigate(`/restaurants/${data.id}`);
         } else {
             const errorData = await response.json();
-            alert(`Failed to create restaurant: ${errorData.error || "Unknown error"}`);
+            alert(
+                `Failed to create restaurant: ${
+                    errorData.error || "Unknown error"
+                }`
+            );
         }
     };
 
@@ -104,6 +112,26 @@ function CreateRestaurantPage() {
                         type="number"
                         value={airportId}
                         onChange={(e) => setAirportId(e.target.value)}
+                        required
+                    />
+                </label>
+                <label>
+                    Latitude:
+                    <input
+                        type="number"
+                        step="any"
+                        value={latitude}
+                        onChange={(e) => setLatitude(e.target.value)}
+                        required
+                    />
+                </label>
+                <label>
+                    Longitude:
+                    <input
+                        type="number"
+                        step="any"
+                        value={longitude}
+                        onChange={(e) => setLongitude(e.target.value)}
                         required
                     />
                 </label>

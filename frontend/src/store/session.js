@@ -1,4 +1,5 @@
 import { csrfFetch } from "./csrf";
+import { setFavorites } from "./favorites";
 
 // action creators
 const SET_USER = "session/setUser";
@@ -68,6 +69,7 @@ export const logout = () => async (dispatch) => {
 
     if (response.ok) {
         dispatch(removeUser());
+        dispatch(setFavorites([]));
     }
 };
 

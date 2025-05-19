@@ -110,7 +110,7 @@ function LandingPage() {
             )}
 
             {/* All Restaurants Section */}
-            <h2>All Restaurants</h2>
+            <h2 className="all-restaurants-title">All Restaurants</h2>
             <div className="restaurant-list">
                 {restaurants.map((restaurant) => (
                     <div

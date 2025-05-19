@@ -25,6 +25,8 @@ exports.createRestaurant = async (req, res) => {
             cuisineType,
             imageUrl,
             airportId,
+            latitude,
+            longitude,
         } = req.body;
 
         if (!name || !airportId) {
@@ -40,6 +42,8 @@ exports.createRestaurant = async (req, res) => {
             cuisineType,
             imageUrl,
             airportId,
+            latitude,
+            longitude,
         });
 
         res.status(201).json(restaurant);

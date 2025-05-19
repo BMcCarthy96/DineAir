@@ -31,3 +31,16 @@ exports.addFavorite = async (req, res, next) => {
         next(err);
     }
 };
+
+exports.getFavorites = async (req, res, next) => {
+    try {
+        const favorites = await Favorite.findAll({
+            where: { userId: req.user.id },
+            include: [Restaurant],
+        });
+        // Return only the restaurant info
+        res.json(favorites.map((fav) => fav.Restaurant));
+    } catch (err) {
+        next(err);
+    }
+};

@@ -177,6 +177,10 @@ body.dark .cancel-button {
     color: #ff6f61;
 }
 
+body.dark .like-button.liked {
+    color: white;
+}
+
 .review-actions {
     display: flex;
     justify-content: flex-start;

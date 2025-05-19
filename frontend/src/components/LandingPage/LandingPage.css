@@ -64,6 +64,14 @@
     padding: 20px;
 }
 
+.landing-page .all-restaurants-title {
+    color: #000;
+}
+
+body.dark .landing-page .all-restaurants-title {
+    color: #000;
+}
+
 .restaurant-card {
     background-color: #fff;
     border-radius: 12px;
