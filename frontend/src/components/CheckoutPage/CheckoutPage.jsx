@@ -1,12 +1,23 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
+import { gateCoordinates } from "../../utils/gateCoordinates";
 import "./CheckoutPage.css";
 
 function CheckoutPage() {
     const [cartItems, setCartItems] = useState([]);
     const [gate, setGate] = useState("");
+    const [error, setError] = useState(null);
     const navigate = useNavigate();
+
+    // Get sorted gate options
+    const gateOptions = Object.keys(gateCoordinates).sort((a, b) => {
+        // Sort by terminal letter, then by number
+        const [aLetter, aNum] = [a[0], parseInt(a.slice(1), 10)];
+        const [bLetter, bNum] = [b[0], parseInt(b.slice(1), 10)];
+        if (aLetter === bLetter) return aNum - bNum;
+        return aLetter.localeCompare(bLetter);
+    });
 
     useEffect(() => {
         async function fetchCartItems() {
@@ -18,14 +29,16 @@ function CheckoutPage() {
             const data = await response.json();
             setCartItems(data);
         }
-
         fetchCartItems();
     }, []);
 
     const handlePlaceOrder = async () => {
+        const gateCoord = gateCoordinates[gate];
+        if (!gateCoord) {
+            alert("Please select a valid gate.");
+            return;
+        }
         try {
-            console.log("Placing order with gate:", gate); // Debugging: Log the gate value
-
             const response = await fetch("/api/orders", {
                 method: "POST",
                 headers: {
@@ -33,20 +46,24 @@ function CheckoutPage() {
                     Authorization: `Bearer ${localStorage.getItem("token")}`,
                     "XSRF-Token": Cookies.get("XSRF-TOKEN"),
                 },
-                body: JSON.stringify({ gate }),
+                body: JSON.stringify({
+                    gate,
+                    gateLat: gateCoord.lat,
+                    gateLng: gateCoord.lng,
+                }),
             });
 
             if (!response.ok) {
                 const errorData = await response.json();
-                console.error("Error placing order:", errorData);
-                throw new Error("Failed to place order.");
+                setError(errorData.error || "Failed to place order.");
+                return;
             }
 
             alert("Order placed successfully!");
             navigate("/delivery-tracking");
         } catch (err) {
             console.error(err);
-            alert("Failed to place order.");
+            setError("Failed to place order.");
         }
     };
 
@@ -90,20 +107,27 @@ function CheckoutPage() {
                 <div className="checkout-form">
                     <label>
                         Gate:
-                        <input
-                            type="text"
+                        <select
                             value={gate}
                             onChange={(e) => setGate(e.target.value)}
-                            placeholder="Enter your gate"
                             required
-                        />
+                        >
+                            <option value="">Select your gate</option>
+                            {gateOptions.map((gateOption) => (
+                                <option key={gateOption} value={gateOption}>
+                                    {gateOption}
+                                </option>
+                            ))}
+                        </select>
                     </label>
                     <button
                         className="place-order-button"
                         onClick={handlePlaceOrder}
+                        disabled={!gate}
                     >
                         Place Order
                     </button>
+                    {error && <p className="error-message">{error}</p>}
                 </div>
             )}
         </div>

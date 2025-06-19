@@ -6,6 +6,7 @@ const csurf = require("csurf");
 const helmet = require("helmet");
 const cookieParser = require("cookie-parser");
 const routes = require("./routes");
+const { initSocket } = require("./utils/socket");
 
 const { environment } = require("./config");
 const isProduction = environment === "production";
@@ -91,4 +92,14 @@ app.use((err, _req, res, _next) => {
     });
 });
 
-module.exports = app;
+if (require.main === module) {
+    const http = require("http");
+    const server = http.createServer(app);
+    initSocket(server);
+    const PORT = process.env.PORT || 8000;
+    server.listen(PORT, () => {
+        console.log(`Server listening on port ${PORT}`);
+    });
+} else {
+    module.exports = app;
+}

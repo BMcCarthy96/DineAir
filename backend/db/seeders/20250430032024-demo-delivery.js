@@ -15,13 +15,13 @@ module.exports = {
             [
                 {
                     orderId: 1,
-                    runnerId: 2,
+                    runnerId: 1,
                     deliveryTime: new Date(),
                     notes: "Be careful, tacos are spicy!",
                 },
                 {
                     orderId: 2,
-                    runnerId: 4,
+                    runnerId: 2,
                     deliveryTime: new Date(),
                     notes: "Sushi delivered fresh, enjoy!",
                 },

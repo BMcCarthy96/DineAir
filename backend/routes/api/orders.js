@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const {
     getUserOrders,
+    getCurrentOrder,
     createOrder,
     getOrderById,
     deleteOrder,
@@ -11,6 +12,7 @@ const { requireAuth } = require("../../utils/auth");
 
 router.get("/", requireAuth, getUserOrders);
 router.post("/", requireAuth, createOrder);
+router.get("/current", requireAuth, getCurrentOrder);
 router.get("/:id", requireAuth, getOrderById);
 router.delete("/:id", requireAuth, deleteOrder);
 

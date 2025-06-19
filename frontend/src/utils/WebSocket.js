@@ -3,7 +3,7 @@ import {
     notifyGateChange,
     notifyFlightDelay,
     notifyOrderStatus,
-    notifyRunnerLocation,
+    // notifyRunnerLocation,
 } from "./Notifications";
 
 // Use relative URL in production, localhost in development
@@ -28,10 +28,10 @@ socket.on("flightDelay", ({ flightNumber, delayTime }) => {
 });
 
 // Listen for runner location updates
-socket.on("runnerLocationUpdate", ({ runnerId, location }) => {
-    console.log(`Runner ${runnerId} location updated:`, location);
-    notifyRunnerLocation();
-});
+// socket.on("runnerLocationUpdate", ({ runnerId, location }) => {
+//     console.log(`Runner ${runnerId} location updated:`, location);
+//     notifyRunnerLocation();
+// });
 
 // Listen for order status updates
 socket.on("orderStatusUpdate", ({ orderId, status }) => {

@@ -28,9 +28,37 @@ exports.getUserOrders = async (req, res) => {
     }
 };
 
+exports.getCurrentOrder = async (req, res) => {
+    try {
+        // Find the most recent order that is not delivered or cancelled
+        const order = await Order.findOne({
+            where: {
+                userId: req.user.id,
+                status: ["pending", "preparing", "picked_up", "on_the_way"], // adjust as needed
+            },
+            order: [["createdAt", "DESC"]],
+            include: [
+                {
+                    model: Restaurant,
+                    attributes: ["name", "latitude", "longitude"],
+                },
+            ],
+        });
+
+        if (!order) {
+            return res.status(404).json({ error: "No active order found" });
+        }
+
+        res.json(order);
+    } catch (err) {
+        console.error("Error fetching current order:", err);
+        res.status(500).json({ error: "Failed to fetch current order" });
+    }
+};
+
 exports.createOrder = async (req, res) => {
     try {
-        const { gate } = req.body;
+        const { gate, gateLat, gateLng } = req.body;
 
         // Fetch the user's cart
         const cart = await Cart.findOne({ where: { userId: req.user.id } });
@@ -67,6 +95,8 @@ exports.createOrder = async (req, res) => {
             airportId: cartItems[0].MenuItem.Restaurant.airportId,
             restaurantId: cartItems[0].MenuItem.restaurantId,
             gate,
+            gateLat,
+            gateLng,
             totalPrice,
             status: "pending",
         });

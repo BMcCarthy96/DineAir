@@ -1,20 +1,21 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import Map from "../Map/Map";
 import RunnerETA from "../RunnerETA/RunnerETA";
 import FlightInfoSidebar from "../FlightInfoSidebar/FlightInfoSidebar";
 import OrderTracking from "../OrderTracking/OrderTracking";
-import { notifyOrderStatus } from "../../utils/Notifications";
+import {
+    notifyOrderStatus,
+    notifyRunnerLocation,
+} from "../../utils/Notifications";
 import socket from "../../utils/WebSocket";
+import { gateCoordinates } from "../../utils/gateCoordinates";
 import "./DeliveryTrackingPage.css";
 
 function DeliveryTrackingPage() {
     const [runnerLocation, setRunnerLocation] = useState(null);
-    const [gateLocation, setGateLocation] = useState({
-        lat: 37.7849,
-        lng: -122.4094,
-    });
+    const [gateLocation, setGateLocation] = useState(null);
     const [restaurantLocation, setRestaurantLocation] = useState(null);
-    const [restaurants, setRestaurants] = useState([]);
+    const [restaurant, setRestaurant] = useState(null); // Only the actual restaurant
     const [showSidebar, setShowSidebar] = useState(false);
     const [flightNumber, setFlightNumber] = useState(null);
     const [date, setDate] = useState(null);
@@ -26,78 +27,93 @@ function DeliveryTrackingPage() {
     );
     const [orderStepIndex, setOrderStepIndex] = useState(0);
 
-    useEffect(() => {
-        if (orderStepIndex < orderSteps.length - 1) {
-            const timer = setTimeout(() => {
-                setOrderStepIndex(orderStepIndex + 1);
-            }, 4000); // 4 seconds per step
-            return () => clearTimeout(timer);
-        }
-    }, [orderStepIndex, orderSteps.length]);
+    // For smooth animation
+    const animationRef = useRef();
+    const tRef = useRef(0);
 
-    // Simulate runner movement
-    function interpolatePosition(start, end, t) {
-        return {
-            lat: start.lat + (end.lat - start.lat) * t,
-            lng: start.lng + (end.lng - start.lng) * t,
-        };
-    }
-
+    // Fetch order and set locations
     useEffect(() => {
-        if (restaurantLocation && gateLocation) {
-            let t = 0;
-            let animationFrame;
-            const animateRunner = () => {
-                if (orderSteps[orderStepIndex] === "On the Way") {
-                    t += 0.01;
-                    if (t > 1) t = 1;
-                    setRunnerLocation(
-                        interpolatePosition(restaurantLocation, gateLocation, t)
-                    );
-                    if (t < 1) {
-                        animationFrame = requestAnimationFrame(animateRunner);
-                    }
-                } else if (orderStepIndex < 2) {
-                    setRunnerLocation(restaurantLocation);
-                } else if (orderStepIndex === 3) {
-                    setRunnerLocation(gateLocation);
-                }
-            };
-            animateRunner();
-            return () => cancelAnimationFrame(animationFrame);
-        }
-    }, [orderStepIndex, orderSteps, restaurantLocation, gateLocation]);
-
-    // Fetch restaurant location for the current order
-    useEffect(() => {
-        async function fetchRestaurantLocation() {
+        async function fetchOrder() {
             try {
-                const response = await fetch("/api/orders/current");
-                if (response.ok) {
-                    const data = await response.json();
-                    const restLoc = {
-                        lat: data.restaurant.latitude,
-                        lng: data.restaurant.longitude,
-                    };
-                    setRestaurantLocation(restLoc);
-                    setRunnerLocation(restLoc);
+                const res = await fetch("/api/orders/current");
+                if (res.ok) {
+                    const data = await res.json();
+                    // Set gate location from stored coordinates if available, else from mapping
+                    if (data.gateLat && data.gateLng) {
+                        setGateLocation({
+                            lat: Number(data.gateLat),
+                            lng: Number(data.gateLng),
+                        });
+                    } else if (data.gate) {
+                        setGateLocation(gateCoordinates[data.gate]);
+                    }
+                    // Set restaurant location if available
+                    if (
+                        data.Restaurant &&
+                        data.Restaurant.latitude &&
+                        data.Restaurant.longitude
+                    ) {
+                        setRestaurantLocation({
+                            lat: data.Restaurant.latitude,
+                            lng: data.Restaurant.longitude,
+                        });
+                        setRestaurant(data.Restaurant); // Save the actual restaurant object
+                        setRunnerLocation({
+                            lat: data.Restaurant.latitude,
+                            lng: data.Restaurant.longitude,
+                        });
+                    }
+                } else {
+                    setError("Unable to fetch order information.");
                 }
             } catch (err) {
                 console.error(err);
+                setError("Unable to fetch order information.");
             }
         }
-        fetchRestaurantLocation();
+        fetchOrder();
     }, []);
 
-    // Fetch all restaurants for airport map markers
+    // Smoothly animate runner marker from restaurant to gate
     useEffect(() => {
-        fetch("/api/restaurants")
-            .then((res) => res.json())
-            .then(setRestaurants)
-            .catch((err) => console.error("Failed to fetch restaurants:", err));
-    }, []);
+        if (
+            orderSteps[orderStepIndex] === "On the Way" &&
+            restaurantLocation &&
+            gateLocation
+        ) {
+            tRef.current = 0;
+            const animate = () => {
+                tRef.current += 0.005; // Adjust for speed (smaller = slower)
+                if (tRef.current > 1) tRef.current = 1;
+                setRunnerLocation({
+                    lat:
+                        restaurantLocation.lat +
+                        (gateLocation.lat - restaurantLocation.lat) *
+                            tRef.current,
+                    lng:
+                        restaurantLocation.lng +
+                        (gateLocation.lng - restaurantLocation.lng) *
+                            tRef.current,
+                });
+                if (tRef.current < 1) {
+                    animationRef.current = requestAnimationFrame(animate);
+                }
+            };
+            animationRef.current = requestAnimationFrame(animate);
+            return () => cancelAnimationFrame(animationRef.current);
+        } else if (
+            (orderStepIndex === 0 || orderStepIndex === 1) &&
+            restaurantLocation
+        ) {
+            // Always keep runner at restaurant for first two steps
+            setRunnerLocation(restaurantLocation);
+        } else if (orderStepIndex === 3 && gateLocation) {
+            // On delivered, runner is at gate
+            setRunnerLocation(gateLocation);
+        }
+    }, [orderStepIndex, orderSteps, restaurantLocation, gateLocation]);
 
-    // Fetch flight information dynamically
+    // Fetch flight information dynamically (if needed)
     useEffect(() => {
         async function fetchFlightInfo() {
             try {
@@ -116,70 +132,60 @@ function DeliveryTrackingPage() {
                 setError("Unable to fetch flight information.");
             }
         }
-
         fetchFlightInfo();
     }, []);
 
-    // Listen for real-time runner location updates via WebSocket
+    // Listen for real-time runner location and order status updates via WebSocket
     useEffect(() => {
-        socket.on("runnerLocationUpdate", ({ location }) => {
+        socket.on("runnerLocationUpdate", ({ runnerId, location }) => {
             setRunnerLocation(location);
+            notifyRunnerLocation(runnerId, location);
         });
-
-        return () => {
-            socket.off("runnerLocationUpdate");
-        };
-    }, []);
-
-    // Listen for gate change notifications via WebSocket
-    useEffect(() => {
-        socket.on("gateChange", ({ gate, terminal }) => {
-            setGateLocation((prev) => ({
-                ...prev,
-                gate,
-                terminal,
-            }));
+        socket.on("gateChange", ({ gate }) => {
+            setGateLocation(gateCoordinates[gate]);
         });
-
-        return () => {
-            socket.off("gateChange");
-        };
-    }, []);
-
-    // Listen for order status updates via WebSocket
-    useEffect(() => {
         socket.on("orderStatusUpdate", ({ status }) => {
             setOrderStatus(status);
             notifyOrderStatus(status);
         });
-
         return () => {
+            socket.off("runnerLocationUpdate");
+            socket.off("gateChange");
             socket.off("orderStatusUpdate");
         };
     }, []);
+
+    // Simulate order status progression for demo (remove in production)
+    useEffect(() => {
+        if (orderStepIndex < orderSteps.length - 1) {
+            const timer = setTimeout(() => {
+                setOrderStepIndex(orderStepIndex + 1);
+            }, 4000);
+            return () => clearTimeout(timer);
+        }
+    }, [orderStepIndex, orderSteps.length]);
 
     return (
         <div className="delivery-tracking-page">
             <h1>Delivery Tracking</h1>
             {error && <p className="error-message">{error}</p>}
-            <div className="tracking-info">
-                {runnerLocation && (
-                    <RunnerETA
-                        runnerLocation={runnerLocation}
-                        gateLocation={gateLocation}
-                    />
-                )}
-                <OrderTracking orderStatus={orderSteps[orderStepIndex]} />
-                {orderStatus && (
-                    <p className="order-status">Order Status: {orderStatus}</p>
-                )}
-            </div>
-            <Map
+            <OrderTracking orderStatus={orderSteps[orderStepIndex]} />
+            <RunnerETA
                 runnerLocation={runnerLocation}
                 gateLocation={gateLocation}
-                restaurantLocation={restaurantLocation}
-                restaurants={restaurants}
             />
+            {runnerLocation && gateLocation && restaurantLocation && (
+                <Map
+                    runnerLocation={runnerLocation}
+                    gateLocation={gateLocation}
+                    restaurantLocation={restaurantLocation}
+                    restaurants={restaurant ? [restaurant] : []} // Only the actual restaurant
+                    isRunnerView={false}
+                />
+            )}
+            <div>
+                <strong>Status:</strong> {orderStatus}
+            </div>
             <button
                 onClick={() => setShowSidebar(!showSidebar)}
                 className="toggle-sidebar-button"

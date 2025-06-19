@@ -6,6 +6,10 @@ function RunnerETA({ runnerLocation, gateLocation }) {
 
     useEffect(() => {
         async function fetchETA() {
+            if (!runnerLocation || !gateLocation) {
+                setEta("");
+                return;
+            }
             try {
                 const response = await fetch("/api/deliveries/calculate-eta", {
                     method: "POST",

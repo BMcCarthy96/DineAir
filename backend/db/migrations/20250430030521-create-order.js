@@ -45,6 +45,14 @@ module.exports = {
                     type: Sequelize.STRING,
                     allowNull: false,
                 },
+                gateLat: {
+                    type: Sequelize.DECIMAL(9, 6),
+                    allowNull: true,
+                },
+                gateLng: {
+                    type: Sequelize.DECIMAL(9, 6),
+                    allowNull: true,
+                },
                 totalPrice: {
                     type: Sequelize.DECIMAL(10, 2),
                     allowNull: false,
