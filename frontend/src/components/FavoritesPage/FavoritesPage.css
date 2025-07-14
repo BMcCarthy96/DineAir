@@ -1,48 +1,27 @@
 .favorites-page {
-    padding: 20px;
-    background-color: #f9f9f9;
     min-height: 100vh;
-}
-
-.favorites-page h1 {
-    text-align: center;
-    font-size: 36px;
-    margin-bottom: 20px;
-    color: #333;
-}
-
-.favorites-list {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
+    padding: 40px 0;
+    background: linear-gradient(120deg, #ff6f61 0%, #ff9a85 100%);
 }
 
 .favorite-card {
-    background-color: #fff;
+    margin: 0 auto;
+    border-radius: 16px;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12);
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(2px);
+    transition: box-shadow 0.3s;
+    cursor: pointer;
+}
+
+.favorite-card:hover {
+    box-shadow: 0 8px 32px rgba(255, 111, 97, 0.25);
+    transform: scale(1.04);
+}
+
+.favorite-image {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
     border-radius: 12px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    padding: 15px;
-}
-
-.favorite-card h2 {
-    font-size: 20px;
-    font-weight: bold;
-    margin-bottom: 10px;
-    color: #333;
-}
-
-.favorite-card p {
-    font-size: 16px;
-    color: #666;
-    margin-bottom: 10px;
-}
-
-.view-details {
-    color: #ff6f61;
-    text-decoration: none;
-    font-weight: bold;
-}
-
-.view-details:hover {
-    text-decoration: underline;
 }
