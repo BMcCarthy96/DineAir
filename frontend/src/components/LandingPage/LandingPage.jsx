@@ -12,7 +12,6 @@ function LandingPage() {
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
-    // Fetch all restaurants
     useEffect(() => {
         async function fetchRestaurants() {
             try {
@@ -30,9 +29,7 @@ function LandingPage() {
         fetchRestaurants();
     }, []);
 
-    // Filter for the select fast prep restaurants by ID
     useEffect(() => {
-        // IDs for fast prep restaurants
         const fastPrepIds = [4, 5, 9, 10];
         setFastPrepRestaurants(
             restaurants.filter((r) => fastPrepIds.includes(r.id))
@@ -53,21 +50,51 @@ function LandingPage() {
     };
 
     return (
-        <div className="landing-page">
-            <div className="landing-header">
-                <h1>Explore Restaurants</h1>
-            </div>
+        <main
+            className="landing-page"
+            aria-label="DineAir Restaurant Selection"
+        >
+            <header className="hero-section" role="banner">
+                <div className="hero-content">
+                    <h1 className="hero-title">DineAir</h1>
+                    <p className="hero-subtitle">
+                        <span className="highlight">Order airport food</span>{" "}
+                        and get it delivered{" "}
+                        <span className="highlight">right to your gate</span>
+                        —fast, fresh, and easy.
+                    </p>
+                    <button
+                        className="cta-button"
+                        onClick={() => navigate("/restaurants")}
+                        aria-label="Browse all restaurants"
+                    >
+                        Browse Restaurants
+                    </button>
+                </div>
+            </header>
 
-            {/* Fast Prep Restaurants Section */}
             {fastPrepRestaurants.length > 0 && (
-                <div className="fast-prep-section">
-                    <h2>Fast Prep Restaurants (15-min prep guaranteed)</h2>
-                    <div className="restaurant-list">
+                <section
+                    className="fast-prep-section"
+                    aria-label="Fast Prep Restaurants"
+                >
+                    <h2 className="section-title">
+                        Fast Prep Restaurants{" "}
+                        <span className="badge">15-min prep guaranteed</span>
+                    </h2>
+                    <div className="restaurant-list" role="list">
                         {fastPrepRestaurants.map((restaurant) => (
                             <div
                                 key={restaurant.id}
                                 className="restaurant-card"
+                                role="listitem"
+                                tabIndex={0}
+                                aria-label={`View details for ${restaurant.name}`}
                                 onClick={() => handleCardClick(restaurant.id)}
+                                onKeyPress={(e) => {
+                                    if (e.key === "Enter")
+                                        handleCardClick(restaurant.id);
+                                }}
                             >
                                 <img
                                     src={
@@ -78,7 +105,7 @@ function LandingPage() {
                                     className="restaurant-image"
                                 />
                                 <div className="restaurant-info">
-                                    <h2>{restaurant.name}</h2>
+                                    <h3>{restaurant.name}</h3>
                                     <p>{restaurant.description}</p>
                                     <p>
                                         <strong>Cuisine:</strong>{" "}
@@ -98,62 +125,30 @@ function LandingPage() {
                                                 ? "active"
                                                 : ""
                                         }`}
+                                        aria-label={
+                                            favorites.some(
+                                                (fav) =>
+                                                    fav.id === restaurant.id
+                                            )
+                                                ? "Remove from favorites"
+                                                : "Add to favorites"
+                                        }
+                                        tabIndex={0}
                                         onClick={(event) =>
                                             toggleFavorite(restaurant, event)
                                         }
+                                        onKeyPress={(e) => {
+                                            if (e.key === "Enter")
+                                                toggleFavorite(restaurant, e);
+                                        }}
                                     />
                                 </div>
                             </div>
                         ))}
                     </div>
-                </div>
+                </section>
             )}
-
-            {/* All Restaurants Section */}
-            <h2 className="all-restaurants-title">All Restaurants</h2>
-            <div className="restaurant-list">
-                {restaurants.map((restaurant) => (
-                    <div
-                        key={restaurant.id}
-                        className="restaurant-card"
-                        onClick={() => handleCardClick(restaurant.id)}
-                    >
-                        <img
-                            src={
-                                restaurant.imageUrl ||
-                                "https://via.placeholder.com/300x200"
-                            }
-                            alt={restaurant.name}
-                            className="restaurant-image"
-                        />
-                        <div className="restaurant-info">
-                            <h2>{restaurant.name}</h2>
-                            <p>{restaurant.description}</p>
-                            <p>
-                                <strong>Cuisine:</strong>{" "}
-                                {restaurant.cuisineType}
-                            </p>
-                            <p>
-                                <strong>Terminal:</strong> {restaurant.terminal}{" "}
-                                | <strong>Gate:</strong> {restaurant.gate}
-                            </p>
-                            <FaStar
-                                className={`favorite-icon ${
-                                    favorites.some(
-                                        (fav) => fav.id === restaurant.id
-                                    )
-                                        ? "active"
-                                        : ""
-                                }`}
-                                onClick={(event) =>
-                                    toggleFavorite(restaurant, event)
-                                }
-                            />
-                        </div>
-                    </div>
-                ))}
-            </div>
-        </div>
+        </main>
     );
 }
 

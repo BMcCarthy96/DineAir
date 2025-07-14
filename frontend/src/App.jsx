@@ -6,6 +6,7 @@ import * as sessionActions from "./store/session";
 import LoginFormPage from "./components/LoginFormPage";
 import SignupFormPage from "./components/SignupFormPage";
 import LandingPage from "./components/LandingPage";
+import AllRestaurantsPage from "./components/AllRestaurantsPage/AllRestaurantsPage";
 import RestaurantPage from "./components/RestaurantPage/RestaurantPage";
 import RestaurantDetails from "./components/RestaurantDetails/RestaurantDetails";
 import MenuItemPage from "./components/MenuItemPage/MenuItemPage";
@@ -73,6 +74,10 @@ const router = createBrowserRouter([
             {
                 path: "/orders",
                 element: <OrderHistoryPage />,
+            },
+            {
+                path: "/restaurants",
+                element: <AllRestaurantsPage />,
             },
             {
                 path: "/restaurants/:restaurantId",

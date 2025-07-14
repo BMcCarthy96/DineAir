@@ -57,11 +57,19 @@ body.light .logo {
     align-items: center;
     background-color: white;
     border-radius: 30px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 8px rgba(255, 111, 97, 0.08);
     overflow: hidden;
-    width: 800px;
-    max-width: 100%;
+    max-width: 400px;
+    width: 100%;
     padding: 0 15px;
+    margin: 0 auto;
+}
+
+.search-dropdown-cuisine {
+    font-size: 15px;
+    color: #ff6f61;
+    margin-left: 12px;
+    font-weight: 500;
 }
 
 .search-icon {

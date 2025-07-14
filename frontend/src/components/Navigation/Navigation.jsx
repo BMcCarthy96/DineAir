@@ -16,7 +16,6 @@ function Navigation() {
     const [query, setQuery] = useState("");
     const [showDropdown, setShowDropdown] = useState(false);
     const { theme, toggleTheme } = useTheme();
-
     const isAuthPage =
         location.pathname === "/login" || location.pathname === "/signup";
 
