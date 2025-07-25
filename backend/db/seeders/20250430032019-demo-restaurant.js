@@ -168,7 +168,7 @@ module.exports = {
             const [existing] = await queryInterface.sequelize.query(
                 `SELECT id FROM "${
                     options.schema ? options.schema + '"."' : ""
-                }Restaurants" WHERE name = :name AND airportId = :airportId`,
+                }Restaurants" WHERE name = :name AND "airportId" = :airportId`,
                 {
                     replacements: {
                         name: restaurant.name,
