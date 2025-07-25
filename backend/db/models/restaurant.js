@@ -5,6 +5,7 @@ module.exports = (sequelize, DataTypes) => {
     class Restaurant extends Model {
         static associate(models) {
             Restaurant.belongsTo(models.User, { foreignKey: "ownerId" });
+            Restaurant.belongsTo(models.Airport, { foreignKey: "airportId" });
             Restaurant.hasMany(models.MenuItem, {
                 foreignKey: "restaurantId",
                 onDelete: "CASCADE",
