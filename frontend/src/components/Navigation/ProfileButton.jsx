@@ -47,9 +47,9 @@ function ProfileButton() {
 
     const getRestaurantsLink = () => {
         if (sessionUser.userType === "admin") {
-            return "/restaurants/admin"; // AdminRestaurantsPage link
+            return "/restaurants/admin"; // AdminRestaurantsPage
         } else if (sessionUser.userType === "restaurantOwner") {
-            return "/restaurants/owner"; // OwnerRestaurantsPage link
+            return "/restaurants/owner"; // OwnerRestaurantsPage
         }
         return null;
     };
