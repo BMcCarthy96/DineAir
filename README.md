@@ -1,215 +1,184 @@
-# 🍽️ DineAir
+# DineAir
 
-**Live Site:** [https://dineair.onrender.com](https://dineair.onrender.com)
+**Concept:** DoorDash-style ordering for airports—travelers browse terminal restaurants, build a cart, check out with a **gate delivery** address, and track the runner on a map.
 
-DineAir is a full-stack restaurant ordering and management platform designed for airports. It enables travelers to discover airport restaurants, browse menus, place orders, and track deliveries. Restaurant owners and admins can manage restaurants and menus, while runners can fulfill and deliver orders.
-
----
-
-## 🚀 Features
-
--   **User Authentication & Roles:**
-    -   Secure login/signup with role-based access: Admin, Restaurant Owner, Runner, Customer.
--   **Restaurant Discovery:**
-    -   Browse all airport restaurants, filter by cuisine, terminal, or gate.
--   **Menu Management:**
-    -   Owners/Admins can add, edit, and delete menu items for their restaurants.
--   **Ordering System:**
-    -   Customers can add menu items to their cart, checkout, and view order history.
--   **Favorites:**
-    -   Users can favorite restaurants for quick access.
--   **Delivery Tracking:**
-    -   Real-time order status and runner dashboard for order fulfillment.
--   **Admin Dashboard:**
-    -   Manage all restaurants, users, and orders.
--   **Responsive UI:**
-    -   Modern, mobile-friendly interface built with React and Vite.
+**Live demo:** [dineair.onrender.com](https://dineair.onrender.com) *(if deployed)*
 
 ---
 
-## 🗂️ Project Structure
+## Highlights (portfolio)
+
+- **Role-based app:** customer, restaurant owner, admin, and runner flows share one UI with tailored navigation.
+- **Gate-centric checkout:** orders store gate + coordinates for maps and ETA-style UX.
+- **Real-time touches:** Socket.io for gate changes and order status (where wired in the demo).
+- **Polished UI:** React + **Tailwind CSS** design system (spacing, typography, cards, dark mode), Framer Motion on key screens, skeleton loaders and empty states.
+- **Full-stack:** Express + Sequelize + PostgreSQL API with JWT **httpOnly cookies**, CSRF for mutating requests, and Redux on the client.
+
+---
+
+## Tech stack
+
+| Layer | Technologies |
+|--------|----------------|
+| Frontend | React 18, Vite, React Router 6, Redux + Thunk, Tailwind CSS, Framer Motion, React Toastify, Socket.io client |
+| Backend | Node.js, Express, Sequelize, PostgreSQL, bcrypt, JWT (cookie), CSRF |
+| Maps | Google Maps JavaScript API (tracking / directions) |
+
+---
+
+## Architecture (high level)
 
 ```
-DineAir/
-├── backend/
-│   ├── app.js
-│   ├── controllers/
-│   ├── db/
-│   ├── routes/
-│   ├── utils/
-│   └── ...
-├── frontend/
-│   ├── src/
-│   │   ├── components/
-│   │   ├── store/
-│   │   ├── App.jsx
-│   │   └── ...
-│   ├── public/
-│   └── ...
-├── images/
-│   └── DineAir_Schema.png
-├── README.md
-└── ...
+Browser (Vite dev server proxies /api → Express)
+    ↓
+Express API (/api/*)
+    ├── auth (cookie JWT, CSRF)
+    ├── restaurants, menu items, carts, orders
+    ├── reviews + likes
+    ├── deliveries / runner
+    └── admin + owner routes
+    ↓
+PostgreSQL (Sequelize models & migrations)
 ```
 
----
-
-## 🛠️ Tech Stack
-
--   **Frontend:** React 18, Redux, Vite, CSS Modules
--   **Backend:** Node.js, Express, Sequelize (PostgreSQL)
--   **Authentication:** Cookie/session-based with CSRF protection
--   **Deployment:** Render.com (frontend & backend)
--   **Testing:** Jest (unit/integration), ESLint
+- **Frontend entry:** `frontend/src/main.jsx` → `ThemeProvider` → Redux `Provider` → `App` (router + toast host).
+- **State:** `frontend/src/store/` — session, favorites, search, reviews, etc.
+- **Shared UI:** `frontend/src/components/ui/` (cards, empty states, skeletons, gate selector).
+- **API helper:** `frontend/src/utils/apiFetch.js` — `credentials: "include"` for cookie auth.
 
 ---
 
-## 🗃️ Database Schema
+## Features
 
-![DineAir-database-schema](./images/DineAir_Schema.png)
-
--   **Users:** Handles authentication and roles.
--   **Restaurants:** Stores restaurant info, location, and owner.
--   **MenuItems:** Menu for each restaurant.
--   **Orders, OrderItems:** Tracks customer orders and their items.
--   **Favorites:** User-specific favorite restaurants.
--   **Runners:** Handles delivery fulfillment.
-
----
-
-## 📖 API Overview
-
-### Authentication
-
--   `POST /api/session` — Log in
--   `DELETE /api/session` — Log out
--   `GET /api/session` — Get current user
--   `POST /api/users` — Sign up
-
-### Restaurants
-
--   `GET /api/restaurants` — List all restaurants
--   `GET /api/restaurants/:id` — Get restaurant details
--   `POST /api/restaurants` — Create restaurant (admin/owner)
--   `PUT /api/restaurants/:id` — Edit restaurant (admin/owner)
--   `DELETE /api/restaurants/:id` — Delete restaurant (admin/owner)
-
-### Menu Items
-
--   `GET /api/restaurants/:restaurantId/menu-items` — List menu items
--   `POST /api/restaurants/:restaurantId/menu-items` — Add menu item (admin/owner)
--   `PUT /api/restaurants/:restaurantId/menu-items/:menuItemId` — Edit menu item (admin/owner)
--   `DELETE /api/restaurants/:restaurantId/menu-items/:menuItemId` — Delete menu item (admin/owner)
-
-### Orders
-
--   `POST /api/orders` — Place order
--   `GET /api/orders/current` — Get current user's orders
--   `GET /api/orders/:orderId` — Get order details
-
-### Favorites
-
--   `GET /api/favorites` — Get user's favorite restaurants
--   `POST /api/favorites/:restaurantId` — Add favorite
--   `DELETE /api/favorites/:restaurantId` — Remove favorite
-
-### Runners
-
--   `GET /api/runner/orders` — Get orders to deliver
--   `PUT /api/runner/orders/:orderId` — Update order status
+- Auth: signup, login, logout; demo logins by role.
+- Restaurant discovery: listing, search (navbar), filters, favorites.
+- Menu: restaurant detail + menu item detail; add to cart (auth required).
+- Cart & checkout: summary, estimated fees, gate selector, place order.
+- Delivery tracking: order steps, map, gate badge, flight sidebar (demo data).
+- Owner: CRUD restaurants, manage menu items on `.../menu-items` route.
+- Admin: manage all restaurants.
+- Runner: assigned deliveries list + map + geolocation emit.
+- Account: profile edit, account deletion.
+- Reviews: list, create (logged in), edit/delete own, likes.
 
 ---
 
-## 🧑‍💻 Local Development
+## Run locally
 
 ### Prerequisites
 
--   Node.js (v18+)
--   PostgreSQL
+- Node.js 18+
+- PostgreSQL
 
-### Setup
+### Backend
 
-1. **Clone the repo:**
+```bash
+cd backend
+npm install
+# Copy .env.example → .env and set DATABASE_URL or DB credentials + secrets
+npx sequelize-cli db:create
+npx sequelize-cli db:migrate
+npx sequelize-cli db:seed:all
+npm start
+# Default API: http://localhost:8000
+```
 
-    ```sh
-    git clone https://github.com/your-username/dineair.git
-    cd dineair
-    ```
+### Frontend
 
-2. **Install dependencies:**
+```bash
+cd frontend
+npm install
+npm run dev
+# App: http://localhost:5174 (see vite.config.js for port)
+```
 
-    ```sh
-    cd backend && npm install
-    cd ../frontend && npm install
-    ```
+The Vite dev server proxies `/api` to `http://localhost:8000`.
 
-3. **Configure environment variables:**
+### Google Maps
 
-    - Copy `.env.example` to `.env` in `/backend` and fill in your DB credentials.
+1. Copy `frontend/.env.example` → `frontend/.env` (the real file must be named `.env`; `.env.example` alone is not loaded by Vite).
+2. Create a browser key and set `VITE_GOOGLE_MAPS_API_KEY` in `frontend/.env`. Restart `npm run dev` after changes.
+3. Run the dev server from the `frontend` folder (`cd frontend && npm run dev`). `vite.config.js` sets `root` and `envDir` to the `frontend` directory so `.env` is always read from there even if the working directory differs.
+4. In development, the browser console prints `[DineAir][Vite env]` with all exposed env keys (values masked for `VITE_*` and other sensitive names). If `VITE_GOOGLE_MAPS_API_KEY` is empty, that log will say so.
+5. In [Google Cloud Console](https://console.cloud.google.com/) → APIs & Services → **Credentials**, restrict the key:
+   - **Application:** HTTP referrers (e.g. `http://localhost:5174/*`, your production URL).
+   - **APIs:** enable at least **Maps JavaScript API** and **Directions API**. The map uses `DirectionsService` / `DirectionsRenderer` for the runner→gate line; without **Directions API**, routes may fail or the key may be rejected for those calls.
 
-4. **Set up the database:**
+The script loads from `loadGoogleMaps.js` (not `index.html`). If the key is missing, the UI shows a setup message (CI-safe).
 
-    ```sh
-    cd backend
-    npx sequelize db:create
-    npx sequelize db:migrate
-    npx sequelize db:seed:all
-    ```
+**Libraries loaded:** `geometry` and `places` are appended to the script URL; only map, markers, and directions are used in `Map.jsx` today (the extra libraries are optional load).
 
-5. **Run the backend:**
+### CI
 
-    ```sh
-    npm start
-    ```
-
-6. **Run the frontend:**
-
-    ```sh
-    cd ../frontend
-    npm run dev
-    ```
-
-7. **Visit:**
-   [http://localhost:5173](http://localhost:5173)
+GitHub Actions (`.github/workflows/ci.yml`) runs frontend **lint + build** (with an empty Maps key so CI passes) and **backend `npm ci`** on push/PR to `main`/`master`.
 
 ---
 
-## 🧩 Notable Code Highlights
+## Demo accounts
 
--   **Role-based UI rendering:**
-    Components and routes are protected and rendered based on user role.
--   **Idempotent seeders:**
-    Demo data is only inserted if not already present, so deletions persist.
--   **Soft delete pattern:**
-    (If implemented) for menu items/restaurants to avoid accidental data loss.
--   **Modular Redux store:**
-    Each feature (auth, restaurants, menu, cart, etc.) has its own slice.
+After seeding, you can use **Demo login** on the sign-in page or enter:
 
----
+| Role | Email | Password |
+|------|--------|----------|
+| Customer | `JustinTyme@dineair.com` | `password` |
+| Admin | `admin@dineair.com` | `adminpassword` |
+| Restaurant owner | `owner1@dineair.com` | `ownerpassword` |
+| Runner | `carrie.on@dineair.com` | `password4` |
 
-## ✨ Future Enhancements
-
--   Real-time order updates with WebSockets
--   Payment integration (Stripe/PayPal)
--   Push notifications for order status
--   Enhanced analytics dashboard for admins/owners
+*(Exact users depend on seeders—adjust if your seeds differ.)*
 
 ---
 
-## 🤝 Contributing
+## Screenshots
 
-1. Fork the repo
-2. Create your feature branch (`git checkout -b feature/YourFeature`)
-3. Commit your changes (`git commit -m 'Add some feature'`)
-4. Push to the branch (`git push origin feature/YourFeature`)
-5. Open a Pull Request
+_Add 3–5 images here for GitHub / portfolio (hero, restaurant grid, cart/checkout, tracking map, mobile nav)._
 
----
-
-## 📫 Contact
-
-For questions or feedback, please open an issue or contact [your-email@example.com](mailto:your-email@example.com).
+```text
+docs/screenshots/
+  landing.png
+  restaurants.png
+  checkout-gate.png
+  tracking.png
+```
 
 ---
 
-**DineAir — Elevate your airport dining experience!**
+## API notes (correct paths)
+
+Authentication lives under **`/api/auth`** (not `/api/session`):
+
+- `POST /api/auth/login`, `POST /api/auth/signup`, `DELETE /api/auth/logout`
+- `GET /api/auth/session` — current user
+
+Other routes include `/api/restaurants`, `/api/carts/items`, `/api/orders`, `/api/deliveries`, etc. See `backend/routes/api/` for the full set.
+
+---
+
+## Database schema
+
+![Schema](./images/DineAir_Schema.png)
+
+---
+
+## Scripts (repo root)
+
+| Script | Purpose |
+|--------|---------|
+| `npm run dev:backend` | Start backend (per root `package.json`) |
+| `cd frontend && npm run dev` | Vite dev |
+| `cd frontend && npm run build` | Production build |
+| `npm run sequelize-cli -- db:migrate` | Migrations via root helper |
+
+---
+
+## Contributing
+
+Fork → feature branch → PR. Keep changes focused; match existing Tailwind patterns (`da-card`, `da-input`, `da-btn-primary`).
+
+---
+
+## License / contact
+
+Capstone / portfolio project. Replace this section with your license and contact as needed.
+
+**DineAir** — skip the line; eat at your gate.
