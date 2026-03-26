@@ -7,7 +7,10 @@ import configureStore from './store';
 import { restoreCSRF, csrfFetch } from './store/csrf';
 import * as sessionActions from './store/session';
 import { ThemeProvider } from "./context/ThemeContext";
+import ErrorBoundary from "./components/ErrorBoundary";
+import { logViteEnvInDevelopment } from "./utils/viteEnvDebug";
 
+logViteEnvInDevelopment();
 
 const store = configureStore();
 
@@ -23,7 +26,9 @@ ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <ThemeProvider>
       <Provider store={store}>
-        <App />
+        <ErrorBoundary>
+          <App />
+        </ErrorBoundary>
       </Provider>
     </ThemeProvider>
   </React.StrictMode>

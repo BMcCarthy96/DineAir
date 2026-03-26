@@ -1,129 +1,213 @@
 import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import * as sessionActions from "../../store/session";
-import { useNavigate } from "react-router-dom";
-import "./SignupFormPage.css";
 
 function SignupFormPage() {
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
-  const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    username: "",
-    password: "",
-    confirmPassword: "",
-    userType: "customer",
-  });
-  const [errors, setErrors] = useState({});
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+    const [formData, setFormData] = useState({
+        firstName: "",
+        lastName: "",
+        email: "",
+        username: "",
+        password: "",
+        confirmPassword: "",
+        userType: "customer",
+    });
+    const [errors, setErrors] = useState({});
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+    const handleChange = (e) => {
+        setFormData({ ...formData, [e.target.name]: e.target.value });
+    };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (formData.password !== formData.confirmPassword) {
-      setErrors({ confirmPassword: "Passwords do not match" });
-      return;
-    }
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        if (formData.password !== formData.confirmPassword) {
+            setErrors({ confirmPassword: "Passwords do not match" });
+            return;
+        }
 
-    console.log("Form Data:", formData); // Log the form data
+        try {
+            await dispatch(sessionActions.signup(formData));
+            navigate("/");
+        } catch (res) {
+            try {
+                if (res && typeof res.json === "function") {
+                    const data = await res.json();
+                    if (data?.errors) {
+                        setErrors(data.errors);
+                        return;
+                    }
+                }
+            } catch {
+                /* ignore */
+            }
+            setErrors({ form: "Something went wrong. Please try again." });
+        }
+    };
 
-    try {
-      await dispatch(sessionActions.signup(formData));
-      navigate("/");
-    } catch (res) {
-      const data = await res.json();
-      if (data?.errors) setErrors(data.errors);
-    }
-  };
+    const errorList = Object.entries(errors);
 
-  return (
-    <div className="signup-page">
-      <div className="signup-box">
-        <h1>Create Your Account</h1>
-        <p className="signup-subtitle">Join DineAir and start exploring today</p>
-        {Object.values(errors).map((error, idx) => (
-          <p key={idx} className="error-message">{error}</p>
-        ))}
-        <form onSubmit={handleSubmit} className="signup-form">
-          <input
-            type="text"
-            name="firstName"
-            placeholder="First Name"
-            value={formData.firstName}
-            onChange={handleChange}
-            title="Enter your first name"
-            required
-          />
-          <input
-            type="text"
-            name="lastName"
-            placeholder="Last Name"
-            value={formData.lastName}
-            onChange={handleChange}
-            title="Enter your last name"
-            required
-          />
-          <input
-            type="email"
-            name="email"
-            placeholder="Email"
-            value={formData.email}
-            onChange={handleChange}
-            title="Enter a valid email address"
-            required
-          />
-          <input
-            type="text"
-            name="username"
-            placeholder="Username"
-            value={formData.username}
-            onChange={handleChange}
-            title="Choose a unique username"
-            required
-          />
-          <input
-            type="password"
-            name="password"
-            placeholder="Password"
-            value={formData.password}
-            onChange={handleChange}
-            title="Password must be at least 6 characters"
-            required
-          />
-          <input
-            type="password"
-            name="confirmPassword"
-            placeholder="Confirm Password"
-            value={formData.confirmPassword}
-            onChange={handleChange}
-            title="Re-enter your password"
-            required
-          />
-          <label htmlFor="userType">Select User Type:</label>
-            <select
-              name="userType"
-              value={formData.userType}
-              onChange={handleChange}
-              required
-            >
-              <option value="customer">Customer</option>
-              <option value="runner">Runner</option>
-              <option value="restaurantOwner">Restaurant Owner</option>
-          </select>
-          <button type="submit" className="signup-button">
-            Sign Up
-          </button>
-        </form>
-        <p className="login-link">
-          Already have an account? <a href="/login">Log In</a>
-        </p>
-      </div>
-    </div>
-  );
+    return (
+        <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center px-4 py-12">
+            <div className="w-full max-w-md">
+                <div className="da-card p-8 shadow-soft-lg sm:p-10">
+                    <h1 className="text-center text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
+                        Create your account
+                    </h1>
+                    <p className="mt-2 text-center text-sm text-slate-600 dark:text-slate-400">
+                        Join DineAir and get airport food at your gate.
+                    </p>
+
+                    {errorList.length > 0 && (
+                        <ul
+                            className="mt-6 space-y-1 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800 dark:border-red-900 dark:bg-red-950/40 dark:text-red-200"
+                            role="alert"
+                        >
+                            {errorList.map(([key, message]) => (
+                                <li key={key}>{message}</li>
+                            ))}
+                        </ul>
+                    )}
+
+                    <form
+                        onSubmit={handleSubmit}
+                        className="mt-8 max-h-[60vh] space-y-4 overflow-y-auto pr-1 sm:max-h-none"
+                    >
+                        <div className="grid gap-4 sm:grid-cols-2">
+                            <div>
+                                <label htmlFor="firstName" className="da-label">
+                                    First name
+                                </label>
+                                <input
+                                    id="firstName"
+                                    type="text"
+                                    name="firstName"
+                                    value={formData.firstName}
+                                    onChange={handleChange}
+                                    className="da-input"
+                                    required
+                                />
+                            </div>
+                            <div>
+                                <label htmlFor="lastName" className="da-label">
+                                    Last name
+                                </label>
+                                <input
+                                    id="lastName"
+                                    type="text"
+                                    name="lastName"
+                                    value={formData.lastName}
+                                    onChange={handleChange}
+                                    className="da-input"
+                                    required
+                                />
+                            </div>
+                        </div>
+                        <div>
+                            <label htmlFor="email" className="da-label">
+                                Email
+                            </label>
+                            <input
+                                id="email"
+                                type="email"
+                                name="email"
+                                value={formData.email}
+                                onChange={handleChange}
+                                className="da-input"
+                                autoComplete="email"
+                                required
+                            />
+                        </div>
+                        <div>
+                            <label htmlFor="username" className="da-label">
+                                Username
+                            </label>
+                            <input
+                                id="username"
+                                type="text"
+                                name="username"
+                                value={formData.username}
+                                onChange={handleChange}
+                                className="da-input"
+                                autoComplete="username"
+                                required
+                            />
+                        </div>
+                        <div>
+                            <label htmlFor="password" className="da-label">
+                                Password
+                            </label>
+                            <input
+                                id="password"
+                                type="password"
+                                name="password"
+                                value={formData.password}
+                                onChange={handleChange}
+                                className="da-input"
+                                autoComplete="new-password"
+                                required
+                            />
+                        </div>
+                        <div>
+                            <label
+                                htmlFor="confirmPassword"
+                                className="da-label"
+                            >
+                                Confirm password
+                            </label>
+                            <input
+                                id="confirmPassword"
+                                type="password"
+                                name="confirmPassword"
+                                value={formData.confirmPassword}
+                                onChange={handleChange}
+                                className="da-input"
+                                autoComplete="new-password"
+                                required
+                            />
+                        </div>
+                        <div>
+                            <label htmlFor="userType" className="da-label">
+                                Account type
+                            </label>
+                            <select
+                                id="userType"
+                                name="userType"
+                                value={formData.userType}
+                                onChange={handleChange}
+                                className="da-input cursor-pointer"
+                                required
+                            >
+                                <option value="customer">Customer</option>
+                                <option value="runner">Runner</option>
+                                <option value="restaurantOwner">
+                                    Restaurant owner
+                                </option>
+                            </select>
+                        </div>
+                        <button
+                            type="submit"
+                            className="da-btn-primary w-full !py-3.5"
+                        >
+                            Sign up
+                        </button>
+                    </form>
+
+                    <p className="mt-8 text-center text-sm text-slate-600 dark:text-slate-400">
+                        Already have an account?{" "}
+                        <Link
+                            to="/login"
+                            className="font-semibold text-brand-600 hover:text-brand-700 dark:text-brand-400"
+                        >
+                            Log in
+                        </Link>
+                    </p>
+                </div>
+            </div>
+        </div>
+    );
 }
 
 export default SignupFormPage;

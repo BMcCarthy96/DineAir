@@ -19,6 +19,8 @@ export function ThemeProvider({ children }) {
     );
 }
 
+/** @see https://github.com/ArnaudBarre/eslint-plugin-react-refresh */
+// eslint-disable-next-line react-refresh/only-export-components -- hook colocated with provider
 export function useTheme() {
     return useContext(ThemeContext);
 }

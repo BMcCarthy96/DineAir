@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
 import Map from "../Map/Map";
 import socket from "../../utils/WebSocket";
-import "./RunnerDashboardPage.css";
+import { apiFetch } from "../../utils/apiFetch";
+import EmptyState from "../ui/EmptyState";
+import { FaTruck } from "react-icons/fa";
 
-// Simulate available runner IDs (replace with real IDs from backend if needed)
 const availableRunnerIds = [1, 2, 3, 4, 5];
 function getRandomRunnerId() {
     return availableRunnerIds[
@@ -19,54 +20,59 @@ function RunnerDashboardPage() {
     });
     const [deliveries, setDeliveries] = useState([]);
     const [error, setError] = useState(null);
+    const [loading, setLoading] = useState(true);
     const [restaurantLocation, setRestaurantLocation] = useState(null);
     const [gateLocation, setGateLocation] = useState(null);
-    const [restaurant, setRestaurant] = useState(null); // Only the actual restaurant
+    const [restaurant, setRestaurant] = useState(null);
 
-    // Fetch assigned deliveries and the actual restaurant for the current delivery
     useEffect(() => {
+        let cancelled = false;
         async function fetchDeliveries() {
+            setError(null);
             try {
-                const response = await fetch("/api/deliveries", {
+                const response = await apiFetch("/api/deliveries", {
                     headers: {
-                        Authorization: `Bearer ${localStorage.getItem(
-                            "token"
-                        )}`,
+                        Authorization: `Bearer ${localStorage.getItem("token") || ""}`,
                     },
                 });
                 if (response.ok) {
                     const data = await response.json();
-                    setDeliveries(data);
-                    // Optionally set restaurant/gate locations from first delivery
-                    if (data.length > 0) {
-                        const order = data[0].Order;
-                        if (order && order.Restaurant) {
-                            setRestaurantLocation({
-                                lat: order.Restaurant.latitude,
-                                lng: order.Restaurant.longitude,
-                            });
-                            setRestaurant(order.Restaurant); // Save the actual restaurant object
-                        }
-                        if (order && order.gateLat && order.gateLng) {
-                            setGateLocation({
-                                lat: Number(order.gateLat),
-                                lng: Number(order.gateLng),
-                            });
+                    if (!cancelled) {
+                        setDeliveries(data);
+                        if (data.length > 0) {
+                            const order = data[0].Order;
+                            if (order?.Restaurant) {
+                                setRestaurantLocation({
+                                    lat: order.Restaurant.latitude,
+                                    lng: order.Restaurant.longitude,
+                                });
+                                setRestaurant(order.Restaurant);
+                            }
+                            if (order?.gateLat && order?.gateLng) {
+                                setGateLocation({
+                                    lat: Number(order.gateLat),
+                                    lng: Number(order.gateLng),
+                                });
+                            }
                         }
                     }
                 } else {
-                    throw new Error("Failed to fetch deliveries");
+                    if (!cancelled) setError("Could not load deliveries.");
                 }
-            } catch (err) {
-                console.error(err);
-                setError("Unable to fetch deliveries.");
+            } catch {
+                if (!cancelled) setError("Could not load deliveries.");
+            } finally {
+                if (!cancelled) setLoading(false);
             }
         }
         fetchDeliveries();
+        return () => {
+            cancelled = true;
+        };
     }, []);
 
-    // Track runner's location using Geolocation API
     useEffect(() => {
+        if (!navigator.geolocation) return undefined;
         const watchId = navigator.geolocation.watchPosition(
             (position) => {
                 const location = {
@@ -76,50 +82,78 @@ function RunnerDashboardPage() {
                 setRunnerLocation(location);
                 socket.emit("runnerLocationUpdate", { runnerId, location });
             },
-            (error) => console.error("Error tracking location:", error),
+            () => {},
             { enableHighAccuracy: true }
         );
         return () => navigator.geolocation.clearWatch(watchId);
     }, [runnerId]);
 
     return (
-        <div className="runner-dashboard-page">
-            <h1>Runner Dashboard</h1>
-            {error && <p className="error-message">{error}</p>}
-            <div className="deliveries">
-                <h2>Assigned Deliveries</h2>
-                {deliveries.length === 0 ? (
-                    <p>No deliveries assigned.</p>
+        <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
+            <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
+                Runner dashboard
+            </h1>
+            <p className="mt-2 text-slate-600 dark:text-slate-400">
+                Assigned drops and your live position on the map.
+            </p>
+
+            {error && (
+                <p
+                    className="mt-6 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900 dark:border-amber-900 dark:bg-amber-950/40 dark:text-amber-100"
+                    role="alert"
+                >
+                    {error}
+                </p>
+            )}
+
+            <section className="da-card mt-8 p-6">
+                <h2 className="text-lg font-semibold text-slate-900 dark:text-white">
+                    Assigned deliveries
+                </h2>
+                {loading ? (
+                    <p className="mt-4 text-sm text-slate-500">Loading…</p>
+                ) : deliveries.length === 0 ? (
+                    <div className="mt-6">
+                        <EmptyState
+                            icon={FaTruck}
+                            title="No active deliveries"
+                            description="When orders are assigned to you, they appear here."
+                        />
+                    </div>
                 ) : (
-                    <ul>
+                    <ul className="mt-4 space-y-3">
                         {deliveries.map((delivery) => (
-                            <li key={delivery.id}>
-                                <p>
-                                    <strong>Order ID:</strong>{" "}
-                                    {delivery.Order.id}
+                            <li
+                                key={delivery.id}
+                                className="rounded-xl border border-slate-100 bg-slate-50/80 px-4 py-3 dark:border-slate-800 dark:bg-slate-900/40"
+                            >
+                                <p className="text-sm font-medium text-slate-900 dark:text-white">
+                                    Order #{delivery.Order?.id}
                                 </p>
-                                <p>
-                                    <strong>Restaurant:</strong>{" "}
-                                    {delivery.Order.Restaurant?.name}
+                                <p className="text-sm text-slate-600 dark:text-slate-400">
+                                    {delivery.Order?.Restaurant?.name}
                                 </p>
-                                <p>
-                                    <strong>Status:</strong> {delivery.status}
+                                <p className="mt-1 text-xs font-semibold uppercase tracking-wide text-slate-500">
+                                    {delivery.status}
                                 </p>
                             </li>
                         ))}
                     </ul>
                 )}
-            </div>
-            <div className="runner-map">
-                <h2>Your Location</h2>
+            </section>
+
+            <section className="mt-8">
+                <h2 className="mb-4 text-lg font-semibold text-slate-900 dark:text-white">
+                    Map
+                </h2>
                 <Map
                     runnerLocation={runnerLocation}
                     gateLocation={gateLocation}
                     restaurantLocation={restaurantLocation}
-                    restaurants={restaurant ? [restaurant] : []} // Only the actual restaurant
+                    restaurants={restaurant ? [restaurant] : []}
                     isRunnerView={true}
                 />
-            </div>
+            </section>
         </div>
     );
 }

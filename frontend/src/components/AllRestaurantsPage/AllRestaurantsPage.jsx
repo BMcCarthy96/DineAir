@@ -1,148 +1,229 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { FaStar, FaSearch } from "react-icons/fa";
-import "./AllRestaurantsPage.css";
+import { useDispatch, useSelector } from "react-redux";
+import { FaStar } from "react-icons/fa";
+import { addFavorite, removeFavorite } from "../../store/favorites";
+import RestaurantCard from "../ui/RestaurantCard";
+import EmptyState from "../ui/EmptyState";
+import { RestaurantCardSkeleton } from "../ui/Skeleton";
+import { displayRating } from "../../utils/restaurantDisplay";
+import { FaUtensils } from "react-icons/fa6";
+
+const fastPrepIds = [4, 5, 9, 10];
 
 function AllRestaurantsPage() {
     const [restaurants, setRestaurants] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [loadError, setLoadError] = useState(null);
     const [query, setQuery] = useState("");
-    const [filtered, setFiltered] = useState([]);
-    const [showDropdown, setShowDropdown] = useState(false);
-    const searchRef = useRef(null);
+    const [cuisineFilter, setCuisineFilter] = useState("");
+    const [ratingFilter, setRatingFilter] = useState("");
     const navigate = useNavigate();
+    const dispatch = useDispatch();
+    const favorites = useSelector((state) => state.favorites);
+    const sessionUser = useSelector((state) => state.session.user);
 
     useEffect(() => {
+        let cancelled = false;
         async function fetchRestaurants() {
-            const response = await fetch("/api/restaurants");
-            if (response.ok) {
+            try {
+                const response = await fetch("/api/restaurants");
+                if (!response.ok) throw new Error("Failed");
                 const data = await response.json();
-                setRestaurants(data);
-                setFiltered(data);
+                if (!cancelled) setRestaurants(data);
+            } catch {
+                if (!cancelled) setLoadError("Could not load restaurants.");
+            } finally {
+                if (!cancelled) setLoading(false);
             }
         }
         fetchRestaurants();
+        return () => {
+            cancelled = true;
+        };
     }, []);
 
-    useEffect(() => {
-        setFiltered(
-            restaurants.filter(
-                (r) =>
-                    r.name.toLowerCase().includes(query.toLowerCase()) ||
-                    r.cuisineType.toLowerCase().includes(query.toLowerCase()) ||
-                    r.terminal.toLowerCase().includes(query.toLowerCase())
-            )
+    const cuisines = useMemo(() => {
+        const set = new Set(
+            restaurants.map((r) => r.cuisineType).filter(Boolean)
         );
-    }, [query, restaurants]);
+        return [...set].sort();
+    }, [restaurants]);
 
-    useEffect(() => {
-        function handleClickOutside(e) {
-            if (searchRef.current && !searchRef.current.contains(e.target)) {
-                setShowDropdown(false);
-            }
+    const filtered = useMemo(() => {
+        return restaurants.filter((r) => {
+            const q = query.trim().toLowerCase();
+            const matchesQuery =
+                !q ||
+                r.name.toLowerCase().includes(q) ||
+                (r.cuisineType || "").toLowerCase().includes(q) ||
+                (r.terminal || "").toLowerCase().includes(q);
+            const matchesCuisine =
+                !cuisineFilter || r.cuisineType === cuisineFilter;
+            const rRating = Number(displayRating(r.id));
+            const matchesRating =
+                !ratingFilter || rRating >= Number(ratingFilter);
+            return matchesQuery && matchesCuisine && matchesRating;
+        });
+    }, [restaurants, query, cuisineFilter, ratingFilter]);
+
+    const toggleFavorite = (restaurant, event) => {
+        event.stopPropagation();
+        if (favorites.some((fav) => fav.id === restaurant.id)) {
+            dispatch(removeFavorite(restaurant.id));
+        } else {
+            dispatch(addFavorite(restaurant));
         }
-        document.addEventListener("mousedown", handleClickOutside);
-        return () =>
-            document.removeEventListener("mousedown", handleClickOutside);
-    }, []);
+    };
 
     const handleCardClick = (restaurantId) => {
         navigate(`/restaurants/${restaurantId}`);
     };
 
     return (
-        <main className="all-restaurants-page" aria-label="All Restaurants">
-            <header>
-                <h1 className="all-restaurants-title">All Restaurants</h1>
-                <div className="search-bar-container" ref={searchRef}>
-                    <div className="search-bar">
-                        <FaSearch className="search-icon" />
+        <main
+            className="mx-auto min-h-screen max-w-7xl px-4 py-10 sm:px-6 lg:px-8"
+            aria-label="All restaurants"
+        >
+            <header className="mb-10">
+                <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-4xl">
+                    Restaurants
+                </h1>
+                <p className="mt-2 max-w-2xl text-slate-600 dark:text-slate-400">
+                    Browse by cuisine, rating, or terminal. Same great menus—now
+                    with a clearer layout.
+                </p>
+
+                <div className="mt-8 flex flex-col gap-4 lg:flex-row lg:items-end">
+                    <div className="flex-1">
+                        <label htmlFor="rest-search" className="da-label">
+                            Search
+                        </label>
                         <input
-                            type="text"
-                            className="search-input"
-                            placeholder="Search by name, cuisine, or terminal..."
+                            id="rest-search"
+                            type="search"
+                            className="da-input"
+                            placeholder="Name, cuisine, or terminal…"
                             value={query}
-                            onChange={(e) => {
-                                setQuery(e.target.value);
-                                setShowDropdown(e.target.value.length > 0);
-                            }}
-                            onFocus={() => setShowDropdown(query.length > 0)}
+                            onChange={(e) => setQuery(e.target.value)}
                             aria-label="Search restaurants"
                         />
                     </div>
-                    {showDropdown && (
-                        <div className="search-dropdown">
-                            {filtered.length > 0 ? (
-                                <ul>
-                                    {filtered.slice(0, 8).map((r) => (
-                                        <li
-                                            key={r.id}
-                                            onClick={() => {
-                                                setShowDropdown(false);
-                                                handleCardClick(r.id);
-                                            }}
-                                            tabIndex={0}
-                                            aria-label={`Go to ${r.name}`}
-                                            onKeyPress={(e) => {
-                                                if (e.key === "Enter") {
-                                                    setShowDropdown(false);
-                                                    handleCardClick(r.id);
-                                                }
-                                            }}
-                                        >
-                                            {r.name}{" "}
-                                            <span className="search-dropdown-cuisine">
-                                                {r.cuisineType}
-                                            </span>
-                                        </li>
-                                    ))}
-                                </ul>
-                            ) : (
-                                <div className="no-results">
-                                    No results found
-                                </div>
-                            )}
+                    <div className="grid flex-1 gap-4 sm:grid-cols-2">
+                        <div>
+                            <label htmlFor="cuisine-filter" className="da-label">
+                                Cuisine
+                            </label>
+                            <select
+                                id="cuisine-filter"
+                                className="da-input cursor-pointer"
+                                value={cuisineFilter}
+                                onChange={(e) =>
+                                    setCuisineFilter(e.target.value)
+                                }
+                            >
+                                <option value="">All cuisines</option>
+                                {cuisines.map((c) => (
+                                    <option key={c} value={c}>
+                                        {c}
+                                    </option>
+                                ))}
+                            </select>
                         </div>
-                    )}
-                </div>
-            </header>
-            <div className="restaurant-list" role="list">
-                {filtered.map((restaurant) => (
-                    <div
-                        key={restaurant.id}
-                        className="restaurant-card"
-                        role="listitem"
-                        tabIndex={0}
-                        aria-label={`View details for ${restaurant.name}`}
-                        onClick={() => handleCardClick(restaurant.id)}
-                        onKeyPress={(e) => {
-                            if (e.key === "Enter")
-                                handleCardClick(restaurant.id);
-                        }}
-                    >
-                        <img
-                            src={
-                                restaurant.imageUrl ||
-                                "https://via.placeholder.com/300x200"
-                            }
-                            alt={restaurant.name}
-                            className="restaurant-image"
-                        />
-                        <div className="restaurant-info">
-                            <h3>{restaurant.name}</h3>
-                            <p>{restaurant.description}</p>
-                            <p>
-                                <strong>Cuisine:</strong>{" "}
-                                {restaurant.cuisineType}
-                            </p>
-                            <p>
-                                <strong>Terminal:</strong> {restaurant.terminal}{" "}
-                                | <strong>Gate:</strong> {restaurant.gate}
-                            </p>
-                            <FaStar className="favorite-icon" />
+                        <div>
+                            <label htmlFor="rating-filter" className="da-label">
+                                Min rating
+                            </label>
+                            <select
+                                id="rating-filter"
+                                className="da-input cursor-pointer"
+                                value={ratingFilter}
+                                onChange={(e) =>
+                                    setRatingFilter(e.target.value)
+                                }
+                            >
+                                <option value="">Any</option>
+                                <option value="4.5">4.5+</option>
+                                <option value="4.3">4.3+</option>
+                                <option value="4.0">4.0+</option>
+                            </select>
                         </div>
                     </div>
-                ))}
-            </div>
+                </div>
+            </header>
+
+            {loadError && (
+                <p className="mb-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800 dark:border-red-900 dark:bg-red-950/40 dark:text-red-200">
+                    {loadError}
+                </p>
+            )}
+
+            {loading ? (
+                <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
+                    {[1, 2, 3, 4, 5, 6].map((k) => (
+                        <RestaurantCardSkeleton key={k} />
+                    ))}
+                </div>
+            ) : filtered.length === 0 ? (
+                <EmptyState
+                    icon={FaUtensils}
+                    title="No restaurants match"
+                    description="Try clearing filters or searching with a different keyword."
+                    action={
+                        <button
+                            type="button"
+                            className="da-btn-secondary !py-2 !text-sm"
+                            onClick={() => {
+                                setQuery("");
+                                setCuisineFilter("");
+                                setRatingFilter("");
+                            }}
+                        >
+                            Reset filters
+                        </button>
+                    }
+                />
+            ) : (
+                <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
+                    {filtered.map((restaurant) => (
+                        <RestaurantCard
+                            key={restaurant.id}
+                            restaurant={restaurant}
+                            onSelect={handleCardClick}
+                            fastPrepIds={fastPrepIds}
+                            favoriteControl={
+                                sessionUser ? (
+                                    <button
+                                        type="button"
+                                        className="rounded-full bg-white/95 p-2.5 shadow-soft backdrop-blur-sm transition hover:scale-105 dark:bg-slate-900/95"
+                                        aria-label={
+                                            favorites.some(
+                                                (f) => f.id === restaurant.id
+                                            )
+                                                ? "Remove from favorites"
+                                                : "Add to favorites"
+                                        }
+                                        onClick={(e) =>
+                                            toggleFavorite(restaurant, e)
+                                        }
+                                    >
+                                        <FaStar
+                                            className={`h-5 w-5 ${
+                                                favorites.some(
+                                                    (f) =>
+                                                        f.id === restaurant.id
+                                                )
+                                                    ? "text-amber-400"
+                                                    : "text-slate-300 dark:text-slate-600"
+                                            }`}
+                                        />
+                                    </button>
+                                ) : null
+                            }
+                        />
+                    ))}
+                </div>
+            )}
         </main>
     );
 }

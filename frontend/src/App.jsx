@@ -1,31 +1,58 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, lazy, Suspense } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { createBrowserRouter, RouterProvider, Outlet } from "react-router-dom";
 import Navigation from "./components/Navigation";
+import PageLoader from "./components/PageLoader";
 import * as sessionActions from "./store/session";
-import LoginFormPage from "./components/LoginFormPage";
-import SignupFormPage from "./components/SignupFormPage";
-import LandingPage from "./components/LandingPage";
-import AllRestaurantsPage from "./components/AllRestaurantsPage/AllRestaurantsPage";
-import RestaurantPage from "./components/RestaurantPage/RestaurantPage";
-import RestaurantDetails from "./components/RestaurantDetails/RestaurantDetails";
-import MenuItemPage from "./components/MenuItemPage/MenuItemPage";
-import CartPage from "./components/CartPage/CartPage";
-import CheckoutPage from "./components/CheckoutPage/CheckoutPage";
-import OrderHistoryPage from "./components/OrderHistoryPage/OrderHistoryPage";
-import AdminRestaurantsPage from "./components/AdminRestaurantsPage/AdminRestaurantsPage";
-import OwnerRestaurantsPage from "./components/OwnerRestaurantsPage/OwnerRestaurantsPage";
-import CreateRestaurantPage from "./components/CreateRestaurantPage/CreateRestaurantPage";
-import EditRestaurantPage from "./components/EditRestaurantPage/EditRestaurantPage";
-import DeliveryTrackingPage from "./components/DeliveryTrackingPage/DeliveryTrackingPage";
-import RunnerDashboardPage from "./components/RunnerDashboardPage/RunnerDashboardPage";
-import FavoritesPage from "./components/FavoritesPage/FavoritesPage";
-import AccountPage from "./components/AccountPage/AccountPage";
 import { io } from "socket.io-client";
 import { notifyGateChange } from "./utils/Notifications";
 import "./utils/WebSocket";
-import { ToastContainer } from "react-toastify";
+import ThemedToastContainer from "./components/ThemedToastContainer";
 import "react-toastify/dist/ReactToastify.css";
+
+const LandingPage = lazy(() => import("./components/LandingPage"));
+const LoginFormPage = lazy(() => import("./components/LoginFormPage"));
+const SignupFormPage = lazy(() => import("./components/SignupFormPage"));
+const AllRestaurantsPage = lazy(() =>
+    import("./components/AllRestaurantsPage/AllRestaurantsPage")
+);
+const RestaurantPage = lazy(() =>
+    import("./components/RestaurantPage/RestaurantPage")
+);
+const RestaurantDetails = lazy(() =>
+    import("./components/RestaurantDetails")
+);
+const MenuItemPage = lazy(() => import("./components/MenuItemPage"));
+const CartPage = lazy(() => import("./components/CartPage/CartPage"));
+const CheckoutPage = lazy(() =>
+    import("./components/CheckoutPage/CheckoutPage")
+);
+const OrderHistoryPage = lazy(() =>
+    import("./components/OrderHistoryPage/OrderHistoryPage")
+);
+const AdminRestaurantsPage = lazy(() =>
+    import("./components/AdminRestaurantsPage/AdminRestaurantsPage")
+);
+const OwnerRestaurantsPage = lazy(() =>
+    import("./components/OwnerRestaurantsPage/OwnerRestaurantsPage")
+);
+const CreateRestaurantPage = lazy(() =>
+    import("./components/CreateRestaurantPage/CreateRestaurantPage")
+);
+const EditRestaurantPage = lazy(() =>
+    import("./components/EditRestaurantPage/EditRestaurantPage")
+);
+const DeliveryTrackingPage = lazy(() =>
+    import("./components/DeliveryTrackingPage/DeliveryTrackingPage")
+);
+const RunnerDashboardPage = lazy(() =>
+    import("./components/RunnerDashboardPage/RunnerDashboardPage")
+);
+const FavoritesPage = lazy(() => import("./components/FavoritesPage/FavoritesPage"));
+const AccountPage = lazy(() => import("./components/AccountPage/AccountPage"));
+const NotFoundPage = lazy(() =>
+    import("./components/NotFoundPage/NotFoundPage.jsx")
+);
 
 function Layout() {
     const dispatch = useDispatch();
@@ -40,9 +67,25 @@ function Layout() {
 
     return (
         <>
-            <Navigation isLoaded={isLoaded} />
-            {isLoaded && <Outlet context={{ sessionUser }} />}{" "}
-            {/* Pass sessionUser to child routes */}
+            <a
+                href="#main-content"
+                className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[2000] focus:rounded-xl focus:bg-white focus:px-4 focus:py-3 focus:text-sm focus:font-semibold focus:text-slate-900 focus:shadow-soft-lg focus:outline-none focus:ring-2 focus:ring-brand-500 dark:focus:bg-slate-900 dark:focus:text-white"
+            >
+                Skip to main content
+            </a>
+            <Navigation />
+            {isLoaded && (
+                <Suspense fallback={<PageLoader />}>
+                    <main
+                        id="main-content"
+                        className="outline-none"
+                        tabIndex={-1}
+                    >
+                        <Outlet context={{ sessionUser }} />
+                    </main>
+                </Suspense>
+            )}
+            {!isLoaded && <PageLoader />}
         </>
     );
 }
@@ -51,38 +94,14 @@ const router = createBrowserRouter([
     {
         element: <Layout />,
         children: [
-            {
-                path: "/",
-                element: <LandingPage />,
-            },
-            {
-                path: "/login",
-                element: <LoginFormPage />,
-            },
-            {
-                path: "/signup",
-                element: <SignupFormPage />,
-            },
-            {
-                path: "/cart",
-                element: <CartPage />,
-            },
-            {
-                path: "/checkout",
-                element: <CheckoutPage />,
-            },
-            {
-                path: "/orders",
-                element: <OrderHistoryPage />,
-            },
-            {
-                path: "/restaurants",
-                element: <AllRestaurantsPage />,
-            },
-            {
-                path: "/restaurants/:restaurantId",
-                element: <RestaurantPage />,
-            },
+            { path: "/", element: <LandingPage /> },
+            { path: "/login", element: <LoginFormPage /> },
+            { path: "/signup", element: <SignupFormPage /> },
+            { path: "/cart", element: <CartPage /> },
+            { path: "/checkout", element: <CheckoutPage /> },
+            { path: "/orders", element: <OrderHistoryPage /> },
+            { path: "/restaurants", element: <AllRestaurantsPage /> },
+            { path: "/restaurants/:restaurantId", element: <RestaurantPage /> },
             {
                 path: "/restaurants/:restaurantId/edit",
                 element: <EditRestaurantPage />,
@@ -95,18 +114,9 @@ const router = createBrowserRouter([
                 path: "/restaurants/:restaurantId/menu-items/:menuItemId",
                 element: <MenuItemPage />,
             },
-            {
-                path: "/restaurants/admin",
-                element: <AdminRestaurantsPage />,
-            },
-            {
-                path: "/restaurants/owner",
-                element: <OwnerRestaurantsPage />,
-            },
-            {
-                path: "/restaurants/new",
-                element: <CreateRestaurantPage />,
-            },
+            { path: "/restaurants/admin", element: <AdminRestaurantsPage /> },
+            { path: "/restaurants/owner", element: <OwnerRestaurantsPage /> },
+            { path: "/restaurants/new", element: <CreateRestaurantPage /> },
             {
                 path: "/delivery-tracking",
                 element: <DeliveryTrackingPage />,
@@ -115,18 +125,9 @@ const router = createBrowserRouter([
                 path: "/runner-dashboard",
                 element: <RunnerDashboardPage />,
             },
-            {
-                path: "/favorites",
-                element: <FavoritesPage />,
-            },
-            {
-                path: "/account",
-                element: <AccountPage />,
-            },
-            {
-                path: "*",
-                element: <h1>Page Not Found</h1>,
-            },
+            { path: "/favorites", element: <FavoritesPage /> },
+            { path: "/account", element: <AccountPage /> },
+            { path: "*", element: <NotFoundPage /> },
         ],
     },
 ]);
@@ -135,7 +136,7 @@ function App() {
     useEffect(() => {
         const backendUrl =
             import.meta.env.MODE === "production"
-                ? undefined // relative, same origin as frontend
+                ? undefined
                 : "http://localhost:8000";
 
         const socket = io(backendUrl);
@@ -152,17 +153,7 @@ function App() {
     return (
         <>
             <RouterProvider router={router} />
-            <ToastContainer
-                position="top-center"
-                autoClose={3000}
-                hideProgressBar={false}
-                newestOnTop={false}
-                closeOnClick
-                rtl={false}
-                pauseOnFocusLoss
-                draggable
-                pauseOnHover
-            />
+            <ThemedToastContainer />
         </>
     );
 }

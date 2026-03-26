@@ -35,20 +35,12 @@ const toggleLikeAction = (reviewId, userId) => ({
 
 // Thunk Actions
 export const fetchReviewsByRestaurant = (restaurantId) => async (dispatch) => {
-    try {
-        const response = await csrfFetch(
-            `/api/restaurants/${restaurantId}/reviews`
-        );
-        const data = await response.json();
-
-        // Ensure the reviews include the likes array
-        console.log("Fetched reviews with likes:", data); // Debugging
-        dispatch(setReviews(data));
-        return data;
-    } catch (err) {
-        console.error("Failed to fetch reviews:", err);
-        throw err;
-    }
+    const response = await csrfFetch(
+        `/api/restaurants/${restaurantId}/reviews`
+    );
+    const data = await response.json();
+    dispatch(setReviews(data));
+    return data;
 };
 
 export const createReview = (restaurantId, review) => async (dispatch) => {
@@ -65,47 +57,32 @@ export const createReview = (restaurantId, review) => async (dispatch) => {
 };
 
 export const updateReview = (restaurantId, review) => async (dispatch) => {
-    try {
-        console.log("Sending update request for review:", review); // Debugging
-        const response = await csrfFetch(
-            `/api/restaurants/${restaurantId}/reviews/${review.id}`,
-            {
-                method: "PUT",
-                body: JSON.stringify(review),
-            }
-        );
-        const data = await response.json();
-        console.log("Updated review response:", data); // Debugging
-        dispatch(updateReviewAction(data));
-        return data;
-    } catch (err) {
-        console.error("Failed to update review:", err); // Debugging
-        throw err;
-    }
+    const response = await csrfFetch(
+        `/api/restaurants/${restaurantId}/reviews/${review.id}`,
+        {
+            method: "PUT",
+            body: JSON.stringify(review),
+        }
+    );
+    const data = await response.json();
+    dispatch(updateReviewAction(data));
+    return data;
 };
 
 export const deleteReview = (restaurantId, reviewId) => async (dispatch) => {
-    try {
-        console.log("Sending delete request for review ID:", reviewId); // Debugging
-        await csrfFetch(
-            `/api/restaurants/${restaurantId}/reviews/${reviewId}`,
-            {
-                method: "DELETE",
-            }
-        );
-        console.log("Successfully deleted review with ID:", reviewId); // Debugging
-        dispatch(deleteReviewAction(reviewId));
-    } catch (err) {
-        console.error("Failed to delete review:", err); // Debugging
-        throw err;
-    }
+    await csrfFetch(
+        `/api/restaurants/${restaurantId}/reviews/${reviewId}`,
+        {
+            method: "DELETE",
+        }
+    );
+    dispatch(deleteReviewAction(reviewId));
 };
 
 export const toggleLike = (reviewId, isLiked) => async (dispatch, getState) => {
-    const userId = getState().session.user.id;
-
-    // Debugging log to check the reviewId and userId
-    console.log(`Toggling like for review ID: ${reviewId}, User ID: ${userId}`);
+    const user = getState().session.user;
+    if (!user?.id) return;
+    const userId = user.id;
 
     dispatch(toggleLikeAction(reviewId, userId));
 
@@ -123,8 +100,6 @@ export const toggleLike = (reviewId, isLiked) => async (dispatch, getState) => {
             });
         }
     } catch (err) {
-        console.error("Failed to toggle like:", err);
-
         dispatch(toggleLikeAction(reviewId, userId));
         throw err;
     }
@@ -146,18 +121,18 @@ const reviewsReducer = (state = initialState, action) => {
         }
         case ADD_REVIEW: {
             const review = action.payload;
-            return { ...state, [review.id]: review };
+            return {
+                ...state,
+                [review.id]: { ...review, likes: review.likes || [] },
+            };
         }
         case UPDATE_REVIEW: {
             const review = action.payload;
 
             // Ensure the payload is a valid review object
             if (!review.id) {
-                console.error("Invalid review payload:", review);
                 return state;
             }
-
-            console.log("Updating review in reducer:", review);
 
             // Update the existing review in the state
             return {
@@ -179,8 +154,7 @@ const reviewsReducer = (state = initialState, action) => {
 
             // Check if the review exists
             if (!review) {
-                console.error(`Review with ID ${reviewId} not found in state.`);
-                return state; // Return the current state if the review does not exist
+                return state;
             }
 
             // Toggle the like state

@@ -1,134 +1,71 @@
-:root {
-    /* Background Colors */
-    --background-light: #fff8f0; /* Soft Cream */
-    --background-dark: #2d2d2d; /* Charcoal for dark mode */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-    /* Text Colors */
-    --text-primary: #2d2d2d; /* Charcoal */
-    --text-secondary: #6e6e6e; /* Warm Gray */
-    --text-on-dark: #fffffa; /* Ivory for text on dark backgrounds */
+@layer base {
+    html {
+        scroll-behavior: smooth;
+    }
 
-    /* Button Colors */
-    --button-primary: #e94e3c; /* Tomato Red */
-    --button-primary-hover: #d43c2a; /* Slightly darker red for hover */
-    --button-secondary: #ffd166; /* Golden Yellow */
-    --button-secondary-hover: #ffc34d; /* Slightly darker yellow for hover */
-    --button-success: #88b04b; /* Sage Green */
+    body {
+        @apply min-h-screen font-sans antialiased transition-colors duration-300;
+    }
 
-    /* Accent Colors */
-    --accent-highlight: #ffd166; /* Golden Yellow */
-    --accent-success: #88b04b; /* Sage Green */
+    body.light {
+        @apply bg-slate-50 text-slate-900;
+    }
 
-    /* Button Colors for Dark Mode */
-    --button-dark: #ff6f61; /* Tomato Red for dark mode */
-    --button-hover-dark: #ffffff; /* White background on hover in dark mode */
-    --button-hover-dark-text: #333333; /* Black text on hover in dark mode */
-    --button-selected-dark: #ffffff; /* White background for selected buttons in dark mode */
-    --button-selected-dark-border: #ff6f61; /* Border color for selected buttons in dark mode */
+    body.dark {
+        @apply bg-slate-950 text-slate-100;
+    }
+
+    body.light ::selection {
+        @apply bg-brand-200 text-brand-900;
+    }
+
+    body.dark ::selection {
+        @apply bg-brand-800 text-white;
+    }
 }
 
-body.light {
-    background-color: var(--background-light);
-    color: var(--text-primary);
-}
+@layer components {
+    .da-input {
+        @apply w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-slate-900 shadow-sm transition-all placeholder:text-slate-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20;
+    }
 
-body.dark {
-    background-color: var(--background-dark);
-    color: var(--text-on-dark);
-}
+    body.dark .da-input {
+        @apply border-slate-700 bg-slate-900 text-slate-100 placeholder:text-slate-500 focus:border-brand-400 focus:ring-brand-400/20;
+    }
 
-.navbar {
-    background-color: var(--navbar-light);
-    transition: background-color 0.3s ease, color 0.3s ease;
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-}
+    .da-label {
+        @apply mb-1.5 block text-sm font-medium text-slate-700;
+    }
 
-body.dark .navbar {
-    background-color: var(
-        --background-dark
-    ); /* Ensure navbar stays dark while scrolling */
-}
+    body.dark .da-label {
+        @apply text-slate-300;
+    }
 
-.card {
-    background-color: var(--card-light);
-    color: var(--text-light);
-    transition: background-color 0.3s ease, color 0.3s ease;
-}
+    .da-btn-primary {
+        @apply inline-flex items-center justify-center rounded-xl bg-brand-600 px-5 py-3 text-sm font-semibold text-white shadow-soft transition hover:bg-brand-700 hover:shadow-soft-lg active:scale-[0.98];
+    }
 
-body.dark .card {
-    background-color: var(--card-dark);
-    color: var(--text-dark);
-}
+    body.dark .da-btn-primary {
+        @apply bg-brand-500 hover:bg-brand-400;
+    }
 
-button {
-    background-color: var(--button-light);
-    color: white;
-    border: none;
-    border-radius: 6px;
-    padding: 10px 15px;
-    font-size: 14px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background-color 0.3s ease, color 0.3s ease;
-}
+    .da-btn-secondary {
+        @apply inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-800 shadow-sm transition hover:border-slate-300 hover:bg-slate-50 active:scale-[0.98];
+    }
 
-button:hover {
-    background-color: var(--button-hover-light);
-}
+    body.dark .da-btn-secondary {
+        @apply border-slate-600 bg-slate-900 text-slate-100 hover:border-slate-500 hover:bg-slate-800;
+    }
 
-body.dark button {
-    background-color: var(--button-dark);
-    color: white;
-    border: none;
-}
+    .da-card {
+        @apply rounded-2xl border border-slate-200/80 bg-white shadow-soft transition hover:border-slate-300/80 hover:shadow-soft-lg;
+    }
 
-body.dark button:hover {
-    background-color: var(--button-hover-dark);
-    color: var(--button-hover-dark-text);
-    border: 2px solid var(--button-selected-dark-border);
-}
-
-.role-button:hover {
-    background-color: #ff6f61; /* Tomato Red on hover */
-    color: white; /* White text on hover */
-}
-
-.role-button.active {
-    background-color: #ff6f61; /* Tomato Red for active state */
-    color: white; /* White text for active state */
-    border: 2px solid #ff6f61; /* Add border for active state */
-}
-
-/* Dark Mode Role Button Styles */
-body.dark .role-button {
-    background-color: var(--button-dark); /* Default to Tomato Red */
-    color: white; /* White text */
-}
-
-body.dark .role-button:hover {
-    background-color: var(--button-hover-dark); /* White background on hover */
-    color: var(--button-hover-dark-text); /* Black text on hover */
-    border: 2px solid var(--button-selected-dark-border); /* Add border on hover */
-}
-
-body.dark .role-button.active {
-    background-color: var(
-        --button-selected-dark
-    ); /* White background for selected */
-    color: var(--button-hover-dark-text); /* Black text for selected */
-    border: 2px solid var(--button-selected-dark-border); /* Add border for selected */
-}
-
-p {
-    color: black;
-}
-
-span {
-    color: black;
-}
-
-label {
-    color: black;
+    body.dark .da-card {
+        @apply border-slate-800 bg-slate-900/80 hover:border-slate-700;
+    }
 }

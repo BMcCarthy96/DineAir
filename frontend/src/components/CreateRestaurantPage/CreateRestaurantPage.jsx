@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import Cookies from "js-cookie";
-import "./CreateRestaurantPage.css";
+import { toast } from "react-toastify";
+import { apiFetch } from "../../utils/apiFetch";
 
 function CreateRestaurantPage() {
     const [name, setName] = useState("");
@@ -30,115 +31,156 @@ function CreateRestaurantPage() {
             longitude: longitude === "" ? null : Number(longitude),
         };
 
-        const response = await fetch("/api/restaurants", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "XSRF-Token": Cookies.get("XSRF-TOKEN"),
-            },
-            body: JSON.stringify(newRestaurant),
-        });
+        try {
+            const response = await apiFetch("/api/restaurants", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "XSRF-Token": Cookies.get("XSRF-TOKEN") || "",
+                },
+                body: JSON.stringify(newRestaurant),
+            });
 
-        if (response.ok) {
-            const data = await response.json();
-            alert("Restaurant created successfully!");
-            navigate(`/restaurants/${data.id}`);
-        } else {
-            const errorData = await response.json();
-            alert(
-                `Failed to create restaurant: ${
-                    errorData.error || "Unknown error"
-                }`
-            );
+            if (response.ok) {
+                const data = await response.json();
+                toast.success("Restaurant created");
+                navigate(`/restaurants/${data.id}`);
+            } else {
+                const errorData = await response.json().catch(() => ({}));
+                toast.error(
+                    errorData.error || errorData.message || "Create failed"
+                );
+            }
+        } catch {
+            toast.error("Could not create restaurant.");
         }
     };
 
     return (
-        <div className="create-restaurant-page">
-            <h1>Create a New Restaurant</h1>
-            <form onSubmit={handleSubmit} className="create-restaurant-form">
-                <label>
-                    Name:
+        <div className="mx-auto max-w-xl px-4 py-10 sm:px-6 lg:px-8">
+            <Link
+                to="/restaurants"
+                className="text-sm font-semibold text-brand-600 dark:text-brand-400"
+            >
+                ← Back
+            </Link>
+            <h1 className="mt-4 text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
+                New restaurant
+            </h1>
+            <p className="mt-2 text-slate-600 dark:text-slate-400">
+                Airport location and coordinates are required for maps and
+                delivery.
+            </p>
+
+            <form
+                onSubmit={handleSubmit}
+                className="da-card mt-8 space-y-4 p-6 sm:p-8"
+            >
+                <FormField label="Name" id="cr-name" required>
                     <input
+                        id="cr-name"
                         type="text"
                         value={name}
                         onChange={(e) => setName(e.target.value)}
+                        className="da-input"
                         required
                     />
-                </label>
-                <label>
-                    Description:
+                </FormField>
+                <FormField label="Description" id="cr-desc" required>
                     <textarea
+                        id="cr-desc"
                         value={description}
                         onChange={(e) => setDescription(e.target.value)}
+                        className="da-input min-h-[100px] resize-y"
                         required
                     />
-                </label>
-                <label>
-                    Terminal:
+                </FormField>
+                <FormField label="Terminal" id="cr-term">
                     <input
+                        id="cr-term"
                         type="text"
                         value={terminal}
                         onChange={(e) => setTerminal(e.target.value)}
+                        className="da-input"
                     />
-                </label>
-                <label>
-                    Gate:
+                </FormField>
+                <FormField label="Gate" id="cr-gate">
                     <input
+                        id="cr-gate"
                         type="text"
                         value={gate}
                         onChange={(e) => setGate(e.target.value)}
+                        className="da-input"
                     />
-                </label>
-                <label>
-                    Cuisine Type:
+                </FormField>
+                <FormField label="Cuisine" id="cr-cuisine">
                     <input
+                        id="cr-cuisine"
                         type="text"
                         value={cuisineType}
                         onChange={(e) => setCuisineType(e.target.value)}
+                        className="da-input"
                     />
-                </label>
-                <label>
-                    Image URL:
+                </FormField>
+                <FormField label="Image URL" id="cr-img">
                     <input
+                        id="cr-img"
                         type="text"
                         value={imageUrl}
                         onChange={(e) => setImageUrl(e.target.value)}
+                        className="da-input"
                     />
-                </label>
-                <label>
-                    Airport ID:
+                </FormField>
+                <FormField label="Airport ID" id="cr-airport" required>
                     <input
+                        id="cr-airport"
                         type="number"
                         value={airportId}
-                        onChange={(e) => setAirportId(e.target.value)}
+                        onChange={(e) =>
+                            setAirportId(Number(e.target.value) || 1)
+                        }
+                        className="da-input"
                         required
                     />
-                </label>
-                <label>
-                    Latitude:
+                </FormField>
+                <FormField label="Latitude" id="cr-lat" required>
                     <input
+                        id="cr-lat"
                         type="number"
                         step="any"
                         value={latitude}
                         onChange={(e) => setLatitude(e.target.value)}
+                        className="da-input"
                         required
                     />
-                </label>
-                <label>
-                    Longitude:
+                </FormField>
+                <FormField label="Longitude" id="cr-lng" required>
                     <input
+                        id="cr-lng"
                         type="number"
                         step="any"
                         value={longitude}
                         onChange={(e) => setLongitude(e.target.value)}
+                        className="da-input"
                         required
                     />
-                </label>
-                <button type="submit" className="submit-button">
-                    Create Restaurant
+                </FormField>
+                <button type="submit" className="da-btn-primary w-full !py-3.5">
+                    Create restaurant
                 </button>
             </form>
+        </div>
+    );
+}
+
+function FormField({ label, id, required, children }) {
+    return (
+        <div>
+            <label htmlFor={id} className="da-label">
+                {label}
+                {required ? " *" : ""}
+            </label>
+            {children}
         </div>
     );
 }
