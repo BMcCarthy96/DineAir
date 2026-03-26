@@ -1,5 +1,6 @@
 const { Delivery, Order, Restaurant, User, Airport } = require("../db/models");
 const { getSocket } = require("../utils/socket");
+const trackingSimulation = require("../utils/trackingSimulation");
 const axios = require("axios");
 
 module.exports = {
@@ -49,16 +50,25 @@ module.exports = {
     // Update the runner's location and emit it to customers
     async updateRunnerLocation(req, res, next) {
         try {
-            const { runnerId, location } = req.body;
+            const { runnerId, location, orderId } = req.body;
 
             console.log(
                 `Emitting runnerLocationUpdate for runnerId: ${runnerId}, location:`,
                 location
             );
 
-            // Emit runner location update to the customer
             const io = getSocket();
-            io.emit("runnerLocationUpdate", { runnerId, location });
+            if (orderId && location) {
+                trackingSimulation.pauseForRealRunner(orderId);
+                io.to(`order:${orderId}`).emit("runnerLocationUpdate", {
+                    orderId,
+                    runnerId,
+                    location,
+                    source: "runner",
+                });
+            } else {
+                io.emit("runnerLocationUpdate", { runnerId, location });
+            }
 
             res.json({ success: true });
         } catch (err) {
@@ -81,7 +91,8 @@ module.exports = {
 
             console.log(`Order ${orderId} status updated: ${status}`);
 
-            // Emit order status update
+            trackingSimulation.setOrderStatus(Number(orderId), status);
+
             const io = getSocket();
             io.emit("orderStatusUpdate", { orderId, status });
 
@@ -119,13 +130,16 @@ module.exports = {
         try {
             const { runnerLocation, gateLocation } = req.body;
 
+            const mapsKey =
+                process.env.GOOGLE_MAPS_API_KEY ||
+                process.env.VITE_GOOGLE_MAPS_API_KEY;
             const response = await axios.get(
                 "https://maps.googleapis.com/maps/api/directions/json",
                 {
                     params: {
                         origin: `${runnerLocation.lat},${runnerLocation.lng}`,
                         destination: `${gateLocation.lat},${gateLocation.lng}`,
-                        key: process.env.VITE_GOOGLE_MAPS_API_KEY,
+                        key: mapsKey,
                     },
                 }
             );

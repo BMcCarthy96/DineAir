@@ -1,4 +1,5 @@
-import { useState, useEffect, useMemo, useRef } from "react";
+import { useState, useEffect } from "react";
+import { trackingLog } from "../../utils/trackingLog";
 import Map from "../Map/Map";
 import RunnerETA from "../RunnerETA/RunnerETA";
 import FlightInfoSidebar from "../FlightInfoSidebar/FlightInfoSidebar";
@@ -8,6 +9,19 @@ import socket from "../../utils/WebSocket";
 import { gateCoordinates } from "../../utils/gateCoordinates";
 import { apiFetch } from "../../utils/apiFetch";
 import { FaLocationDot } from "react-icons/fa6";
+import { useLiveRunnerTracking } from "../../hooks/useLiveRunnerTracking";
+import { useTrackingDemoProgress } from "../../hooks/useTrackingDemoProgress";
+
+function dbStatusToUiLabel(status) {
+    const m = {
+        pending: "Order Received",
+        preparing: "Preparing",
+        picked_up: "On the Way",
+        on_the_way: "On the Way",
+        delivered: "Delivered",
+    };
+    return m[status] ?? "Order Received";
+}
 
 function DeliveryTrackingPage() {
     const [gateLocation, setGateLocation] = useState(null);
@@ -15,20 +29,39 @@ function DeliveryTrackingPage() {
     const [showSidebar, setShowSidebar] = useState(false);
     const [flightNumber, setFlightNumber] = useState(null);
     const [date, setDate] = useState(null);
-    const [orderStatus, setOrderStatus] = useState("");
     const [orderError, setOrderError] = useState(null);
     const [flightError, setFlightError] = useState(null);
     const [deliveryGate, setDeliveryGate] = useState(null);
-    const orderSteps = useMemo(
-        () => ["Order Received", "Preparing", "On the Way", "Delivered"],
-        []
-    );
-    const [orderStepIndex, setOrderStepIndex] = useState(0);
+    const [orderId, setOrderId] = useState(null);
+    /** Server/socket truth (DB). Demo timeline merges on top for portfolio progression. */
+    const [orderDbStatus, setOrderDbStatus] = useState(null);
 
-    const [displayedRunnerLocation, setDisplayedRunnerLocation] =
-        useState(null);
-    const animationFrame = useRef();
-    const tRef = useRef(0);
+    const { effectiveStatus, demoStatus, runnerMapProgress } =
+        useTrackingDemoProgress(orderId, orderDbStatus);
+
+    /** Derived each render from effectiveStatus only (no separate memoized label state). */
+    const uiOrderStatus = dbStatusToUiLabel(effectiveStatus);
+
+    useEffect(() => {
+        if (!import.meta.env.DEV) return;
+        trackingLog("status pipeline (visible chip + timeline)", {
+            serverStatus: orderDbStatus,
+            demoStatus,
+            effectiveStatus,
+            uiOrderStatus,
+            orderTrackingGets: effectiveStatus,
+        });
+    }, [orderDbStatus, demoStatus, effectiveStatus, uiOrderStatus]);
+
+    const { runnerLocation, connectionMode, isLive } = useLiveRunnerTracking({
+        orderId,
+        socket,
+        restaurantLocation,
+        gateLocation,
+        orderStatus: effectiveStatus,
+        orderDbStatus,
+        runnerMapProgress,
+    });
 
     useEffect(() => {
         async function fetchOrder() {
@@ -36,6 +69,8 @@ function DeliveryTrackingPage() {
                 const res = await apiFetch("/api/orders/current");
                 if (res.ok) {
                     const data = await res.json();
+                    if (data.id != null) setOrderId(data.id);
+                    if (data.status) setOrderDbStatus(data.status);
                     if (data.gate) setDeliveryGate(data.gate);
                     if (data.gateLat && data.gateLng) {
                         setGateLocation({
@@ -67,55 +102,6 @@ function DeliveryTrackingPage() {
     }, []);
 
     useEffect(() => {
-        if (!restaurantLocation || !gateLocation) return;
-
-        let animating = true;
-
-        if (orderSteps[orderStepIndex] === "On the Way") {
-            tRef.current = 0;
-            const animate = () => {
-                if (!animating) return;
-                tRef.current += 0.003;
-                if (tRef.current > 1) tRef.current = 1;
-                setDisplayedRunnerLocation({
-                    lat:
-                        restaurantLocation.lat +
-                        (gateLocation.lat - restaurantLocation.lat) *
-                            tRef.current,
-                    lng:
-                        restaurantLocation.lng +
-                        (gateLocation.lng - restaurantLocation.lng) *
-                            tRef.current,
-                });
-                if (tRef.current < 1) {
-                    animationFrame.current = requestAnimationFrame(animate);
-                }
-            };
-            animationFrame.current = requestAnimationFrame(animate);
-        } else if (orderStepIndex === 0 || orderStepIndex === 1) {
-            setDisplayedRunnerLocation(restaurantLocation);
-            if (animationFrame.current)
-                cancelAnimationFrame(animationFrame.current);
-        } else if (orderStepIndex === 3) {
-            setDisplayedRunnerLocation(gateLocation);
-            if (animationFrame.current)
-                cancelAnimationFrame(animationFrame.current);
-        }
-
-        return () => {
-            animating = false;
-            if (animationFrame.current)
-                cancelAnimationFrame(animationFrame.current);
-        };
-    }, [orderStepIndex, restaurantLocation, gateLocation, orderSteps]);
-
-    useEffect(() => {
-        if (restaurantLocation && !displayedRunnerLocation) {
-            setDisplayedRunnerLocation(restaurantLocation);
-        }
-    }, [restaurantLocation, displayedRunnerLocation]);
-
-    useEffect(() => {
         async function fetchFlightInfo() {
             try {
                 const response = await apiFetch(
@@ -137,28 +123,21 @@ function DeliveryTrackingPage() {
     }, []);
 
     useEffect(() => {
-        socket.on("gateChange", ({ gate }) => {
+        const onGate = ({ gate }) => {
             setGateLocation(gateCoordinates[gate]);
             if (gate) setDeliveryGate(gate);
-        });
-        socket.on("orderStatusUpdate", ({ status }) => {
-            setOrderStatus(status);
+        };
+        const onOrderStatus = ({ status }) => {
+            if (status) setOrderDbStatus(status);
             notifyOrderStatus(status);
-        });
+        };
+        socket.on("gateChange", onGate);
+        socket.on("orderStatusUpdate", onOrderStatus);
         return () => {
-            socket.off("gateChange");
-            socket.off("orderStatusUpdate");
+            socket.off("gateChange", onGate);
+            socket.off("orderStatusUpdate", onOrderStatus);
         };
     }, []);
-
-    useEffect(() => {
-        if (orderStepIndex < orderSteps.length - 1) {
-            const timer = setTimeout(() => {
-                setOrderStepIndex(orderStepIndex + 1);
-            }, 4000);
-            return () => clearTimeout(timer);
-        }
-    }, [orderStepIndex, orderSteps.length]);
 
     return (
         <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
@@ -171,21 +150,53 @@ function DeliveryTrackingPage() {
                         Follow your runner from kitchen to gate.
                     </p>
                 </div>
-                {deliveryGate && (
-                    <div className="inline-flex items-center gap-2 self-start rounded-2xl border border-slate-200 bg-white px-4 py-3 shadow-soft dark:border-slate-700 dark:bg-slate-900">
-                        <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-100 text-brand-700 dark:bg-brand-950 dark:text-brand-300">
-                            <FaLocationDot className="h-5 w-5" aria-hidden />
-                        </span>
-                        <div>
-                            <p className="text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">
-                                Delivering to
-                            </p>
-                            <p className="text-lg font-bold text-slate-900 dark:text-white">
-                                Gate {deliveryGate}
-                            </p>
+                <div className="flex w-full flex-col items-stretch gap-3 sm:max-w-md sm:items-end">
+                    {deliveryGate && (
+                        <div className="da-card inline-flex items-center gap-3 self-start px-4 py-3 shadow-soft">
+                            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-100 text-brand-700 dark:bg-brand-950 dark:text-brand-300">
+                                <FaLocationDot className="h-5 w-5" aria-hidden />
+                            </span>
+                            <div className="min-w-0 text-left">
+                                <p className="text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">
+                                    Delivering to
+                                </p>
+                                <p className="text-lg font-bold tracking-tight text-slate-900 dark:text-white">
+                                    Gate {deliveryGate}
+                                </p>
+                            </div>
                         </div>
+                    )}
+                    <div
+                        className="da-card flex flex-wrap items-center gap-x-3 gap-y-2 px-4 py-3 text-xs font-medium shadow-soft"
+                        aria-live="polite"
+                    >
+                        {isLive ? (
+                            <span className="inline-flex items-center gap-1.5 rounded-full bg-brand-600/10 px-3 py-1 text-brand-800 dark:bg-brand-500/15 dark:text-brand-200">
+                                <span
+                                    className="h-2 w-2 animate-pulse rounded-full bg-brand-600 dark:bg-brand-400"
+                                    aria-hidden
+                                />
+                                Live
+                            </span>
+                        ) : connectionMode === "connecting" ? (
+                            <span className="rounded-full bg-slate-100 px-3 py-1 text-slate-600 dark:bg-slate-800 dark:text-slate-300">
+                                Connecting…
+                            </span>
+                        ) : (
+                            <span className="rounded-full bg-amber-500/10 px-3 py-1 text-amber-900 dark:text-amber-100">
+                                Tracking offline
+                            </span>
+                        )}
+                        <span className="text-slate-600 dark:text-slate-400">
+                            <span className="text-slate-400 dark:text-slate-500">
+                                Status:{" "}
+                            </span>
+                            <span className="font-semibold text-slate-800 dark:text-slate-200">
+                                {uiOrderStatus}
+                            </span>
+                        </span>
                     </div>
-                )}
+                </div>
             </div>
 
             {orderError && (
@@ -199,23 +210,16 @@ function DeliveryTrackingPage() {
 
             <section className="da-card mb-8 p-6 sm:p-8">
                 <h2 className="sr-only">Order status</h2>
-                <OrderTracking orderStatus={orderSteps[orderStepIndex]} />
+                <OrderTracking effectiveStatus={effectiveStatus} />
             </section>
 
             <div className="mb-6 grid gap-6 lg:grid-cols-2">
                 <div className="da-card p-6">
                     <RunnerETA
-                        runnerLocation={displayedRunnerLocation}
+                        runnerLocation={runnerLocation}
                         gateLocation={gateLocation}
+                        effectiveStatus={effectiveStatus}
                     />
-                    {orderStatus ? (
-                        <p className="mt-4 text-sm text-slate-600 dark:text-slate-400">
-                            <span className="font-semibold text-slate-900 dark:text-white">
-                                Socket status:
-                            </span>{" "}
-                            {orderStatus}
-                        </p>
-                    ) : null}
                 </div>
                 <div className="flex flex-col justify-center gap-3">
                     <button
@@ -239,11 +243,11 @@ function DeliveryTrackingPage() {
                 </div>
             </div>
 
-            {displayedRunnerLocation && gateLocation && restaurantLocation && (
+            {runnerLocation && gateLocation && restaurantLocation && (
                 <section className="da-card overflow-hidden p-2 sm:p-4">
                     <h2 className="sr-only">Map</h2>
                     <Map
-                        runnerLocation={displayedRunnerLocation}
+                        runnerLocation={runnerLocation}
                         gateLocation={gateLocation}
                         restaurantLocation={restaurantLocation}
                         isRunnerView={false}

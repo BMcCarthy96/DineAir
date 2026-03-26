@@ -6,6 +6,8 @@ import {
     hintsForLoadPhase,
     maskApiKeyForDisplay,
 } from "../../utils/mapsDiagnostics";
+import { haversineMeters } from "../../utils/geo";
+import { shouldShowMapsDiagnostics } from "../../utils/mapsDebugFlag";
 
 const containerStyle = {
     width: "100%",
@@ -24,7 +26,7 @@ function MapsDevDiagnostics({
     loadPhase,
     directionsDetail,
 }) {
-    if (!import.meta.env.DEV) return null;
+    if (!shouldShowMapsDiagnostics()) return null;
 
     const origin =
         typeof window !== "undefined" ? window.location.origin : "(no window)";
@@ -92,6 +94,9 @@ function Map({
     const gateMarker = useRef(null);
     const restaurantMarkers = useRef([]);
     const directionsRenderer = useRef(null);
+    const lastDirectionsAtRef = useRef(0);
+    const lastDirectionsRunnerRef = useRef(null);
+    const lastGateKeyRef = useRef("");
 
     /** no-key | loading | ready | error */
     const [mapsStatus, setMapsStatus] = useState("loading");
@@ -110,12 +115,12 @@ function Map({
     const keyMasked = maskApiKeyForDisplay(trimmedKey);
 
     useEffect(() => {
-        if (!import.meta.env.DEV) return;
+        if (!shouldShowMapsDiagnostics()) return;
         setDevPresence(getMapsPresenceSnapshot());
     }, [mapsStatus, errorDetail, directionsDetail]);
 
     useEffect(() => {
-        if (!import.meta.env.DEV || mapsStatus !== "loading") return;
+        if (!shouldShowMapsDiagnostics() || mapsStatus !== "loading") return;
         const id = setInterval(
             () => setDevPresence(getMapsPresenceSnapshot()),
             400
@@ -234,23 +239,24 @@ function Map({
         restaurantLocation,
     ]);
 
-    // Runner marker
+    // Runner marker (update position in place for smooth tracking)
     useEffect(() => {
         if (mapsStatus !== "ready" || !mapInstance.current || !runnerLocation) {
             return;
         }
         if (runnerMarker.current) {
-            runnerMarker.current.setMap(null);
+            runnerMarker.current.setPosition(runnerLocation);
+        } else {
+            runnerMarker.current = new window.google.maps.Marker({
+                map: mapInstance.current,
+                position: runnerLocation,
+                title: "Runner",
+                label: {
+                    text: "🏃‍♂️",
+                    fontSize: "24px",
+                },
+            });
         }
-        runnerMarker.current = new window.google.maps.Marker({
-            map: mapInstance.current,
-            position: runnerLocation,
-            title: "Runner",
-            label: {
-                text: "🏃‍♂️",
-                fontSize: "24px",
-            },
-        });
         if (isRunnerView) {
             mapInstance.current.setCenter(runnerLocation);
         }
@@ -301,7 +307,7 @@ function Map({
         }
     }, [mapsStatus, restaurants]);
 
-    // Directions
+    // Directions (throttled: avoid Directions API spam while runner moves smoothly)
     useEffect(() => {
         if (
             mapsStatus !== "ready" ||
@@ -321,6 +327,28 @@ function Map({
             }
             return;
         }
+
+        const gateKey = `${gateLocation.lat},${gateLocation.lng}`;
+        const now = Date.now();
+        const minIntervalMs = 12000;
+        const minMoveM = 85;
+        const prevRunner = lastDirectionsRunnerRef.current;
+        const gateChanged = gateKey !== lastGateKeyRef.current;
+        let shouldRequest = gateChanged;
+        if (!shouldRequest && prevRunner) {
+            const moved = haversineMeters(prevRunner, runnerLocation);
+            shouldRequest =
+                moved >= minMoveM ||
+                now - lastDirectionsAtRef.current >= minIntervalMs;
+        } else if (!prevRunner) {
+            shouldRequest = true;
+        }
+        if (!shouldRequest) {
+            return;
+        }
+        lastDirectionsAtRef.current = now;
+        lastDirectionsRunnerRef.current = runnerLocation;
+        lastGateKeyRef.current = gateKey;
 
         const directionsService = new window.google.maps.DirectionsService();
         directionsService.route(

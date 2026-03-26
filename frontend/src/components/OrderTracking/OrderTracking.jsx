@@ -1,13 +1,45 @@
+import { useEffect } from "react";
 import { FaCheck } from "react-icons/fa";
+import { trackingLog } from "../../utils/trackingLog";
 
-function OrderTracking({ orderStatus }) {
-    const statuses = [
-        "Order Received",
-        "Preparing",
-        "On the Way",
-        "Delivered",
-    ];
-    const currentStep = statuses.indexOf(orderStatus);
+const STEP_LABELS = [
+    "Order Received",
+    "Preparing",
+    "On the Way",
+    "Delivered",
+];
+
+/**
+ * Map canonical order phase (API / demo merge) to timeline step index.
+ * @param {string | null | undefined} status
+ */
+function effectiveStatusToStepIndex(status) {
+    if (!status) return 0;
+    if (status === "picked_up") return 2;
+    const map = {
+        pending: 0,
+        preparing: 1,
+        on_the_way: 2,
+        delivered: 3,
+    };
+    const idx = map[status];
+    return typeof idx === "number" ? idx : 0;
+}
+
+/**
+ * @param {{ effectiveStatus: string | null }} props
+ */
+function OrderTracking({ effectiveStatus }) {
+    const currentStep = effectiveStatusToStepIndex(effectiveStatus);
+
+    useEffect(() => {
+        if (!import.meta.env.DEV) return;
+        trackingLog("OrderTracking render props", {
+            effectiveStatus,
+            currentStep,
+            stepLabel: STEP_LABELS[currentStep],
+        });
+    }, [effectiveStatus]);
 
     return (
         <div
@@ -15,12 +47,12 @@ function OrderTracking({ orderStatus }) {
             role="list"
             aria-label="Order progress"
         >
-            {statuses.map((status, index) => {
+            {STEP_LABELS.map((label, index) => {
                 const done = index <= currentStep;
                 const active = index === currentStep;
                 return (
                     <div
-                        key={status}
+                        key={label}
                         className="flex flex-1 flex-col items-center text-center"
                         role="listitem"
                     >
@@ -44,7 +76,7 @@ function OrderTracking({ orderStatus }) {
                                     : "text-slate-400 dark:text-slate-500"
                             }`}
                         >
-                            {status}
+                            {label}
                         </p>
                     </div>
                 );

@@ -4,63 +4,18 @@ const { port } = require("../config");
 const app = require("../app");
 const db = require("../db/models");
 const http = require("http");
-const { initSocket, setSocket } = require("../utils/socket");
+const { initSocket } = require("../utils/socket");
 
-// Create the HTTP server
 const server = http.createServer(app);
 
-// Initialize WebSocket server with proper CORS
-const io = initSocket(server, {
-    cors: {
-        origin:
-            process.env.NODE_ENV === "production"
-                ? "https://dineair.onrender.com"
-                : "http://localhost:5174",
-        methods: ["GET", "POST"],
-        credentials: true,
-    },
-});
+initSocket(server);
 
-// Make io accessible in controllers
-setSocket(io);
-
-// WebSocket event handlers
-io.on("connection", (socket) => {
-    console.log("A user connected:", socket.id);
-
-    // Handle runner location updates
-    socket.on("runnerLocationUpdate", ({ runnerId, location }) => {
-        console.log(`Runner ${runnerId} location updated:`, location);
-        io.emit("runnerLocationUpdate", { runnerId, location });
-    });
-
-    // Handle order status updates
-    socket.on("orderStatusUpdate", ({ orderId, status }) => {
-        console.log(`Order ${orderId} status updated: ${status}`);
-        io.emit("orderStatusUpdate", { orderId, status });
-    });
-
-    // Handle gate change notifications
-    socket.on("gateChange", ({ gate, terminal }) => {
-        console.log(`Gate changed to ${gate}, Terminal ${terminal}`);
-        io.emit("gateChange", { gate, terminal });
-    });
-
-    // Handle disconnection
-    socket.on("disconnect", () => {
-        console.log("A user disconnected:", socket.id);
-    });
-});
-
-// Check the database connection before starting the app
 db.sequelize
     .authenticate()
     .then(() => {
         console.log(
             "Database connection success! Sequelize is ready to use..."
         );
-
-        // Start listening for connections
         server.listen(port, () => console.log(`Listening on port ${port}...`));
     })
     .catch((err) => {

@@ -24,6 +24,7 @@ function RunnerDashboardPage() {
     const [restaurantLocation, setRestaurantLocation] = useState(null);
     const [gateLocation, setGateLocation] = useState(null);
     const [restaurant, setRestaurant] = useState(null);
+    const [activeOrderId, setActiveOrderId] = useState(null);
 
     useEffect(() => {
         let cancelled = false;
@@ -41,6 +42,7 @@ function RunnerDashboardPage() {
                         setDeliveries(data);
                         if (data.length > 0) {
                             const order = data[0].Order;
+                            setActiveOrderId(order?.id ?? null);
                             if (order?.Restaurant) {
                                 setRestaurantLocation({
                                     lat: order.Restaurant.latitude,
@@ -54,6 +56,8 @@ function RunnerDashboardPage() {
                                     lng: Number(order.gateLng),
                                 });
                             }
+                        } else {
+                            setActiveOrderId(null);
                         }
                     }
                 } else {
@@ -80,13 +84,17 @@ function RunnerDashboardPage() {
                     lng: position.coords.longitude,
                 };
                 setRunnerLocation(location);
-                socket.emit("runnerLocationUpdate", { runnerId, location });
+                socket.emit("runnerLocationUpdate", {
+                    runnerId,
+                    orderId: activeOrderId,
+                    location,
+                });
             },
             () => {},
             { enableHighAccuracy: true }
         );
         return () => navigator.geolocation.clearWatch(watchId);
-    }, [runnerId]);
+    }, [runnerId, activeOrderId]);
 
     return (
         <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">

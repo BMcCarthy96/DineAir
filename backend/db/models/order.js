@@ -36,6 +36,14 @@ module.exports = (sequelize, DataTypes) => {
             gate: {
                 type: DataTypes.STRING,
             },
+            gateLat: {
+                type: DataTypes.DECIMAL(9, 6),
+                allowNull: true,
+            },
+            gateLng: {
+                type: DataTypes.DECIMAL(9, 6),
+                allowNull: true,
+            },
             totalPrice: {
                 type: DataTypes.DECIMAL(10, 2),
                 allowNull: false,
