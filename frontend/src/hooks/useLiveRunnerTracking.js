@@ -5,6 +5,8 @@ import { trackingLog, trackingWarn } from "../utils/trackingLog";
 
 /** How often React state syncs from the internal smooth loop (marker still feels smooth). */
 const DISPLAY_FLUSH_MS = 90;
+/** If no meaningful socket coordinate update in this window, demo movement takes over. */
+const SOCKET_STALE_MS = 3000;
 
 function easePathT(t) {
     const c = Math.min(1, Math.max(0, t));
@@ -53,6 +55,12 @@ export function useLiveRunnerTracking({
         travelActive &&
         isDbTravelStatus(orderDbStatus) &&
         runnerMapProgress < 0.02;
+    const socketMsSinceLast =
+        lastSocketSampleAtRef.current > 0
+            ? Date.now() - lastSocketSampleAtRef.current
+            : Number.POSITIVE_INFINITY;
+    const socketHealthy = socketDrivesPosition && socketMsSinceLast <= SOCKET_STALE_MS;
+    const movementSource = socketHealthy ? "socket" : "demo";
 
     useEffect(() => {
         if (!import.meta.env.DEV || orderId == null) return;
@@ -63,6 +71,12 @@ export function useLiveRunnerTracking({
             runnerMapProgress: Number(runnerMapProgress.toFixed(3)),
             travelActive,
             socketDrivesPosition,
+            socketHealthy,
+            movementSource,
+            lastSocketUpdateMsAgo:
+                Number.isFinite(socketMsSinceLast) && socketMsSinceLast < 1e9
+                    ? Math.round(socketMsSinceLast)
+                    : null,
         });
     }, [
         orderId,
@@ -71,6 +85,9 @@ export function useLiveRunnerTracking({
         runnerMapProgress,
         travelActive,
         socketDrivesPosition,
+        socketHealthy,
+        movementSource,
+        socketMsSinceLast,
     ]);
 
     useEffect(() => {
@@ -111,7 +128,7 @@ export function useLiveRunnerTracking({
         const onUpdate = (payload) => {
             if (payload?.orderId !== orderId || !payload?.location) return;
             if (!travelActive) return;
-            // Demo timeline + runnerMapProgress drive the marker once "On the Way" by time.
+            // Socket is an enhancement only in the early travel window.
             if (!socketDrivesPosition) return;
             const next = normalizeLatLng(payload.location);
             if (!next) return;
@@ -224,13 +241,13 @@ export function useLiveRunnerTracking({
 
     /**
      * Single demo-aligned path: restaurant → gate by runnerMapProgress (same anchor as status).
-     * When socketDrivesPosition is true, onUpdate sets targetRef instead.
+     * Socket may override briefly when healthy, but demo always remains the fallback driver.
      */
     useEffect(() => {
         const r = normalizeLatLng(restaurantLocation);
         const g = normalizeLatLng(gateLocation);
         if (!r || !g) return;
-        if (socketDrivesPosition) return;
+        if (socketHealthy) return;
 
         const p = easePathT(runnerMapProgress);
         const lat = r.lat + (g.lat - r.lat) * p;
@@ -251,7 +268,7 @@ export function useLiveRunnerTracking({
         runnerMapProgress,
         restaurantLocation,
         gateLocation,
-        socketDrivesPosition,
+        socketHealthy,
     ]);
 
     /** Delivered: ensure gate snap if progress math ever lags. */
