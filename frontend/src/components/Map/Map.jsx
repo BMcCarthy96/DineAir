@@ -100,6 +100,7 @@ function Map({
     const lastDirectionsAtRef = useRef(0);
     const lastDirectionsRunnerRef = useRef(null);
     const lastGateKeyRef = useRef("");
+    const directionsInputWarnedRef = useRef(new Set());
 
     /** no-key | loading | ready | error */
     const [mapsStatus, setMapsStatus] = useState("loading");
@@ -196,40 +197,45 @@ function Map({
         () => safeRunner || safeGate || safeRestaurant || DEFAULT_CENTER,
         [safeRunner, safeGate, safeRestaurant]
     );
+    const fallbackCenterWarnedRef = useRef(false);
+    useEffect(() => {
+        const noLiveCenter = !safeRunner && !safeGate && !safeRestaurant;
+        if (!noLiveCenter || fallbackCenterWarnedRef.current) return;
+        fallbackCenterWarnedRef.current = true;
+        const detail = { usingFallbackCenter: DEFAULT_CENTER };
+        if (import.meta.env.DEV) {
+            devLogMaps("info", "No valid live coordinates yet; using fallback center", detail);
+        } else {
+            console.info("[DineAir Maps] Using fallback center pending valid coordinates", detail);
+        }
+    }, [safeRunner, safeGate, safeRestaurant]);
 
     /** Latest center for map init/resize (avoid re-running init when lat/lng change). */
     const centerRef = useRef(center);
     centerRef.current = center;
 
-    const invalidCoordWarnedRef = useRef(false);
+    const invalidSourceWarnedRef = useRef(new Set());
     useEffect(() => {
-        const bad =
-            (runnerLocation && !safeRunner) ||
-            (gateLocation && !safeGate) ||
-            (restaurantLocation && !safeRestaurant);
-        if (!bad || invalidCoordWarnedRef.current) return;
-        invalidCoordWarnedRef.current = true;
-        const detail = {
-            runner: runnerLocation,
-            gate: gateLocation,
-            restaurant: restaurantLocation,
+        const warnSourceOnce = (source, raw, normalized) => {
+            if (!raw || normalized) return;
+            if (invalidSourceWarnedRef.current.has(source)) return;
+            invalidSourceWarnedRef.current.add(source);
+            const detail = { source, raw };
+            if (import.meta.env.DEV) {
+                devLogMaps(
+                    "warn",
+                    "Invalid coordinates from source (skipping Google Maps update)",
+                    detail
+                );
+            } else {
+                console.warn("[DineAir Maps] Invalid coordinate source skipped", detail);
+            }
         };
-        if (import.meta.env.DEV) {
-            devLogMaps("warn", "Non-finite map coordinates (normalized to fallback)", detail);
-        } else {
-            console.warn(
-                "[DineAir Maps] Skipping invalid coordinates; using safe fallbacks only.",
-                detail
-            );
-        }
-    }, [
-        runnerLocation,
-        gateLocation,
-        restaurantLocation,
-        safeRunner,
-        safeGate,
-        safeRestaurant,
-    ]);
+
+        warnSourceOnce("runnerLocation", runnerLocation, safeRunner);
+        warnSourceOnce("gateLocation", gateLocation, safeGate);
+        warnSourceOnce("restaurantLocation", restaurantLocation, safeRestaurant);
+    }, [runnerLocation, gateLocation, restaurantLocation, safeRunner, safeGate, safeRestaurant]);
 
     // Initialize map once when the API is ready (center updates via recenter effect + centerRef).
     // Resize after layout: gray tiles often mean 0×0 canvas until resize fires (common in prod / flex layouts).
@@ -433,6 +439,25 @@ function Map({
             !directionsRenderer.current ||
             !window.google
         ) {
+            if (mapsStatus === "ready") {
+                const warnDirectionsInputOnce = (key, raw, normalized) => {
+                    if (!raw || normalized) return;
+                    if (directionsInputWarnedRef.current.has(key)) return;
+                    directionsInputWarnedRef.current.add(key);
+                    const detail = { source: key, raw };
+                    if (import.meta.env.DEV) {
+                        devLogMaps(
+                            "warn",
+                            "Directions skipped due to invalid coordinate input",
+                            detail
+                        );
+                    } else {
+                        console.warn("[DineAir Maps] Directions skipped (invalid input)", detail);
+                    }
+                };
+                warnDirectionsInputOnce("origin_runnerLocation", runnerLocation, safeRunner);
+                warnDirectionsInputOnce("destination_gateLocation", gateLocation, safeGate);
+            }
             if (directionsRenderer.current) {
                 directionsRenderer.current.setDirections({ routes: [] });
             }
@@ -501,7 +526,7 @@ function Map({
                 }
             }
         );
-    }, [mapsStatus, safeRunner, safeGate]);
+    }, [mapsStatus, safeRunner, safeGate, runnerLocation, gateLocation]);
 
     const diagnosticsBlock = (
         <MapsDevDiagnostics
