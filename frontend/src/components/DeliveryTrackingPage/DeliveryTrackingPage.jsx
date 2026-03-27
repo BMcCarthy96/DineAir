@@ -8,6 +8,7 @@ import { notifyOrderStatus } from "../../utils/Notifications";
 import socket from "../../utils/WebSocket";
 import { gateCoordinates } from "../../utils/gateCoordinates";
 import { apiFetch } from "../../utils/apiFetch";
+import { normalizeLatLng } from "../../utils/coordinates";
 import { FaLocationDot } from "react-icons/fa6";
 import { useLiveRunnerTracking } from "../../hooks/useLiveRunnerTracking";
 import { useTrackingDemoProgress } from "../../hooks/useTrackingDemoProgress";
@@ -72,24 +73,21 @@ function DeliveryTrackingPage() {
                     if (data.id != null) setOrderId(data.id);
                     if (data.status) setOrderDbStatus(data.status);
                     if (data.gate) setDeliveryGate(data.gate);
-                    if (data.gateLat && data.gateLng) {
-                        setGateLocation({
-                            lat: Number(data.gateLat),
-                            lng: Number(data.gateLng),
-                        });
-                    } else if (data.gate) {
-                        setGateLocation(gateCoordinates[data.gate]);
-                    }
-                    if (
-                        data.Restaurant &&
-                        data.Restaurant.latitude &&
-                        data.Restaurant.longitude
-                    ) {
-                        setRestaurantLocation({
-                            lat: data.Restaurant.latitude,
-                            lng: data.Restaurant.longitude,
-                        });
-                    }
+                    const gateFromApi = normalizeLatLng({
+                        lat: data.gateLat,
+                        lng: data.gateLng,
+                    });
+                    const gateFromCode =
+                        data.gate && gateCoordinates[data.gate]
+                            ? normalizeLatLng(gateCoordinates[data.gate])
+                            : null;
+                    const gateResolved = gateFromApi || gateFromCode;
+                    if (gateResolved) setGateLocation(gateResolved);
+                    const restResolved = normalizeLatLng({
+                        lat: data.Restaurant?.latitude,
+                        lng: data.Restaurant?.longitude,
+                    });
+                    if (restResolved) setRestaurantLocation(restResolved);
                 } else {
                     setOrderError("No active order to track right now.");
                 }
@@ -243,7 +241,8 @@ function DeliveryTrackingPage() {
                 </div>
             </div>
 
-            {runnerLocation && gateLocation && restaurantLocation && (
+            {/* Mount map as soon as gate + restaurant are known; runner can arrive after (avoids late mount / zero-size gray map in prod). */}
+            {gateLocation && restaurantLocation && (
                 <section className="da-card overflow-hidden p-2 sm:p-4">
                     <h2 className="sr-only">Map</h2>
                     <Map

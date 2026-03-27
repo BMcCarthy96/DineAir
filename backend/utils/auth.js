@@ -19,13 +19,18 @@ const setTokenCookie = (res, user) => {
     );
 
     const isProduction = process.env.NODE_ENV === "production";
+    /** Set TOKEN_COOKIE_SAMESITE=none when the SPA is on a different site than the API (Render split deploy). Requires Secure. */
+    const crossSite =
+        process.env.TOKEN_COOKIE_SAMESITE === "none" ||
+        process.env.TOKEN_COOKIE_SAMESITE === "None";
+    const sameSiteToken = crossSite ? "none" : isProduction ? "lax" : false;
 
     // Set the token cookie
     res.cookie("token", token, {
         maxAge: expiresIn * 1000, // maxAge in milliseconds
         httpOnly: true,
-        secure: isProduction,
-        sameSite: isProduction && "Lax",
+        secure: isProduction || crossSite,
+        sameSite: sameSiteToken,
     });
 
     return token;

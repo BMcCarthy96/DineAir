@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { normalizeLatLng } from "../utils/coordinates";
 import { haversineMeters, lerpLatLng } from "../utils/geo";
 import { trackingLog, trackingWarn } from "../utils/trackingLog";
 
@@ -93,10 +94,8 @@ export function useLiveRunnerTracking({
             if (!travelActive) return;
             // Demo timeline + runnerMapProgress drive the marker once "On the Way" by time.
             if (!socketDrivesPosition) return;
-            const next = {
-                lat: Number(payload.location.lat),
-                lng: Number(payload.location.lng),
-            };
+            const next = normalizeLatLng(payload.location);
+            if (!next) return;
             const now = Date.now();
             const prev = lastSocketSampleRef.current;
             if (prev) {
@@ -197,11 +196,11 @@ export function useLiveRunnerTracking({
     }, []);
 
     useEffect(() => {
-        if (restaurantLocation && displayedRef.current == null) {
-            displayedRef.current = { ...restaurantLocation };
-            targetRef.current = { ...restaurantLocation };
-            setDisplayedLocation({ ...restaurantLocation });
-        }
+        const r = normalizeLatLng(restaurantLocation);
+        if (!r || displayedRef.current != null) return;
+        displayedRef.current = { ...r };
+        targetRef.current = { ...r };
+        setDisplayedLocation({ ...r });
     }, [restaurantLocation]);
 
     /**
@@ -209,16 +208,14 @@ export function useLiveRunnerTracking({
      * When socketDrivesPosition is true, onUpdate sets targetRef instead.
      */
     useEffect(() => {
-        if (!restaurantLocation || !gateLocation) return;
+        const r = normalizeLatLng(restaurantLocation);
+        const g = normalizeLatLng(gateLocation);
+        if (!r || !g) return;
         if (socketDrivesPosition) return;
 
         const p = easePathT(runnerMapProgress);
-        const lat =
-            restaurantLocation.lat +
-            (gateLocation.lat - restaurantLocation.lat) * p;
-        const lng =
-            restaurantLocation.lng +
-            (gateLocation.lng - restaurantLocation.lng) * p;
+        const lat = r.lat + (g.lat - r.lat) * p;
+        const lng = r.lng + (g.lng - r.lng) * p;
         if (!Number.isFinite(lat) || !Number.isFinite(lng)) return;
         targetRef.current = { lat, lng };
     }, [
@@ -230,12 +227,9 @@ export function useLiveRunnerTracking({
 
     /** Delivered: ensure gate snap if progress math ever lags. */
     useEffect(() => {
-        if (orderStatus !== "delivered" || !gateLocation) return;
-        const g = {
-            lat: Number(gateLocation.lat),
-            lng: Number(gateLocation.lng),
-        };
-        if (!Number.isFinite(g.lat) || !Number.isFinite(g.lng)) return;
+        if (orderStatus !== "delivered") return;
+        const g = normalizeLatLng(gateLocation);
+        if (!g) return;
         targetRef.current = { ...g };
         displayedRef.current = { ...g };
         setDisplayedLocation({ ...g });

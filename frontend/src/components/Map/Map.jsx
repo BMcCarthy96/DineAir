@@ -1,5 +1,6 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { loadGoogleMapsScript } from "../../utils/loadGoogleMaps";
+import { normalizeLatLng } from "../../utils/coordinates";
 import {
     devLogMaps,
     getMapsPresenceSnapshot,
@@ -13,6 +14,8 @@ const containerStyle = {
     width: "100%",
     height: "min(420px, 55vh)",
     minHeight: "280px",
+    position: "relative",
+    zIndex: 0,
 };
 
 /** Used when the API is ready but coordinates are not yet available (avoids a blank map). */
@@ -179,13 +182,60 @@ function Map({
             });
     }, [keyPresent, trimmedKey, keyMasked]);
 
-    const center =
-        runnerLocation || gateLocation || restaurantLocation || DEFAULT_CENTER;
+    const safeRunner = useMemo(
+        () => normalizeLatLng(runnerLocation),
+        [runnerLocation]
+    );
+    const safeGate = useMemo(() => normalizeLatLng(gateLocation), [gateLocation]);
+    const safeRestaurant = useMemo(
+        () => normalizeLatLng(restaurantLocation),
+        [restaurantLocation]
+    );
 
-    // Initialize map
+    const center = useMemo(
+        () => safeRunner || safeGate || safeRestaurant || DEFAULT_CENTER,
+        [safeRunner, safeGate, safeRestaurant]
+    );
+
+    /** Latest center for map init/resize (avoid re-running init when lat/lng change). */
+    const centerRef = useRef(center);
+    centerRef.current = center;
+
+    const invalidCoordWarnedRef = useRef(false);
+    useEffect(() => {
+        const bad =
+            (runnerLocation && !safeRunner) ||
+            (gateLocation && !safeGate) ||
+            (restaurantLocation && !safeRestaurant);
+        if (!bad || invalidCoordWarnedRef.current) return;
+        invalidCoordWarnedRef.current = true;
+        const detail = {
+            runner: runnerLocation,
+            gate: gateLocation,
+            restaurant: restaurantLocation,
+        };
+        if (import.meta.env.DEV) {
+            devLogMaps("warn", "Non-finite map coordinates (normalized to fallback)", detail);
+        } else {
+            console.warn(
+                "[DineAir Maps] Skipping invalid coordinates; using safe fallbacks only.",
+                detail
+            );
+        }
+    }, [
+        runnerLocation,
+        gateLocation,
+        restaurantLocation,
+        safeRunner,
+        safeGate,
+        safeRestaurant,
+    ]);
+
+    // Initialize map once when the API is ready (center updates via recenter effect + centerRef).
+    // Resize after layout: gray tiles often mean 0×0 canvas until resize fires (common in prod / flex layouts).
     useEffect(() => {
         if (mapsStatus !== "ready" || !mapRef.current || mapInstance.current) {
-            return;
+            return undefined;
         }
 
         if (!window.google?.maps?.Map) {
@@ -194,12 +244,14 @@ function Map({
             devLogMaps("error", msg, getMapsPresenceSnapshot());
             setErrorDetail(`${msg} [step: map-api-not-ready]`);
             setMapsStatus("error");
-            return;
+            return undefined;
         }
+
+        const initialCenter = centerRef.current;
 
         try {
             mapInstance.current = new window.google.maps.Map(mapRef.current, {
-                center,
+                center: initialCenter,
                 zoom: 15,
             });
 
@@ -212,6 +264,68 @@ function Map({
                         strokeWeight: 5,
                     },
                 });
+
+            const scheduleResize = () => {
+                const m = mapInstance.current;
+                if (!m || !window.google?.maps?.event) return;
+                window.google.maps.event.trigger(m, "resize");
+                const c = centerRef.current;
+                if (
+                    c &&
+                    Number.isFinite(c.lat) &&
+                    Number.isFinite(c.lng)
+                ) {
+                    m.setCenter(c);
+                }
+            };
+
+            requestAnimationFrame(() => {
+                requestAnimationFrame(scheduleResize);
+            });
+            const t1 = setTimeout(scheduleResize, 120);
+            const t2 = setTimeout(scheduleResize, 450);
+
+            const el = mapRef.current;
+            let ro = null;
+            if (typeof ResizeObserver !== "undefined" && el) {
+                ro = new ResizeObserver(() => {
+                    scheduleResize();
+                });
+                ro.observe(el);
+            }
+
+            if (import.meta.env.PROD) {
+                console.info("[DineAir Maps] map instance created", {
+                    centerLat: initialCenter.lat,
+                    centerLng: initialCenter.lng,
+                });
+            }
+
+            return () => {
+                clearTimeout(t1);
+                clearTimeout(t2);
+                if (ro && el) {
+                    ro.unobserve(el);
+                    ro.disconnect();
+                }
+                if (runnerMarker.current) {
+                    runnerMarker.current.setMap(null);
+                    runnerMarker.current = null;
+                }
+                if (gateMarker.current) {
+                    gateMarker.current.setMap(null);
+                    gateMarker.current = null;
+                }
+                restaurantMarkers.current.forEach((marker) =>
+                    marker.setMap(null)
+                );
+                restaurantMarkers.current = [];
+                if (directionsRenderer.current) {
+                    directionsRenderer.current.setMap(null);
+                    directionsRenderer.current = null;
+                }
+                mapInstance.current = null;
+            };
         } catch (err) {
             const name = err?.name ? `${err.name}: ` : "";
             const msg =
@@ -221,35 +335,38 @@ function Map({
             devLogMaps("error", "Map constructor:", err);
             setErrorDetail(`${msg} [step: map-constructor]`);
             setMapsStatus("error");
+            return undefined;
         }
-    }, [mapsStatus, center]);
+    }, [mapsStatus]);
 
     // Recenter when locations appear (first real center beats default)
     useEffect(() => {
         if (!mapInstance.current || mapsStatus !== "ready") return;
-        const next =
-            runnerLocation || gateLocation || restaurantLocation;
+        const next = safeRunner || safeGate || safeRestaurant;
         if (next) {
             mapInstance.current.setCenter(next);
         }
-    }, [
-        mapsStatus,
-        runnerLocation,
-        gateLocation,
-        restaurantLocation,
-    ]);
+    }, [mapsStatus, safeRunner, safeGate, safeRestaurant]);
+
+    /** After center changes (or when markers appear), nudge tile redraw — fixes gray map when layout/center updates post-init. */
+    useEffect(() => {
+        if (mapsStatus !== "ready" || !mapInstance.current) return;
+        if (!window.google?.maps?.event) return;
+        const m = mapInstance.current;
+        window.google.maps.event.trigger(m, "resize");
+    }, [mapsStatus, center.lat, center.lng]);
 
     // Runner marker (update position in place for smooth tracking)
     useEffect(() => {
-        if (mapsStatus !== "ready" || !mapInstance.current || !runnerLocation) {
+        if (mapsStatus !== "ready" || !mapInstance.current || !safeRunner) {
             return;
         }
         if (runnerMarker.current) {
-            runnerMarker.current.setPosition(runnerLocation);
+            runnerMarker.current.setPosition(safeRunner);
         } else {
             runnerMarker.current = new window.google.maps.Marker({
                 map: mapInstance.current,
-                position: runnerLocation,
+                position: safeRunner,
                 title: "Runner",
                 label: {
                     text: "🏃‍♂️",
@@ -258,19 +375,19 @@ function Map({
             });
         }
         if (isRunnerView) {
-            mapInstance.current.setCenter(runnerLocation);
+            mapInstance.current.setCenter(safeRunner);
         }
-    }, [mapsStatus, runnerLocation, isRunnerView]);
+    }, [mapsStatus, safeRunner, isRunnerView]);
 
     // Gate marker
     useEffect(() => {
-        if (mapsStatus !== "ready" || !mapInstance.current || !gateLocation) {
+        if (mapsStatus !== "ready" || !mapInstance.current || !safeGate) {
             return;
         }
         if (!gateMarker.current) {
             gateMarker.current = new window.google.maps.Marker({
                 map: mapInstance.current,
-                position: gateLocation,
+                position: safeGate,
                 title: "Gate",
                 label: {
                     text: "📍",
@@ -278,9 +395,9 @@ function Map({
                 },
             });
         } else {
-            gateMarker.current.setPosition(gateLocation);
+            gateMarker.current.setPosition(safeGate);
         }
-    }, [mapsStatus, gateLocation]);
+    }, [mapsStatus, safeGate]);
 
     // Restaurant markers
     useEffect(() => {
@@ -292,17 +409,17 @@ function Map({
 
         if (restaurants?.length > 0) {
             restaurants.forEach((restaurant) => {
-                if (restaurant.latitude && restaurant.longitude) {
-                    const marker = new window.google.maps.Marker({
-                        position: {
-                            lat: parseFloat(restaurant.latitude),
-                            lng: parseFloat(restaurant.longitude),
-                        },
-                        map: mapInstance.current,
-                        title: restaurant.name,
-                    });
-                    restaurantMarkers.current.push(marker);
-                }
+                const pos = normalizeLatLng({
+                    lat: restaurant.latitude,
+                    lng: restaurant.longitude,
+                });
+                if (!pos) return;
+                const marker = new window.google.maps.Marker({
+                    position: pos,
+                    map: mapInstance.current,
+                    title: restaurant.name,
+                });
+                restaurantMarkers.current.push(marker);
             });
         }
     }, [mapsStatus, restaurants]);
@@ -311,24 +428,21 @@ function Map({
     useEffect(() => {
         if (
             mapsStatus !== "ready" ||
-            !runnerLocation ||
-            !gateLocation ||
+            !safeRunner ||
+            !safeGate ||
             !directionsRenderer.current ||
             !window.google
         ) {
             if (directionsRenderer.current) {
                 directionsRenderer.current.setDirections({ routes: [] });
             }
-            if (
-                (!runnerLocation || !gateLocation) &&
-                import.meta.env.DEV
-            ) {
+            if ((!safeRunner || !safeGate) && import.meta.env.DEV) {
                 setDirectionsDetail("");
             }
             return;
         }
 
-        const gateKey = `${gateLocation.lat},${gateLocation.lng}`;
+        const gateKey = `${safeGate.lat},${safeGate.lng}`;
         const now = Date.now();
         const minIntervalMs = 12000;
         const minMoveM = 85;
@@ -336,7 +450,7 @@ function Map({
         const gateChanged = gateKey !== lastGateKeyRef.current;
         let shouldRequest = gateChanged;
         if (!shouldRequest && prevRunner) {
-            const moved = haversineMeters(prevRunner, runnerLocation);
+            const moved = haversineMeters(prevRunner, safeRunner);
             shouldRequest =
                 moved >= minMoveM ||
                 now - lastDirectionsAtRef.current >= minIntervalMs;
@@ -347,14 +461,14 @@ function Map({
             return;
         }
         lastDirectionsAtRef.current = now;
-        lastDirectionsRunnerRef.current = runnerLocation;
+        lastDirectionsRunnerRef.current = safeRunner;
         lastGateKeyRef.current = gateKey;
 
         const directionsService = new window.google.maps.DirectionsService();
         directionsService.route(
             {
-                origin: runnerLocation,
-                destination: gateLocation,
+                origin: safeRunner,
+                destination: safeGate,
                 travelMode: window.google.maps.TravelMode.WALKING,
             },
             (result, status) => {
@@ -387,17 +501,7 @@ function Map({
                 }
             }
         );
-    }, [mapsStatus, runnerLocation, gateLocation]);
-
-    useEffect(() => {
-        return () => {
-            if (runnerMarker.current) runnerMarker.current.setMap(null);
-            if (gateMarker.current) gateMarker.current.setMap(null);
-            restaurantMarkers.current.forEach((marker) => marker.setMap(null));
-            if (directionsRenderer.current)
-                directionsRenderer.current.setMap(null);
-        };
-    }, []);
+    }, [mapsStatus, safeRunner, safeGate]);
 
     const diagnosticsBlock = (
         <MapsDevDiagnostics
@@ -507,7 +611,7 @@ function Map({
             <div
                 ref={mapRef}
                 style={containerStyle}
-                className="overflow-hidden rounded-2xl border border-slate-200 shadow-inner dark:border-slate-700"
+                className="min-h-[280px] w-full overflow-hidden rounded-2xl border border-slate-200 shadow-inner dark:border-slate-700"
             />
             {diagnosticsBlock}
         </div>

@@ -6,14 +6,18 @@ import {
     // notifyRunnerLocation,
 } from "./Notifications";
 import { trackingLog, trackingWarn } from "./trackingLog";
+import { getApiBaseUrl } from "./apiBaseUrl";
 
-// Use relative URL in production, localhost in development
-const backendUrl =
+/**
+ * Same host as API: set VITE_API_BASE_URL when the frontend is static on a different origin than the API (Render).
+ * Omit for same-origin builds (single service).
+ */
+const socketOrigin =
     import.meta.env.MODE === "production"
-        ? undefined // relative, same origin as frontend
+        ? getApiBaseUrl() || undefined
         : "http://localhost:8000";
 
-const socket = io(backendUrl, {
+const socket = io(socketOrigin, {
     transports: ["websocket", "polling"],
     withCredentials: true,
     reconnection: true,
@@ -39,6 +43,16 @@ if (import.meta.env.DEV) {
         trackingWarn(
             "socket.io reconnect stopped after max attempts — realtime unavailable"
         );
+    });
+} else {
+    socket.on("connect", () => {
+        console.info("[DineAir] socket connected", { id: socket.id });
+    });
+    socket.on("connect_error", (err) => {
+        console.warn("[DineAir] socket connect_error", {
+            message: err?.message || String(err),
+            url: socketOrigin ?? "(same-origin)",
+        });
     });
 }
 

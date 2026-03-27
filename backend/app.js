@@ -20,19 +20,37 @@ app.use(morgan("dev"));
 app.use(cookieParser());
 app.use(express.json());
 
-// Security Middleware
-if (!isProduction) {
-    // enable cors only in development
+const defaultFrontendOrigins = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "http://localhost:5174",
+    "http://127.0.0.1:5174",
+    "http://localhost:5175",
+    "http://127.0.0.1:5175",
+    "https://dineair.onrender.com",
+];
+
+function parseFrontendOrigins() {
+    const fromEnv = process.env.FRONTEND_URLS
+        ? process.env.FRONTEND_URLS.split(",")
+              .map((s) => s.trim())
+              .filter(Boolean)
+        : [];
+    return fromEnv.length ? fromEnv : defaultFrontendOrigins;
+}
+
+// CORS: required when the SPA and API are on different origins (e.g. two Render services).
+if (isProduction) {
     app.use(
         cors({
-            origin: [
-                "http://localhost:5173",
-                "http://127.0.0.1:5173",
-                "http://localhost:5174",
-                "http://127.0.0.1:5174",
-                "http://localhost:5175",
-                "http://127.0.0.1:5175",
-            ],
+            origin: parseFrontendOrigins(),
+            credentials: true,
+        })
+    );
+} else {
+    app.use(
+        cors({
+            origin: defaultFrontendOrigins.filter((o) => o.startsWith("http://")),
             credentials: true,
         })
     );
