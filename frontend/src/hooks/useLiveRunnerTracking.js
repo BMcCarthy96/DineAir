@@ -55,6 +55,25 @@ export function useLiveRunnerTracking({
         runnerMapProgress < 0.02;
 
     useEffect(() => {
+        if (!import.meta.env.DEV || orderId == null) return;
+        trackingLog("runner movement mode", {
+            orderId,
+            orderStatus,
+            orderDbStatus,
+            runnerMapProgress: Number(runnerMapProgress.toFixed(3)),
+            travelActive,
+            socketDrivesPosition,
+        });
+    }, [
+        orderId,
+        orderStatus,
+        orderDbStatus,
+        runnerMapProgress,
+        travelActive,
+        socketDrivesPosition,
+    ]);
+
+    useEffect(() => {
         if (orderId == null) {
             setConnectionMode("fallback");
             return;
@@ -72,7 +91,7 @@ export function useLiveRunnerTracking({
 
     /** Socket subscription — single effect, named handlers, full cleanup (incl. socket.once leak). */
     useEffect(() => {
-        if (!orderId || !socket || !restaurantLocation || !gateLocation) {
+        if (orderId == null || !socket || !restaurantLocation || !gateLocation) {
             return undefined;
         }
 
@@ -218,7 +237,17 @@ export function useLiveRunnerTracking({
         const lng = r.lng + (g.lng - r.lng) * p;
         if (!Number.isFinite(lat) || !Number.isFinite(lng)) return;
         targetRef.current = { lat, lng };
+        if (import.meta.env.DEV) {
+            trackingLog("runner path interpolation", {
+                orderId,
+                t: Number(runnerMapProgress.toFixed(3)),
+                easedT: Number(p.toFixed(3)),
+                lat: Number(lat.toFixed(5)),
+                lng: Number(lng.toFixed(5)),
+            });
+        }
     }, [
+        orderId,
         runnerMapProgress,
         restaurantLocation,
         gateLocation,
