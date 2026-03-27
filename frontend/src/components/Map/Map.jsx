@@ -192,6 +192,13 @@ function Map({
         () => normalizeLatLng(restaurantLocation),
         [restaurantLocation]
     );
+    useEffect(() => {
+        if (!import.meta.env.DEV) return;
+        devLogMaps("info", "runnerLocation prop", {
+            raw: runnerLocation,
+            normalized: safeRunner,
+        });
+    }, [runnerLocation, safeRunner]);
 
     const center = useMemo(
         () => safeRunner || safeGate || safeRestaurant || DEFAULT_CENTER,
@@ -369,6 +376,9 @@ function Map({
         }
         if (runnerMarker.current) {
             runnerMarker.current.setPosition(safeRunner);
+            if (import.meta.env.DEV) {
+                devLogMaps("info", "runner marker setPosition", safeRunner);
+            }
         } else {
             runnerMarker.current = new window.google.maps.Marker({
                 map: mapInstance.current,
@@ -379,6 +389,9 @@ function Map({
                     fontSize: "24px",
                 },
             });
+            if (import.meta.env.DEV) {
+                devLogMaps("info", "runner marker created", safeRunner);
+            }
         }
         if (isRunnerView) {
             mapInstance.current.setCenter(safeRunner);

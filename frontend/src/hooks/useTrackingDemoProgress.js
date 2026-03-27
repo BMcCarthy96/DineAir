@@ -13,6 +13,8 @@ const PHASE_MS = {
     preparing: 12_000,
     on_the_way: 22_000,
 };
+const TOTAL_DEMO_MS = PHASE_MS.pending + PHASE_MS.preparing + PHASE_MS.on_the_way;
+const STALE_ANCHOR_RESET_MS = TOTAL_DEMO_MS + 15_000;
 
 /**
  * Numeric ordering for merging demo timeline with API/socket status.
@@ -96,6 +98,16 @@ function readOrInitAnchor(orderId) {
     }
 }
 
+function writeAnchor(orderId, startedAt) {
+    if (orderId == null || orderId === "") return;
+    const key = STORAGE_KEY_PREFIX + String(orderId);
+    try {
+        sessionStorage.setItem(key, JSON.stringify({ startedAt }));
+    } catch {
+        // ignore storage write failures
+    }
+}
+
 /**
  * Portfolio demo: advances order phase over time so the timeline and runner match without DB writes.
  * Merges with API/socket status using the more advanced phase.
@@ -105,6 +117,7 @@ function readOrInitAnchor(orderId) {
  */
 export function useTrackingDemoProgress(orderId, serverStatus) {
     const [tick, setTick] = useState(0);
+    const [anchorVersion, setAnchorVersion] = useState(0);
 
     useEffect(() => {
         if (orderId == null) return undefined;
@@ -112,9 +125,33 @@ export function useTrackingDemoProgress(orderId, serverStatus) {
         return () => clearInterval(id);
     }, [orderId]);
 
-    const startedAt = useMemo(() => readOrInitAnchor(orderId), [orderId]);
+    const startedAt = useMemo(
+        () => readOrInitAnchor(orderId),
+        [orderId, anchorVersion]
+    );
 
     const normalizedServer = normalizeServerStatus(serverStatus);
+
+    useEffect(() => {
+        if (orderId == null || startedAt == null) return;
+        const elapsed = Math.max(0, Date.now() - startedAt);
+        const serverDelivered = normalizedServer === "delivered";
+        // Production/demo-friendly: stale anchors from prior visits should not skip movement forever.
+        if (!serverDelivered && elapsed > STALE_ANCHOR_RESET_MS) {
+            const now = Date.now();
+            writeAnchor(orderId, now);
+            setAnchorVersion((n) => n + 1);
+            if (import.meta.env.DEV) {
+                trackingLog("demo anchor auto-reset", {
+                    orderId,
+                    oldStartedAt: startedAt,
+                    newStartedAt: now,
+                    elapsedMs: elapsed,
+                    totalDemoMs: TOTAL_DEMO_MS,
+                });
+            }
+        }
+    }, [orderId, startedAt, normalizedServer]);
 
     /**
      * One clock snapshot per `tick` for demo phase + merge (avoids nested memo staleness).
@@ -160,6 +197,7 @@ export function useTrackingDemoProgress(orderId, serverStatus) {
         if (!import.meta.env.DEV || orderId == null) return;
         trackingLog("demo timeline tick", {
             orderId,
+            startedAt,
             elapsedMs,
             serverStatus: normalizedServer,
             demoStatus,
@@ -169,6 +207,7 @@ export function useTrackingDemoProgress(orderId, serverStatus) {
         });
     }, [
         orderId,
+        startedAt,
         elapsedMs,
         normalizedServer,
         demoStatus,

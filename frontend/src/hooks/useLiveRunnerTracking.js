@@ -7,6 +7,7 @@ import { trackingLog, trackingWarn } from "../utils/trackingLog";
 const DISPLAY_FLUSH_MS = 90;
 /** If no meaningful socket coordinate update in this window, demo movement takes over. */
 const SOCKET_STALE_MS = 3000;
+const SOCKET_MEANINGFUL_MOVE_M = 2.5;
 
 function easePathT(t) {
     const c = Math.min(1, Math.max(0, t));
@@ -45,7 +46,8 @@ export function useLiveRunnerTracking({
     const joinedRef = useRef(false);
     /** Coalesce noisy GPS / duplicate socket payloads */
     const lastSocketSampleRef = useRef(null);
-    const lastSocketSampleAtRef = useRef(0);
+    const lastSocketSeenAtRef = useRef(0);
+    const lastSocketMeaningfulAtRef = useRef(0);
 
     const travelActive =
         orderStatus === "picked_up" || orderStatus === "on_the_way";
@@ -56,11 +58,15 @@ export function useLiveRunnerTracking({
         isDbTravelStatus(orderDbStatus) &&
         runnerMapProgress < 0.02;
     const socketMsSinceLast =
-        lastSocketSampleAtRef.current > 0
-            ? Date.now() - lastSocketSampleAtRef.current
+        lastSocketMeaningfulAtRef.current > 0
+            ? Date.now() - lastSocketMeaningfulAtRef.current
             : Number.POSITIVE_INFINITY;
     const socketHealthy = socketDrivesPosition && socketMsSinceLast <= SOCKET_STALE_MS;
     const movementSource = socketHealthy ? "socket" : "demo";
+    const socketMsSinceSeen =
+        lastSocketSeenAtRef.current > 0
+            ? Date.now() - lastSocketSeenAtRef.current
+            : Number.POSITIVE_INFINITY;
 
     useEffect(() => {
         if (!import.meta.env.DEV || orderId == null) return;
@@ -73,9 +79,13 @@ export function useLiveRunnerTracking({
             socketDrivesPosition,
             socketHealthy,
             movementSource,
-            lastSocketUpdateMsAgo:
+            lastSocketMeaningfulMsAgo:
                 Number.isFinite(socketMsSinceLast) && socketMsSinceLast < 1e9
                     ? Math.round(socketMsSinceLast)
+                    : null,
+            lastSocketSeenMsAgo:
+                Number.isFinite(socketMsSinceSeen) && socketMsSinceSeen < 1e9
+                    ? Math.round(socketMsSinceSeen)
                     : null,
         });
     }, [
@@ -88,6 +98,7 @@ export function useLiveRunnerTracking({
         socketHealthy,
         movementSource,
         socketMsSinceLast,
+        socketMsSinceSeen,
     ]);
 
     useEffect(() => {
@@ -133,21 +144,36 @@ export function useLiveRunnerTracking({
             const next = normalizeLatLng(payload.location);
             if (!next) return;
             const now = Date.now();
+            lastSocketSeenAtRef.current = now;
             const prev = lastSocketSampleRef.current;
+            let movedMeters = Number.POSITIVE_INFINITY;
             if (prev) {
-                const d = haversineMeters(prev, next);
-                if (d < 2.5 && now - lastSocketSampleAtRef.current < 900) {
+                movedMeters = haversineMeters(prev, next);
+                // Repeated stale samples should not keep socket in control.
+                if (movedMeters < SOCKET_MEANINGFUL_MOVE_M) {
+                    trackingLog("socket sample stale — demo fallback eligible", {
+                        orderId,
+                        movedMeters: Number(movedMeters.toFixed(2)),
+                        msSinceMeaningful:
+                            lastSocketMeaningfulAtRef.current > 0
+                                ? now - lastSocketMeaningfulAtRef.current
+                                : null,
+                    });
                     return;
                 }
             }
             lastSocketSampleRef.current = next;
-            lastSocketSampleAtRef.current = now;
+            lastSocketMeaningfulAtRef.current = now;
             targetRef.current = next;
             trackingLog("runner coordinates", {
                 orderId,
                 source: payload.source,
                 lat: next.lat.toFixed(5),
                 lng: next.lng.toFixed(5),
+                movedMeters:
+                    Number.isFinite(movedMeters) && movedMeters < 1e8
+                        ? Number(movedMeters.toFixed(2))
+                        : null,
             });
         };
 
@@ -270,6 +296,16 @@ export function useLiveRunnerTracking({
         gateLocation,
         socketHealthy,
     ]);
+
+    useEffect(() => {
+        if (!import.meta.env.DEV || orderId == null || !displayedLocation) return;
+        trackingLog("runnerLocation emitted to map", {
+            orderId,
+            source: movementSource,
+            lat: Number(displayedLocation.lat.toFixed(5)),
+            lng: Number(displayedLocation.lng.toFixed(5)),
+        });
+    }, [orderId, displayedLocation, movementSource]);
 
     /** Delivered: ensure gate snap if progress math ever lags. */
     useEffect(() => {
