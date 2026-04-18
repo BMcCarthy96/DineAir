@@ -225,18 +225,23 @@ export function useLiveRunnerTracking({
         let lastFlush = performance.now();
 
         const step = () => {
-            const target = targetRef.current;
+            const target = normalizeLatLng(targetRef.current);
             if (target) {
                 const prev = displayedRef.current;
                 if (!prev) {
                     displayedRef.current = { ...target };
                 } else {
-                    const d = haversineMeters(prev, target);
-                    if (d < 1.2) {
+                    const prevSafe = normalizeLatLng(prev);
+                    if (!prevSafe) {
                         displayedRef.current = { ...target };
                     } else {
-                        const blend = Math.min(0.2, Math.max(0.05, d / 380));
-                        displayedRef.current = lerpLatLng(prev, target, blend);
+                        const d = haversineMeters(prevSafe, target);
+                        if (d < 1.2) {
+                            displayedRef.current = { ...target };
+                        } else {
+                            const blend = Math.min(0.2, Math.max(0.05, d / 380));
+                            displayedRef.current = lerpLatLng(prevSafe, target, blend);
+                        }
                     }
                 }
             }

@@ -14,9 +14,11 @@ logViteEnvInDevelopment();
 
 const store = configureStore();
 
-if (import.meta.env.MODE !== 'production') {
-  restoreCSRF();
+// Always fetch a fresh CSRF token so POST mutations work in all environments.
+// In production the HTML route sets XSRF-TOKEN, but browser cache can skip that.
+restoreCSRF();
 
+if (import.meta.env.MODE !== 'production') {
   window.csrfFetch = csrfFetch;
   window.store = store;
   window.sessionActions = sessionActions;

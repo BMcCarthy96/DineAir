@@ -4,6 +4,7 @@ import { createBrowserRouter, RouterProvider, Outlet } from "react-router-dom";
 import Navigation from "./components/Navigation";
 import PageLoader from "./components/PageLoader";
 import * as sessionActions from "./store/session";
+import { csrfFetch } from "./store/csrf";
 import { io } from "socket.io-client";
 import { notifyGateChange } from "./utils/Notifications";
 import "./utils/WebSocket";
@@ -60,9 +61,13 @@ function Layout() {
     const sessionUser = useSelector((state) => state.session.user);
 
     useEffect(() => {
-        dispatch(sessionActions.restoreUser()).then(() => {
-            setIsLoaded(true);
-        });
+        csrfFetch("/api/csrf/restore")
+            .catch(() => {})
+            .finally(() => {
+                dispatch(sessionActions.restoreUser()).then(() => {
+                    setIsLoaded(true);
+                });
+            });
     }, [dispatch]);
 
     return (

@@ -5,6 +5,7 @@
  */
 export function normalizeLatLng(input) {
     if (input == null || typeof input !== "object") return null;
+    if (!("lat" in input) || !("lng" in input)) return null;
     const lat = Number(input.lat);
     const lng = Number(input.lng);
     if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;

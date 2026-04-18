@@ -91,6 +91,23 @@ function Map({
     restaurants = [],
     isRunnerView = false,
 }) {
+    const prodWarnedShapeRef = useRef(new Set());
+    const prodInfoOnceRef = useRef(new Set());
+    const warnInvalidOnce = (tag, payload) => {
+        if (!import.meta.env.PROD) return;
+        const key = `${tag}:${JSON.stringify(payload)}`;
+        if (prodWarnedShapeRef.current.has(key)) return;
+        prodWarnedShapeRef.current.add(key);
+        console.warn(`[DineAir Maps] ${tag}`, payload);
+    };
+    const infoOnce = (tag, payload) => {
+        if (!import.meta.env.PROD) return;
+        const key = `${tag}:${JSON.stringify(payload)}`;
+        if (prodInfoOnceRef.current.has(key)) return;
+        prodInfoOnceRef.current.add(key);
+        console.info(`[DineAir Maps] ${tag}`, payload);
+    };
+
     const mapRef = useRef(null);
     const mapInstance = useRef(null);
     const runnerMarker = useRef(null);
@@ -199,11 +216,45 @@ function Map({
             normalized: safeRunner,
         });
     }, [runnerLocation, safeRunner]);
+    useEffect(() => {
+        if (import.meta.env.DEV) return;
+        if (runnerLocation && !safeRunner) {
+            warnInvalidOnce("invalid runnerLocation", { raw: runnerLocation });
+        }
+        if (gateLocation && !safeGate) {
+            warnInvalidOnce("invalid gateLocation", { raw: gateLocation });
+        }
+        if (restaurantLocation && !safeRestaurant) {
+            warnInvalidOnce("invalid restaurantLocation", {
+                raw: restaurantLocation,
+            });
+        }
+    }, [
+        runnerLocation,
+        gateLocation,
+        restaurantLocation,
+        safeRunner,
+        safeGate,
+        safeRestaurant,
+    ]);
 
     const center = useMemo(
         () => safeRunner || safeGate || safeRestaurant || DEFAULT_CENTER,
         [safeRunner, safeGate, safeRestaurant]
     );
+    useEffect(() => {
+        if (!import.meta.env.PROD) return;
+        infoOnce("chosen center", {
+            source: safeRunner
+                ? "runner"
+                : safeGate
+                  ? "gate"
+                  : safeRestaurant
+                    ? "restaurant"
+                    : "fallback",
+            center,
+        });
+    }, [safeRunner, safeGate, safeRestaurant, center]);
     const fallbackCenterWarnedRef = useRef(false);
     useEffect(() => {
         const noLiveCenter = !safeRunner && !safeGate && !safeRestaurant;
@@ -260,7 +311,7 @@ function Map({
             return undefined;
         }
 
-        const initialCenter = centerRef.current;
+        const initialCenter = normalizeLatLng(centerRef.current) || DEFAULT_CENTER;
 
         try {
             mapInstance.current = new window.google.maps.Map(mapRef.current, {
@@ -282,14 +333,14 @@ function Map({
                 const m = mapInstance.current;
                 if (!m || !window.google?.maps?.event) return;
                 window.google.maps.event.trigger(m, "resize");
-                const c = centerRef.current;
-                if (
-                    c &&
-                    Number.isFinite(c.lat) &&
-                    Number.isFinite(c.lng)
-                ) {
-                    m.setCenter(c);
+                const c = normalizeLatLng(centerRef.current);
+                if (!c) {
+                    warnInvalidOnce("setCenter skipped (invalid derived center)", {
+                        derivedCenter: centerRef.current,
+                    });
+                    return;
                 }
+                m.setCenter(c);
             };
 
             requestAnimationFrame(() => {
@@ -355,10 +406,9 @@ function Map({
     // Recenter when locations appear (first real center beats default)
     useEffect(() => {
         if (!mapInstance.current || mapsStatus !== "ready") return;
-        const next = safeRunner || safeGate || safeRestaurant;
-        if (next) {
-            mapInstance.current.setCenter(next);
-        }
+        const next = normalizeLatLng(safeRunner || safeGate || safeRestaurant);
+        if (!next) return;
+        mapInstance.current.setCenter(next);
     }, [mapsStatus, safeRunner, safeGate, safeRestaurant]);
 
     /** After center changes (or when markers appear), nudge tile redraw — fixes gray map when layout/center updates post-init. */
@@ -375,14 +425,26 @@ function Map({
             return;
         }
         if (runnerMarker.current) {
-            runnerMarker.current.setPosition(safeRunner);
+            const pos = normalizeLatLng(safeRunner);
+            if (!pos) {
+                warnInvalidOnce("runner marker setPosition skipped", {
+                    safeRunner,
+                });
+                return;
+            }
+            runnerMarker.current.setPosition(pos);
             if (import.meta.env.DEV) {
                 devLogMaps("info", "runner marker setPosition", safeRunner);
             }
         } else {
+            const pos = normalizeLatLng(safeRunner);
+            if (!pos) {
+                warnInvalidOnce("runner marker creation skipped", { safeRunner });
+                return;
+            }
             runnerMarker.current = new window.google.maps.Marker({
                 map: mapInstance.current,
-                position: safeRunner,
+                position: pos,
                 title: "Runner",
                 label: {
                     text: "🏃‍♂️",
@@ -404,9 +466,14 @@ function Map({
             return;
         }
         if (!gateMarker.current) {
+            const pos = normalizeLatLng(safeGate);
+            if (!pos) {
+                warnInvalidOnce("gate marker creation skipped", { safeGate });
+                return;
+            }
             gateMarker.current = new window.google.maps.Marker({
                 map: mapInstance.current,
-                position: safeGate,
+                position: pos,
                 title: "Gate",
                 label: {
                     text: "📍",
@@ -414,7 +481,12 @@ function Map({
                 },
             });
         } else {
-            gateMarker.current.setPosition(safeGate);
+            const pos = normalizeLatLng(safeGate);
+            if (!pos) {
+                warnInvalidOnce("gate marker setPosition skipped", { safeGate });
+                return;
+            }
+            gateMarker.current.setPosition(pos);
         }
     }, [mapsStatus, safeGate]);
 
@@ -499,14 +571,28 @@ function Map({
             return;
         }
         lastDirectionsAtRef.current = now;
-        lastDirectionsRunnerRef.current = safeRunner;
+        lastDirectionsRunnerRef.current = normalizeLatLng(safeRunner);
         lastGateKeyRef.current = gateKey;
+        const origin = normalizeLatLng(safeRunner);
+        const destination = normalizeLatLng(safeGate);
+        if (!origin || !destination) {
+            warnInvalidOnce("Directions route skipped (invalid origin/destination)", {
+                originRaw: runnerLocation,
+                destinationRaw: gateLocation,
+                originNormalized: origin,
+                destinationNormalized: destination,
+            });
+            return;
+        }
+        if (import.meta.env.PROD) {
+            infoOnce("Directions inputs", { origin, destination });
+        }
 
         const directionsService = new window.google.maps.DirectionsService();
         directionsService.route(
             {
-                origin: safeRunner,
-                destination: safeGate,
+                origin,
+                destination,
                 travelMode: window.google.maps.TravelMode.WALKING,
             },
             (result, status) => {
