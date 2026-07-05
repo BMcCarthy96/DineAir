@@ -154,37 +154,35 @@ function RestaurantDetails() {
                 <SmartImage
                     src={restaurant.imageUrl}
                     alt=""
-                    className="absolute inset-0 h-full w-full"
+                    className="h-64 w-full sm:h-80"
                 />
                 <div
-                    className="relative min-h-[280px]"
+                    className="absolute inset-0 flex flex-col justify-end px-6 py-10 sm:px-10"
                     style={{
                         background:
                             "linear-gradient(to top, rgba(6,9,19,0.9), rgba(6,9,19,0.25))",
                     }}
                 >
-                    <div className="flex min-h-[280px] flex-col justify-end px-6 py-10 sm:px-10">
-                        <div className="flex flex-wrap items-center gap-3">
-                            <h1 className="font-display text-3xl font-bold tracking-tight text-white sm:text-4xl">
-                                {restaurant.name}
-                            </h1>
-                            <span className="flex items-center gap-1 rounded-lg bg-white/15 px-2.5 py-1 text-sm font-semibold text-white backdrop-blur-sm">
-                                <FaStar className="text-brand-400" aria-hidden />
-                                {rating}
-                            </span>
-                        </div>
-                        <p className="mt-3 max-w-2xl text-lg text-white/90">
-                            {restaurant.description}
-                        </p>
-                        <div className="mt-4 flex flex-wrap gap-2 text-sm font-medium text-white/85">
-                            <span className="rounded-md border border-white/20 bg-black/20 px-3 py-1 font-mono text-xs uppercase tracking-widest backdrop-blur-sm">
-                                Terminal {restaurant.terminal} · Gate{" "}
-                                {restaurant.gate}
-                            </span>
-                            <span className="rounded-lg bg-white/15 px-3 py-1 backdrop-blur-sm">
-                                {restaurant.cuisineType}
-                            </span>
-                        </div>
+                    <div className="flex flex-wrap items-center gap-3">
+                        <h1 className="font-display text-3xl font-bold tracking-tight text-white sm:text-4xl">
+                            {restaurant.name}
+                        </h1>
+                        <span className="flex items-center gap-1 rounded-lg bg-white/15 px-2.5 py-1 text-sm font-semibold text-white backdrop-blur-sm">
+                            <FaStar className="text-brand-400" aria-hidden />
+                            {rating}
+                        </span>
+                    </div>
+                    <p className="mt-3 max-w-2xl text-lg text-white/90">
+                        {restaurant.description}
+                    </p>
+                    <div className="mt-4 flex flex-wrap gap-2 text-sm font-medium text-white/85">
+                        <span className="rounded-md border border-white/20 bg-black/20 px-3 py-1 font-mono text-xs uppercase tracking-widest backdrop-blur-sm">
+                            Terminal {restaurant.terminal} · Gate{" "}
+                            {restaurant.gate}
+                        </span>
+                        <span className="rounded-lg bg-white/15 px-3 py-1 backdrop-blur-sm">
+                            {restaurant.cuisineType}
+                        </span>
                     </div>
                 </div>
             </header>
