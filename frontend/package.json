@@ -14,6 +14,7 @@
     "@fontsource-variable/inter": "^5.2.8",
     "@fontsource-variable/space-grotesk": "^5.2.10",
     "@fontsource/ibm-plex-mono": "^5.2.7",
+    "canvas-confetti": "^1.9.4",
     "framer-motion": "^12.23.3",
     "js-cookie": "^3.0.5",
     "react": "^18.2.0",

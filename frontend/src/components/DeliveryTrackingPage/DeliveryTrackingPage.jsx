@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import confetti from "canvas-confetti";
 import { trackingLog } from "../../utils/trackingLog";
 import Map from "../Map/Map";
 import RunnerETA from "../RunnerETA/RunnerETA";
@@ -53,6 +54,35 @@ function DeliveryTrackingPage() {
             orderTrackingGets: effectiveStatus,
         });
     }, [orderDbStatus, demoStatus, effectiveStatus, uiOrderStatus]);
+
+    const hasCelebratedRef = useRef(false);
+
+    useEffect(() => {
+        if (effectiveStatus !== "delivered" || hasCelebratedRef.current) return;
+        hasCelebratedRef.current = true;
+        const colors = ["#d97706", "#f59e0b", "#fbbf24", "#22c55e"];
+        confetti({
+            particleCount: 140,
+            spread: 90,
+            startVelocity: 45,
+            origin: { y: 0.6 },
+            colors,
+        });
+        confetti({
+            particleCount: 60,
+            angle: 60,
+            spread: 70,
+            origin: { x: 0, y: 0.7 },
+            colors,
+        });
+        confetti({
+            particleCount: 60,
+            angle: 120,
+            spread: 70,
+            origin: { x: 1, y: 0.7 },
+            colors,
+        });
+    }, [effectiveStatus]);
 
     const { runnerLocation, connectionMode, isLive } = useLiveRunnerTracking({
         orderId,
@@ -198,9 +228,9 @@ function DeliveryTrackingPage() {
                         aria-live="polite"
                     >
                         {isLive ? (
-                            <span className="inline-flex items-center gap-1.5 rounded-full bg-brand-600/10 px-3 py-1 text-brand-800 dark:bg-brand-500/15 dark:text-brand-200">
+                            <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-600/10 px-3 py-1 text-emerald-800 dark:bg-emerald-500/15 dark:text-emerald-200">
                                 <span
-                                    className="h-2 w-2 animate-pulse rounded-full bg-brand-600 dark:bg-brand-400"
+                                    className="h-2 w-2 animate-pulse rounded-full bg-emerald-600 dark:bg-emerald-400"
                                     aria-hidden
                                 />
                                 Live
