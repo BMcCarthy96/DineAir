@@ -99,6 +99,34 @@ function DeliveryTrackingPage() {
         fetchOrder();
     }, []);
 
+    /**
+     * Fallback safety net alongside the socket push: if a redeploy, reconnect gap, or any
+     * other dropped event leaves the live update unreceived, this catches the page up within
+     * a few seconds instead of requiring a manual refresh.
+     */
+    useEffect(() => {
+        if (orderId == null || orderDbStatus === "delivered") return undefined;
+        let cancelled = false;
+        const poll = async () => {
+            try {
+                const res = await apiFetch("/api/orders/current");
+                if (!cancelled && res.ok) {
+                    const data = await res.json();
+                    if (data.id === orderId && data.status) {
+                        setOrderDbStatus(data.status);
+                    }
+                }
+            } catch {
+                // Socket push remains the primary path; just wait for the next tick.
+            }
+        };
+        const intervalId = setInterval(poll, 5000);
+        return () => {
+            cancelled = true;
+            clearInterval(intervalId);
+        };
+    }, [orderId, orderDbStatus]);
+
     useEffect(() => {
         async function fetchFlightInfo() {
             try {
