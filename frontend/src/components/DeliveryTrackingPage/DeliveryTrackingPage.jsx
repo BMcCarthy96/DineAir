@@ -10,20 +10,10 @@ import socket from "../../utils/WebSocket";
 import { gateCoordinates } from "../../utils/gateCoordinates";
 import { apiFetch } from "../../utils/apiFetch";
 import { normalizeLatLng } from "../../utils/coordinates";
+import { orderStatusLabel } from "../../utils/orderStatusLabel";
 import { FaLocationDot } from "react-icons/fa6";
 import { useLiveRunnerTracking } from "../../hooks/useLiveRunnerTracking";
 import { useTrackingDemoProgress } from "../../hooks/useTrackingDemoProgress";
-
-function dbStatusToUiLabel(status) {
-    const m = {
-        pending: "Order Received",
-        preparing: "Preparing",
-        picked_up: "On the Way",
-        on_the_way: "On the Way",
-        delivered: "Delivered",
-    };
-    return m[status] ?? "Order Received";
-}
 
 function DeliveryTrackingPage() {
     const [gateLocation, setGateLocation] = useState(null);
@@ -42,7 +32,7 @@ function DeliveryTrackingPage() {
         useTrackingDemoProgress(orderId, orderDbStatus);
 
     /** Derived each render from effectiveStatus only (no separate memoized label state). */
-    const uiOrderStatus = dbStatusToUiLabel(effectiveStatus);
+    const uiOrderStatus = orderStatusLabel(effectiveStatus);
 
     useEffect(() => {
         if (!import.meta.env.DEV) return;
@@ -61,27 +51,36 @@ function DeliveryTrackingPage() {
         if (effectiveStatus !== "delivered" || hasCelebratedRef.current) return;
         hasCelebratedRef.current = true;
         const colors = ["#d97706", "#f59e0b", "#fbbf24", "#22c55e"];
-        confetti({
-            particleCount: 140,
-            spread: 90,
-            startVelocity: 45,
-            origin: { y: 0.6 },
-            colors,
-        });
-        confetti({
-            particleCount: 60,
-            angle: 60,
-            spread: 70,
-            origin: { x: 0, y: 0.7 },
-            colors,
-        });
-        confetti({
-            particleCount: 60,
-            angle: 120,
-            spread: 70,
-            origin: { x: 1, y: 0.7 },
-            colors,
-        });
+        const fire = () => {
+            confetti({
+                particleCount: 140,
+                spread: 90,
+                startVelocity: 45,
+                ticks: 300,
+                origin: { y: 0.6 },
+                colors,
+            });
+            confetti({
+                particleCount: 60,
+                angle: 60,
+                spread: 70,
+                ticks: 300,
+                origin: { x: 0, y: 0.7 },
+                colors,
+            });
+            confetti({
+                particleCount: 60,
+                angle: 120,
+                spread: 70,
+                ticks: 300,
+                origin: { x: 1, y: 0.7 },
+                colors,
+            });
+        };
+        // Two staggered waves so the celebration is longer and harder to miss.
+        fire();
+        const secondWave = setTimeout(fire, 400);
+        return () => clearTimeout(secondWave);
     }, [effectiveStatus]);
 
     const { runnerLocation, connectionMode, isLive } = useLiveRunnerTracking({

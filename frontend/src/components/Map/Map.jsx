@@ -403,21 +403,88 @@ function Map({
         }
     }, [mapsStatus]);
 
-    // Recenter when locations appear (first real center beats default)
+    // Recenter when locations appear (first real center beats default). Only the runner's
+    // own view tightly follows their live position — the customer overview map instead uses
+    // fitBounds below so the whole restaurant→gate path stays visible as the runner moves.
     useEffect(() => {
-        if (!mapInstance.current || mapsStatus !== "ready") return;
+        if (!isRunnerView || !mapInstance.current || mapsStatus !== "ready") {
+            return;
+        }
         const next = normalizeLatLng(safeRunner || safeGate || safeRestaurant);
         if (!next) return;
         mapInstance.current.setCenter(next);
-    }, [mapsStatus, safeRunner, safeGate, safeRestaurant]);
+    }, [isRunnerView, mapsStatus, safeRunner, safeGate, safeRestaurant]);
 
-    /** After center changes (or when markers appear), nudge tile redraw — fixes gray map when layout/center updates post-init. */
+    /**
+     * Customer overview map: fit both restaurant and gate in view once they're known, instead
+     * of a fixed zoom that only shows a tight radius around the runner. Refits if the gate
+     * changes, but not on every runner tick, so the view stays stable as the runner moves.
+     */
+    const boundsFittedKeyRef = useRef("");
     useEffect(() => {
-        if (mapsStatus !== "ready" || !mapInstance.current) return;
+        if (isRunnerView || mapsStatus !== "ready" || !mapInstance.current) {
+            return undefined;
+        }
+        if (!safeRestaurant || !safeGate || !window.google?.maps?.LatLngBounds) {
+            return undefined;
+        }
+        const key = `${safeRestaurant.lat},${safeRestaurant.lng}|${safeGate.lat},${safeGate.lng}`;
+        if (boundsFittedKeyRef.current === key) return undefined;
+        boundsFittedKeyRef.current = key;
+
+        const applyBounds = () => {
+            const map = mapInstance.current;
+            if (!map || !window.google?.maps?.event) return;
+            // The map's own init resize schedule (above) recenters on the runner at 120ms/450ms
+            // after creation, and fitBounds against a not-yet-laid-out container mispositions
+            // markers — so trigger a fresh resize and run this after that schedule settles,
+            // ensuring this fit (not that recenter) determines the final view.
+            window.google.maps.event.trigger(map, "resize");
+            const bounds = new window.google.maps.LatLngBounds();
+            bounds.extend(safeRestaurant);
+            bounds.extend(safeGate);
+            // fitBounds zooms in as tight as the two points allow, which over-zooms when the
+            // restaurant and gate happen to be close together. Cap it so the view always keeps
+            // some walkable context instead of framing the runner too tightly. Wait for "idle"
+            // (not "bounds_changed", which can also fire mid-animation) so this reads the final
+            // settled zoom/center rather than an in-flight one.
+            window.google.maps.event.addListenerOnce(map, "idle", () => {
+                if (map.getZoom() > 14) map.setZoom(14);
+                // The runner marker self-heals against the new view via its own continuous
+                // position updates; static markers don't get touched again otherwise, so
+                // nudge them to reproject against the now-settled map.
+                if (gateMarker.current) {
+                    gateMarker.current.setPosition(gateMarker.current.getPosition());
+                }
+                if (restaurantMarkers.current.length > 0) {
+                    restaurantMarkers.current.forEach((marker) =>
+                        marker.setPosition(marker.getPosition())
+                    );
+                }
+            });
+            map.fitBounds(bounds, 64);
+        };
+        const t = setTimeout(applyBounds, 550);
+        return () => clearTimeout(t);
+    }, [isRunnerView, mapsStatus, safeRestaurant, safeGate]);
+
+    /**
+     * After center changes (or when markers appear), nudge tile redraw — fixes gray map when
+     * layout/center updates post-init. Only needed for the runner's own tightly-following view:
+     * on the customer overview map this fired on every runner tick and fought fitBounds' one-time
+     * framing, progressively desyncing the marker projection from the visible viewport the longer
+     * an order ran (each resize-without-a-settled-recenter drifted it a little further).
+     */
+    useEffect(() => {
+        if (!isRunnerView || mapsStatus !== "ready" || !mapInstance.current) {
+            return;
+        }
         if (!window.google?.maps?.event) return;
         const m = mapInstance.current;
         window.google.maps.event.trigger(m, "resize");
-    }, [mapsStatus, center.lat, center.lng]);
+        const current = m.getCenter();
+        if (current) m.setCenter(current);
+    }, [isRunnerView, mapsStatus, center.lat, center.lng]);
 
     // Runner marker (update position in place for smooth tracking)
     useEffect(() => {

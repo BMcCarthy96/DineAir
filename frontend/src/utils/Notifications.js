@@ -1,4 +1,5 @@
 import { toast } from "react-toastify";
+import { orderStatusLabel } from "./orderStatusLabel";
 
 export const notifyGateChange = (gate, terminal) => {
     toast.info(`Gate updated to ${gate} (Terminal ${terminal})`, {
@@ -16,9 +17,11 @@ let lastStatus = null;
 
 export const notifyOrderStatus = (status) => {
     if (status !== lastStatus) {
-        toast.success(`Order status: ${status}`, {
-            position: "top-center",
-        });
+        const message =
+            status === "delivered"
+                ? "🎉 Delivered! Enjoy your meal."
+                : `Order status: ${orderStatusLabel(status)}`;
+        toast.success(message, { position: "top-center" });
         lastStatus = status;
     }
 };
