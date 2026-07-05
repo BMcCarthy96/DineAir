@@ -16,7 +16,7 @@
     }
 
     body.dark {
-        @apply bg-slate-950 text-slate-100;
+        @apply bg-night-950 text-slate-100;
     }
 
     body.light ::selection {
@@ -24,7 +24,14 @@
     }
 
     body.dark ::selection {
-        @apply bg-brand-800 text-white;
+        @apply bg-brand-500/40 text-white;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4 {
+        @apply font-display;
     }
 }
 
@@ -34,7 +41,7 @@
     }
 
     body.dark .da-input {
-        @apply border-slate-700 bg-slate-900 text-slate-100 placeholder:text-slate-500 focus:border-brand-400 focus:ring-brand-400/20;
+        @apply border-night-600 bg-night-900 text-slate-100 placeholder:text-slate-500 focus:border-brand-400 focus:ring-brand-400/20;
     }
 
     .da-label {
@@ -46,11 +53,11 @@
     }
 
     .da-btn-primary {
-        @apply inline-flex items-center justify-center rounded-xl bg-brand-600 px-5 py-3 text-sm font-semibold text-white shadow-soft transition hover:bg-brand-700 hover:shadow-soft-lg active:scale-[0.98];
+        @apply inline-flex items-center justify-center rounded-xl bg-brand-500 px-5 py-3 text-sm font-semibold text-night-950 shadow-soft transition hover:bg-brand-400 hover:shadow-glow active:scale-[0.98];
     }
 
     body.dark .da-btn-primary {
-        @apply bg-brand-500 hover:bg-brand-400;
+        @apply bg-brand-400 hover:bg-brand-300;
     }
 
     .da-btn-secondary {
@@ -58,7 +65,15 @@
     }
 
     body.dark .da-btn-secondary {
-        @apply border-slate-600 bg-slate-900 text-slate-100 hover:border-slate-500 hover:bg-slate-800;
+        @apply border-night-600 bg-night-800 text-slate-100 hover:border-night-500 hover:bg-night-700;
+    }
+
+    .da-btn-danger {
+        @apply inline-flex items-center justify-center rounded-xl bg-red-600 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-red-700 active:scale-[0.98];
+    }
+
+    body.dark .da-btn-danger {
+        @apply bg-red-500 hover:bg-red-400;
     }
 
     .da-card {
@@ -66,6 +81,30 @@
     }
 
     body.dark .da-card {
-        @apply border-slate-800 bg-slate-900/80 hover:border-slate-700;
+        @apply border-night-700 bg-night-900/80 hover:border-night-500;
+    }
+
+    .da-chip {
+        @apply inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-600;
+    }
+
+    body.dark .da-chip {
+        @apply bg-night-800 text-slate-300;
+    }
+
+    .da-chip-mono {
+        @apply inline-flex items-center gap-1.5 rounded-md border border-slate-200 bg-slate-50 px-2 py-1 font-mono text-xs font-medium uppercase tracking-widest text-slate-600;
+    }
+
+    body.dark .da-chip-mono {
+        @apply border-brand-500/30 bg-black/30 text-brand-300;
+    }
+
+    .da-eyebrow {
+        @apply inline-flex items-center gap-2 font-mono text-xs font-semibold uppercase tracking-[0.2em] text-brand-600;
+    }
+
+    body.dark .da-eyebrow {
+        @apply text-brand-400;
     }
 }

@@ -58,7 +58,7 @@ function ProfileButton() {
     const restaurantsLink = sessionUser ? getRestaurantsLink() : null;
 
     const dropdownClass = [
-        "absolute left-0 top-full z-[1100] mt-2 min-w-[240px] overflow-hidden rounded-2xl border border-slate-200 bg-white py-2 shadow-soft-lg dark:border-slate-700 dark:bg-slate-900",
+        "absolute left-0 top-full z-[1100] mt-2 min-w-[240px] overflow-hidden rounded-2xl border border-slate-200 bg-white py-2 shadow-soft-lg dark:border-night-700 dark:bg-night-900",
         showSideBar ? "block" : "hidden",
     ].join(" ");
 
@@ -67,7 +67,7 @@ function ProfileButton() {
             <button
                 type="button"
                 onClick={toggleMenu}
-                className="flex h-10 w-10 items-center justify-center rounded-xl text-slate-800 transition hover:bg-slate-100 dark:text-slate-100 dark:hover:bg-slate-800"
+                className="flex h-10 w-10 items-center justify-center rounded-xl text-slate-800 transition hover:bg-slate-100 dark:text-slate-100 dark:hover:bg-night-800"
                 aria-expanded={showSideBar}
                 aria-haspopup="true"
                 aria-label="Open menu"
@@ -78,7 +78,7 @@ function ProfileButton() {
             <ul className={dropdownClass}>
                 {sessionUser ? (
                     <>
-                        <li className="border-b border-slate-100 px-4 py-3 dark:border-slate-800">
+                        <li className="border-b border-slate-100 px-4 py-3 dark:border-night-800">
                             <div className="text-sm font-semibold text-slate-900 dark:text-white">
                                 Hello, {sessionUser.firstName}
                             </div>
@@ -89,7 +89,7 @@ function ProfileButton() {
                         <li>
                             <Link
                                 to="/account"
-                                className="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-700 transition hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-slate-800"
+                                className="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-700 transition hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-night-800"
                                 onClick={closeMenu}
                             >
                                 <MdAccountCircle className="h-5 w-5 shrink-0 text-brand-500" />
@@ -99,7 +99,7 @@ function ProfileButton() {
                         <li>
                             <Link
                                 to="/orders"
-                                className="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-700 transition hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-slate-800"
+                                className="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-700 transition hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-night-800"
                                 onClick={closeMenu}
                             >
                                 <PiReceiptFill className="h-5 w-5 shrink-0 text-brand-500" />
@@ -109,7 +109,7 @@ function ProfileButton() {
                         <li>
                             <Link
                                 to="/favorites"
-                                className="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-700 transition hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-slate-800"
+                                className="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-700 transition hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-night-800"
                                 onClick={closeMenu}
                             >
                                 <IoIosHeart className="h-5 w-5 shrink-0 text-brand-500" />
@@ -120,7 +120,7 @@ function ProfileButton() {
                             <li>
                                 <Link
                                     to={restaurantsLink}
-                                    className="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-700 transition hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-slate-800"
+                                    className="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-700 transition hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-night-800"
                                     onClick={closeMenu}
                                 >
                                     <RiRestaurantLine className="h-5 w-5 shrink-0 text-brand-500" />
@@ -132,7 +132,7 @@ function ProfileButton() {
                             <li>
                                 <Link
                                     to="/runner-dashboard"
-                                    className="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-700 transition hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-slate-800"
+                                    className="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-700 transition hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-night-800"
                                     onClick={closeMenu}
                                 >
                                     <FaRunning className="h-5 w-5 shrink-0 text-brand-500" />
@@ -140,7 +140,7 @@ function ProfileButton() {
                                 </Link>
                             </li>
                         )}
-                        <li className="border-t border-slate-100 p-2 dark:border-slate-800">
+                        <li className="border-t border-slate-100 p-2 dark:border-night-800">
                             <button
                                 type="button"
                                 className="w-full rounded-xl px-3 py-2 text-sm font-semibold text-brand-600 transition hover:bg-brand-50 dark:text-brand-400 dark:hover:bg-brand-950/50"
@@ -154,7 +154,7 @@ function ProfileButton() {
                     <li className="flex flex-col gap-1 p-2">
                         <Link
                             to="/login"
-                            className="rounded-xl px-3 py-2 text-center text-sm font-semibold text-slate-700 hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-slate-800"
+                            className="rounded-xl px-3 py-2 text-center text-sm font-semibold text-slate-700 hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-night-800"
                             onClick={closeMenu}
                         >
                             Log in

@@ -1,6 +1,10 @@
 const express = require("express");
 const router = express.Router();
-const { requireAuth, requireRunner } = require("../../utils/auth");
+const {
+    requireAuth,
+    requireRunner,
+    requireAdmin,
+} = require("../../utils/auth");
 const deliveryController = require("../../controllers/deliveryController");
 
 // Get all deliveries assigned to a runner
@@ -11,10 +15,11 @@ router.get(
     deliveryController.getRunnerDeliveries
 );
 
-// Mark a delivery as completed
+// Mark a delivery as completed (runner-owned check happens in the controller)
 router.put(
     "/:deliveryId/complete",
     requireAuth,
+    requireRunner,
     deliveryController.completeDelivery
 );
 
@@ -22,6 +27,7 @@ router.put(
 router.post(
     "/update-location",
     requireAuth,
+    requireRunner,
     deliveryController.updateRunnerLocation
 );
 
@@ -29,6 +35,7 @@ router.post(
 router.post(
     "/notify-gate-change",
     requireAuth,
+    requireAdmin,
     deliveryController.notifyGateChange
 );
 
@@ -42,10 +49,11 @@ router.get(
     deliveryController.getRunnerLocation
 );
 
-// Update order status
+// Update order status (runner-owned check happens in the controller)
 router.post(
     "/update-order-status",
     requireAuth,
+    requireRunner,
     deliveryController.updateOrderStatus
 );
 

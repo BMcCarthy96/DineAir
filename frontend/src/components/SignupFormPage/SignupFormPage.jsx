@@ -53,7 +53,8 @@ function SignupFormPage() {
         <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center px-4 py-12">
             <div className="w-full max-w-md">
                 <div className="da-card p-8 shadow-soft-lg sm:p-10">
-                    <h1 className="text-center text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
+                    <p className="da-eyebrow justify-center">DineAir</p>
+                    <h1 className="mt-2 text-center text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
                         Create your account
                     </h1>
                     <p className="mt-2 text-center text-sm text-slate-600 dark:text-slate-400">

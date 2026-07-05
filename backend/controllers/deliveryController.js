@@ -1,7 +1,6 @@
 const { Delivery, Order, Restaurant, User, Airport } = require("../db/models");
 const { getSocket } = require("../utils/socket");
 const trackingSimulation = require("../utils/trackingSimulation");
-const axios = require("axios");
 
 module.exports = {
     // Fetch all deliveries assigned to the current runner
@@ -37,9 +36,23 @@ module.exports = {
             delivery.status = "delivered";
             await delivery.save();
 
-            // Emit delivery completion notification
-            const io = getSocket();
-            io.emit("deliveryCompleted", { deliveryId });
+            if (delivery.orderId) {
+                const order = await Order.findByPk(delivery.orderId);
+                if (order && order.status !== "delivered") {
+                    order.status = "delivered";
+                    await order.save();
+                }
+                trackingSimulation.stop(delivery.orderId);
+                getSocket()
+                    .to(`order:${delivery.orderId}`)
+                    .emit("orderStatusUpdate", {
+                        orderId: delivery.orderId,
+                        status: "delivered",
+                    });
+                getSocket()
+                    .to(`order:${delivery.orderId}`)
+                    .emit("deliveryCompleted", { deliveryId });
+            }
 
             res.json(delivery);
         } catch (err) {
@@ -52,10 +65,9 @@ module.exports = {
         try {
             const { runnerId, location, orderId } = req.body;
 
-            console.log(
-                `Emitting runnerLocationUpdate for runnerId: ${runnerId}, location:`,
-                location
-            );
+            if (Number(runnerId) !== req.user.id) {
+                return res.status(403).json({ error: "Forbidden" });
+            }
 
             const io = getSocket();
             if (orderId && location) {
@@ -85,16 +97,21 @@ module.exports = {
             if (!order) {
                 return res.status(404).json({ error: "Order not found" });
             }
+            if (order.runnerId !== req.user.id) {
+                return res.status(403).json({ error: "Forbidden" });
+            }
 
             order.status = status;
             await order.save();
 
-            console.log(`Order ${orderId} status updated: ${status}`);
-
             trackingSimulation.setOrderStatus(Number(orderId), status);
+            if (status === "delivered") {
+                trackingSimulation.stop(Number(orderId));
+            }
 
-            const io = getSocket();
-            io.emit("orderStatusUpdate", { orderId, status });
+            getSocket()
+                .to(`order:${orderId}`)
+                .emit("orderStatusUpdate", { orderId, status });
 
             res.json({ success: true, message: "Order status updated." });
         } catch (err) {
@@ -107,10 +124,6 @@ module.exports = {
     async notifyGateChange(req, res, next) {
         try {
             const { gate, terminal } = req.body;
-
-            console.log(
-                `Notifying gate change: Gate ${gate}, Terminal ${terminal}`
-            );
 
             // Emit gate change notification
             const io = getSocket();
@@ -133,18 +146,17 @@ module.exports = {
             const mapsKey =
                 process.env.GOOGLE_MAPS_API_KEY ||
                 process.env.VITE_GOOGLE_MAPS_API_KEY;
-            const response = await axios.get(
-                "https://maps.googleapis.com/maps/api/directions/json",
-                {
-                    params: {
-                        origin: `${runnerLocation.lat},${runnerLocation.lng}`,
-                        destination: `${gateLocation.lat},${gateLocation.lng}`,
-                        key: mapsKey,
-                    },
-                }
+            const params = new URLSearchParams({
+                origin: `${runnerLocation.lat},${runnerLocation.lng}`,
+                destination: `${gateLocation.lat},${gateLocation.lng}`,
+                key: mapsKey,
+            });
+            const response = await fetch(
+                `https://maps.googleapis.com/maps/api/directions/json?${params}`
             );
+            const data = await response.json();
 
-            const eta = response.data.routes[0]?.legs[0]?.duration?.text;
+            const eta = data.routes?.[0]?.legs?.[0]?.duration?.text;
             res.json({ eta });
         } catch (err) {
             console.error("Error calculating ETA:", err);
@@ -152,15 +164,28 @@ module.exports = {
         }
     },
 
-    // Fetch the runner's current location (mocked for now)
+    // Fetch the runner's current location from their active delivery's simulation/order
     async getRunnerLocation(req, res, next) {
         try {
             const { runnerId } = req.query;
 
-            // Mocked runner location; replace with real data source
-            const runnerLocation = { lat: 37.7749, lng: -122.4194 };
+            const delivery = await Delivery.findOne({
+                where: { runnerId, status: ["pending", "in_progress"] },
+                include: [{ model: Order, include: [Restaurant] }],
+                order: [["createdAt", "DESC"]],
+            });
 
-            res.json({ location: runnerLocation });
+            if (!delivery?.Order) {
+                return res.status(404).json({ error: "No active delivery" });
+            }
+
+            const simulated = trackingSimulation.getLocation(delivery.Order.id);
+            const location = simulated || {
+                lat: Number(delivery.Order.Restaurant?.latitude),
+                lng: Number(delivery.Order.Restaurant?.longitude),
+            };
+
+            res.json({ location, orderId: delivery.Order.id });
         } catch (err) {
             next(err);
         }

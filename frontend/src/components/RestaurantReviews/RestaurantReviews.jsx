@@ -103,7 +103,7 @@ function RestaurantReviews({ restaurantId }) {
             )}
 
             {sessionUser ? (
-                <div className="mt-6 space-y-3 rounded-2xl border border-slate-100 bg-slate-50/80 p-4 dark:border-slate-800 dark:bg-slate-900/40">
+                <div className="mt-6 space-y-3 rounded-2xl border border-slate-100 bg-slate-50/80 p-4 dark:border-night-800 dark:bg-night-900/40">
                     <label htmlFor="new-review-text" className="da-label">
                         Write a review
                     </label>
@@ -173,7 +173,7 @@ function RestaurantReviews({ restaurantId }) {
                         return (
                             <li
                                 key={review.id}
-                                className="rounded-2xl border border-slate-100 bg-slate-50/50 p-4 dark:border-slate-800 dark:bg-slate-900/30"
+                                className="rounded-2xl border border-slate-100 bg-slate-50/50 p-4 dark:border-night-800 dark:bg-night-900/30"
                             >
                                 <div className="flex flex-wrap items-start justify-between gap-2">
                                     <h3 className="font-semibold text-slate-900 dark:text-white">
@@ -199,7 +199,7 @@ function RestaurantReviews({ restaurantId }) {
                                         className={`rounded-lg px-3 py-1.5 text-sm font-semibold transition ${
                                             isLiked
                                                 ? "bg-brand-100 text-brand-800 dark:bg-brand-950 dark:text-brand-200"
-                                                : "bg-white text-slate-700 ring-1 ring-slate-200 hover:bg-slate-50 dark:bg-slate-800 dark:text-slate-200 dark:ring-slate-600"
+                                                : "bg-white text-slate-700 ring-1 ring-slate-200 hover:bg-slate-50 dark:bg-night-800 dark:text-slate-200 dark:ring-night-600"
                                         } ${!userId ? "cursor-not-allowed opacity-50" : ""}`}
                                     >
                                         {isLiked ? "Liked" : "Like"}
@@ -207,7 +207,7 @@ function RestaurantReviews({ restaurantId }) {
                                 </div>
 
                                 {editingReview?.id === review.id ? (
-                                    <div className="mt-4 space-y-3 border-t border-slate-200 pt-4 dark:border-slate-700">
+                                    <div className="mt-4 space-y-3 border-t border-slate-200 pt-4 dark:border-night-700">
                                         <textarea
                                             value={
                                                 editingReview?.comment || ""
@@ -257,10 +257,10 @@ function RestaurantReviews({ restaurantId }) {
                                     </div>
                                 ) : (
                                     isOwner && (
-                                        <div className="mt-4 flex flex-wrap gap-2 border-t border-slate-200 pt-4 dark:border-slate-700">
+                                        <div className="mt-4 flex flex-wrap gap-2 border-t border-slate-200 pt-4 dark:border-night-700">
                                             <button
                                                 type="button"
-                                                className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-800 transition hover:bg-slate-50 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:hover:bg-slate-700"
+                                                className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-800 transition hover:bg-slate-50 dark:border-night-600 dark:bg-night-800 dark:text-slate-100 dark:hover:bg-night-700"
                                                 onClick={() =>
                                                     setEditingReview({
                                                         id: review.id,

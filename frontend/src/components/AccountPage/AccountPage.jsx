@@ -1,10 +1,11 @@
 import { useOutletContext, useNavigate, Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
-import Cookies from "js-cookie";
 import { toast } from "react-toastify";
 import * as sessionActions from "../../store/session";
 import { apiFetch } from "../../utils/apiFetch";
+import PageHeader from "../ui/PageHeader";
+import Modal from "../ui/Modal";
 
 function AccountPage() {
     const { sessionUser } = useOutletContext();
@@ -43,11 +44,6 @@ function AccountPage() {
         try {
             const response = await apiFetch(`/api/users/${sessionUser.id}`, {
                 method: "PUT",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${localStorage.getItem("token") || ""}`,
-                    "XSRF-Token": Cookies.get("XSRF-TOKEN") || "",
-                },
                 body: JSON.stringify(updatedProfile),
             });
 
@@ -72,10 +68,6 @@ function AccountPage() {
         try {
             const response = await apiFetch(`/api/users/${sessionUser.id}`, {
                 method: "DELETE",
-                headers: {
-                    Authorization: `Bearer ${localStorage.getItem("token") || ""}`,
-                    "XSRF-Token": Cookies.get("XSRF-TOKEN") || "",
-                },
             });
             if (response.ok) {
                 toast.success("Account deleted");
@@ -111,12 +103,11 @@ function AccountPage() {
 
     return (
         <div className="mx-auto max-w-lg px-4 py-10 sm:px-6 lg:px-8">
-            <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
-                Account
-            </h1>
-            <p className="mt-2 text-slate-600 dark:text-slate-400">
-                Update your details or remove your account.
-            </p>
+            <PageHeader
+                eyebrow="Profile"
+                title="Account"
+                description="Update your details or remove your account."
+            />
 
             <form
                 onSubmit={handleSubmit}
@@ -211,42 +202,31 @@ function AccountPage() {
                 </button>
             </form>
 
-            {showDeleteModal && (
-                <div
-                    className="fixed inset-0 z-[2000] flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-sm"
-                    role="dialog"
-                    aria-modal="true"
-                    aria-labelledby="delete-title"
-                >
-                    <div className="da-card max-w-md p-6 shadow-soft-lg">
-                        <h3
-                            id="delete-title"
-                            className="text-lg font-semibold text-slate-900 dark:text-white"
+            <Modal
+                open={showDeleteModal}
+                onClose={() => setShowDeleteModal(false)}
+                title="Delete your account?"
+                footer={
+                    <>
+                        <button
+                            type="button"
+                            className="da-btn-danger flex-1"
+                            onClick={handleDeleteAccount}
                         >
-                            Delete your account?
-                        </h3>
-                        <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
-                            This cannot be undone.
-                        </p>
-                        <div className="mt-6 flex flex-wrap gap-3">
-                            <button
-                                type="button"
-                                className="da-btn-primary flex-1 !bg-red-600 hover:!bg-red-700"
-                                onClick={handleDeleteAccount}
-                            >
-                                Yes, delete
-                            </button>
-                            <button
-                                type="button"
-                                className="da-btn-secondary flex-1"
-                                onClick={() => setShowDeleteModal(false)}
-                            >
-                                Cancel
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
+                            Yes, delete
+                        </button>
+                        <button
+                            type="button"
+                            className="da-btn-secondary flex-1"
+                            onClick={() => setShowDeleteModal(false)}
+                        >
+                            Cancel
+                        </button>
+                    </>
+                }
+            >
+                This cannot be undone.
+            </Modal>
         </div>
     );
 }

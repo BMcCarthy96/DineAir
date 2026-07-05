@@ -36,7 +36,7 @@ function MapsDevDiagnostics({
 
     return (
         <div
-            className="mt-2 rounded-lg border border-dashed border-slate-300 bg-slate-100/80 px-3 py-2 text-left font-mono text-[10px] leading-relaxed text-slate-700 dark:border-slate-600 dark:bg-slate-900/50 dark:text-slate-300"
+            className="mt-2 rounded-lg border border-dashed border-slate-300 bg-slate-100/80 px-3 py-2 text-left font-mono text-[10px] leading-relaxed text-slate-700 dark:border-night-600 dark:bg-night-900/50 dark:text-slate-300"
             data-testid="maps-dev-diagnostics"
         >
             <div className="font-semibold text-slate-600 dark:text-slate-400">
@@ -69,12 +69,12 @@ function MapsDevDiagnostics({
                 )}
             </ul>
             {directionsDetail && (
-                <p className="mt-2 border-t border-slate-300 pt-2 text-amber-900 dark:border-slate-600 dark:text-amber-200">
+                <p className="mt-2 border-t border-slate-300 pt-2 text-amber-900 dark:border-night-600 dark:text-amber-200">
                     Directions: {directionsDetail}
                 </p>
             )}
             {mapsStatus === "error" && loadPhase && (
-                <ul className="mt-2 list-inside list-disc border-t border-slate-300 pt-2 text-slate-600 dark:border-slate-600 dark:text-slate-400">
+                <ul className="mt-2 list-inside list-disc border-t border-slate-300 pt-2 text-slate-600 dark:border-night-600 dark:text-slate-400">
                     {hintsForLoadPhase(loadPhase).map((h) => (
                         <li key={h}>{h}</li>
                     ))}
@@ -642,7 +642,7 @@ function Map({
         return (
             <div className="w-full">
                 <div
-                    className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-slate-300 bg-slate-50 px-6 py-12 text-center dark:border-slate-600 dark:bg-slate-900/40"
+                    className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-slate-300 bg-slate-50 px-6 py-12 text-center dark:border-night-600 dark:bg-night-900/40"
                     style={containerStyle}
                     role="region"
                     aria-label="Map unavailable"
@@ -652,19 +652,19 @@ function Map({
                     </p>
                     <p className="mt-2 max-w-sm text-xs text-slate-500 dark:text-slate-400">
                         Set{" "}
-                        <code className="rounded bg-slate-200 px-1 dark:bg-slate-800">
+                        <code className="rounded bg-slate-200 px-1 dark:bg-night-800">
                             VITE_GOOGLE_MAPS_API_KEY
                         </code>{" "}
                         in{" "}
-                        <code className="rounded bg-slate-200 px-1 dark:bg-slate-800">
+                        <code className="rounded bg-slate-200 px-1 dark:bg-night-800">
                             frontend/.env
                         </code>{" "}
                         and restart{" "}
-                        <code className="rounded bg-slate-200 px-1 dark:bg-slate-800">
+                        <code className="rounded bg-slate-200 px-1 dark:bg-night-800">
                             npm run dev
                         </code>{" "}
                         (see{" "}
-                        <code className="rounded bg-slate-200 px-1 dark:bg-slate-800">
+                        <code className="rounded bg-slate-200 px-1 dark:bg-night-800">
                             .env.example
                         </code>
                         ).
@@ -715,12 +715,12 @@ function Map({
         return (
             <div className="w-full">
                 <div
-                    className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 dark:border-slate-700 dark:bg-slate-900/40"
+                    className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 dark:border-night-700 dark:bg-night-900/40"
                     style={containerStyle}
                     role="status"
                     aria-label="Loading map"
                 >
-                    <div className="h-10 w-10 animate-spin rounded-full border-2 border-slate-200 border-t-brand-600 dark:border-slate-600 dark:border-t-brand-400" />
+                    <div className="h-10 w-10 animate-spin rounded-full border-2 border-slate-200 border-t-brand-600 dark:border-night-600 dark:border-t-brand-400" />
                     <p className="text-xs text-slate-500 dark:text-slate-400">
                         Loading map…
                     </p>
@@ -735,7 +735,7 @@ function Map({
             <div
                 ref={mapRef}
                 style={containerStyle}
-                className="min-h-[280px] w-full overflow-hidden rounded-2xl border border-slate-200 shadow-inner dark:border-slate-700"
+                className="min-h-[280px] w-full overflow-hidden rounded-2xl border border-slate-200 shadow-inner dark:border-night-700"
             />
             {diagnosticsBlock}
         </div>

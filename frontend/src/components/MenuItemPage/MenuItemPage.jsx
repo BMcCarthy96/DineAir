@@ -1,11 +1,11 @@
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import Cookies from "js-cookie";
 import { toast } from "react-toastify";
 import { motion } from "framer-motion";
 import { apiFetch } from "../../utils/apiFetch";
 import { Skeleton } from "../ui/Skeleton";
+import SmartImage from "../ui/SmartImage";
 
 function MenuItemPage() {
     const { restaurantId, menuItemId } = useParams();
@@ -49,11 +49,6 @@ function MenuItemPage() {
         try {
             const response = await apiFetch("/api/carts/items", {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${localStorage.getItem("token") || ""}`,
-                    "XSRF-Token": Cookies.get("XSRF-TOKEN") || "",
-                },
                 body: JSON.stringify({
                     menuItemId: Number(menuItemId),
                     quantity: 1,
@@ -114,19 +109,12 @@ function MenuItemPage() {
                 animate={{ opacity: 1, y: 0 }}
                 className="da-card mt-8 overflow-hidden"
             >
-                <img
-                    src={
-                        menuItem.imageUrl ||
-                        "https://via.placeholder.com/800x480"
-                    }
-                    alt=""
-                    className="aspect-video w-full object-cover"
-                />
+                <SmartImage src={menuItem.imageUrl} alt="" className="aspect-video w-full" />
                 <div className="p-6 sm:p-8">
                     <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
                         {menuItem.name}
                     </h1>
-                    <p className="mt-2 text-2xl font-bold text-brand-600 dark:text-brand-400">
+                    <p className="mt-2 font-mono text-2xl font-bold text-brand-600 dark:text-brand-400">
                         ${price}
                     </p>
                     <p className="mt-4 text-slate-600 dark:text-slate-400">

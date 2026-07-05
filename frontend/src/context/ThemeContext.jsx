@@ -1,11 +1,23 @@
 import { useState, useContext, useEffect } from "react";
 import ThemeContext from "./ThemeContextContext";
 
+const STORAGE_KEY = "dineair-theme";
+
+function getInitialTheme() {
+    const stored = window.localStorage.getItem(STORAGE_KEY);
+    if (stored === "light" || stored === "dark") return stored;
+    if (window.matchMedia?.("(prefers-color-scheme: light)").matches) {
+        return "light";
+    }
+    return "dark";
+}
+
 export function ThemeProvider({ children }) {
-    const [theme, setTheme] = useState("light");
+    const [theme, setTheme] = useState(getInitialTheme);
 
     useEffect(() => {
         document.body.className = theme;
+        window.localStorage.setItem(STORAGE_KEY, theme);
     }, [theme]);
 
     const toggleTheme = () => {

@@ -1,19 +1,14 @@
 import { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
 import Map from "../Map/Map";
 import socket from "../../utils/WebSocket";
 import { apiFetch } from "../../utils/apiFetch";
 import EmptyState from "../ui/EmptyState";
 import { FaTruck } from "react-icons/fa";
 
-const availableRunnerIds = [1, 2, 3, 4, 5];
-function getRandomRunnerId() {
-    return availableRunnerIds[
-        Math.floor(Math.random() * availableRunnerIds.length)
-    ];
-}
-
 function RunnerDashboardPage() {
-    const [runnerId] = useState(getRandomRunnerId());
+    const sessionUser = useSelector((state) => state.session.user);
+    const runnerId = sessionUser?.id ?? null;
     const [runnerLocation, setRunnerLocation] = useState({
         lat: 33.9416,
         lng: -118.4085,
@@ -31,11 +26,7 @@ function RunnerDashboardPage() {
         async function fetchDeliveries() {
             setError(null);
             try {
-                const response = await apiFetch("/api/deliveries", {
-                    headers: {
-                        Authorization: `Bearer ${localStorage.getItem("token") || ""}`,
-                    },
-                });
+                const response = await apiFetch("/api/deliveries");
                 if (response.ok) {
                     const data = await response.json();
                     if (!cancelled) {
@@ -133,7 +124,7 @@ function RunnerDashboardPage() {
                         {deliveries.map((delivery) => (
                             <li
                                 key={delivery.id}
-                                className="rounded-xl border border-slate-100 bg-slate-50/80 px-4 py-3 dark:border-slate-800 dark:bg-slate-900/40"
+                                className="rounded-xl border border-slate-100 bg-slate-50/80 px-4 py-3 dark:border-night-800 dark:bg-night-900/40"
                             >
                                 <p className="text-sm font-medium text-slate-900 dark:text-white">
                                     Order #{delivery.Order?.id}

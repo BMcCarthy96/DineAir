@@ -39,7 +39,7 @@ function OrderTracking({ effectiveStatus }) {
             currentStep,
             stepLabel: STEP_LABELS[currentStep],
         });
-    }, [effectiveStatus]);
+    }, [effectiveStatus, currentStep]);
 
     return (
         <div
@@ -60,8 +60,8 @@ function OrderTracking({ effectiveStatus }) {
                             className={`flex h-11 w-11 items-center justify-center rounded-full text-sm font-bold transition ${
                                 done
                                     ? "bg-brand-600 text-white shadow-soft"
-                                    : "border-2 border-slate-200 bg-white text-slate-400 dark:border-slate-600 dark:bg-slate-900"
-                            } ${active ? "ring-2 ring-brand-400 ring-offset-2 ring-offset-white dark:ring-offset-slate-950" : ""}`}
+                                    : "border-2 border-slate-200 bg-white text-slate-400 dark:border-night-600 dark:bg-night-900"
+                            } ${active ? "ring-2 ring-brand-400 ring-offset-2 ring-offset-white dark:ring-offset-night-950" : ""}`}
                         >
                             {done ? (
                                 <FaCheck className="h-4 w-4" aria-hidden />

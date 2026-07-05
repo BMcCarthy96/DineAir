@@ -35,7 +35,7 @@ function FlightInfoSidebar({ flightNumber, date }) {
 
     if (loading) {
         return (
-            <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-6 text-sm text-slate-600 dark:border-slate-700 dark:bg-slate-900/50 dark:text-slate-400">
+            <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-6 text-sm text-slate-600 dark:border-night-700 dark:bg-night-900/50 dark:text-slate-400">
                 Loading flight data…
             </div>
         );
@@ -53,7 +53,7 @@ function FlightInfoSidebar({ flightNumber, date }) {
     }
 
     return (
-        <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-soft dark:border-slate-700 dark:bg-slate-900">
+        <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-soft dark:border-night-700 dark:bg-night-900">
             <h2 className="text-lg font-semibold text-slate-900 dark:text-white">
                 Flight information
             </h2>

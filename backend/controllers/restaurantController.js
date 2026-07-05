@@ -1,8 +1,27 @@
-const { Restaurant } = require("../db/models");
+const { Restaurant, sequelize } = require("../db/models");
+
+const ratingAttributes = {
+    include: [
+        [
+            sequelize.literal(
+                '(SELECT AVG(rating) FROM "Reviews" WHERE "Reviews"."restaurantId" = "Restaurant"."id")'
+            ),
+            "avgRating",
+        ],
+        [
+            sequelize.literal(
+                '(SELECT COUNT(*) FROM "Reviews" WHERE "Reviews"."restaurantId" = "Restaurant"."id")'
+            ),
+            "reviewCount",
+        ],
+    ],
+};
 
 exports.getAllRestaurants = async (req, res) => {
     try {
-        const restaurants = await Restaurant.findAll();
+        const restaurants = await Restaurant.findAll({
+            attributes: ratingAttributes,
+        });
         res.json(restaurants);
     } catch (err) {
         res.status(500).json({ error: "Failed to fetch restaurants" });
@@ -10,7 +29,9 @@ exports.getAllRestaurants = async (req, res) => {
 };
 
 exports.getRestaurantById = async (req, res) => {
-    const restaurant = await Restaurant.findByPk(req.params.id);
+    const restaurant = await Restaurant.findByPk(req.params.id, {
+        attributes: ratingAttributes,
+    });
     if (!restaurant) return res.status(404).json({ error: "Not found" });
     res.json(restaurant);
 };
@@ -118,14 +139,3 @@ exports.deleteRestaurant = async (req, res) => {
     }
 };
 
-exports.getFastPrepRestaurants = async (req, res) => {
-    const { timeBeforeBoarding } = req.query;
-
-    const restaurants = await Restaurant.findAll({
-        where: {
-            prepTime: { [Op.lte]: timeBeforeBoarding },
-        },
-    });
-
-    res.json(restaurants);
-};

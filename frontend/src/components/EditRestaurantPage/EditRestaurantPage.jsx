@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
-import Cookies from "js-cookie";
 import { toast } from "react-toastify";
 import { apiFetch } from "../../utils/apiFetch";
 import { Skeleton } from "../ui/Skeleton";
+import FormField from "../ui/FormField";
 
 function EditRestaurantPage() {
     const { restaurantId } = useParams();
@@ -70,10 +70,6 @@ function EditRestaurantPage() {
                 `/api/restaurants/${restaurantId}`,
                 {
                     method: "PUT",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "XSRF-Token": Cookies.get("XSRF-TOKEN") || "",
-                    },
                     body: JSON.stringify(updatedRestaurant),
                 }
             );
@@ -128,7 +124,7 @@ function EditRestaurantPage() {
                 onSubmit={handleSubmit}
                 className="da-card mt-8 space-y-4 p-6 sm:p-8"
             >
-                <Field label="Name" htmlFor="er-name">
+                <FormField label="Name" id="er-name">
                     <input
                         id="er-name"
                         type="text"
@@ -137,8 +133,8 @@ function EditRestaurantPage() {
                         className="da-input"
                         required
                     />
-                </Field>
-                <Field label="Description" htmlFor="er-desc">
+                </FormField>
+                <FormField label="Description" id="er-desc">
                     <textarea
                         id="er-desc"
                         value={description}
@@ -146,8 +142,8 @@ function EditRestaurantPage() {
                         className="da-input min-h-[100px] resize-y"
                         required
                     />
-                </Field>
-                <Field label="Terminal" htmlFor="er-term">
+                </FormField>
+                <FormField label="Terminal" id="er-term">
                     <input
                         id="er-term"
                         type="text"
@@ -155,8 +151,8 @@ function EditRestaurantPage() {
                         onChange={(e) => setTerminal(e.target.value)}
                         className="da-input"
                     />
-                </Field>
-                <Field label="Gate" htmlFor="er-gate">
+                </FormField>
+                <FormField label="Gate" id="er-gate">
                     <input
                         id="er-gate"
                         type="text"
@@ -164,8 +160,8 @@ function EditRestaurantPage() {
                         onChange={(e) => setGate(e.target.value)}
                         className="da-input"
                     />
-                </Field>
-                <Field label="Cuisine" htmlFor="er-cuisine">
+                </FormField>
+                <FormField label="Cuisine" id="er-cuisine">
                     <input
                         id="er-cuisine"
                         type="text"
@@ -173,8 +169,8 @@ function EditRestaurantPage() {
                         onChange={(e) => setCuisineType(e.target.value)}
                         className="da-input"
                     />
-                </Field>
-                <Field label="Image URL" htmlFor="er-img">
+                </FormField>
+                <FormField label="Image URL" id="er-img">
                     <input
                         id="er-img"
                         type="text"
@@ -182,8 +178,8 @@ function EditRestaurantPage() {
                         onChange={(e) => setImageUrl(e.target.value)}
                         className="da-input"
                     />
-                </Field>
-                <Field label="Airport ID" htmlFor="er-airport">
+                </FormField>
+                <FormField label="Airport ID" id="er-airport">
                     <input
                         id="er-airport"
                         type="number"
@@ -194,22 +190,11 @@ function EditRestaurantPage() {
                         className="da-input"
                         required
                     />
-                </Field>
+                </FormField>
                 <button type="submit" className="da-btn-primary w-full !py-3.5">
                     Save changes
                 </button>
             </form>
-        </div>
-    );
-}
-
-function Field({ label, htmlFor, children }) {
-    return (
-        <div>
-            <label htmlFor={htmlFor} className="da-label">
-                {label}
-            </label>
-            {children}
         </div>
     );
 }

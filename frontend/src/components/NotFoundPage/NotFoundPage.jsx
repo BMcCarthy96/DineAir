@@ -3,10 +3,8 @@ import { Link } from "react-router-dom";
 function NotFoundPage() {
     return (
         <div className="mx-auto flex min-h-[60vh] max-w-lg flex-col items-center justify-center px-4 py-20 text-center">
-            <p className="text-sm font-semibold uppercase tracking-widest text-brand-600 dark:text-brand-400">
-                404
-            </p>
-            <h1 className="mt-2 text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
+            <span className="da-chip-mono text-base">Gate 404</span>
+            <h1 className="mt-4 text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
                 This gate doesn&apos;t exist
             </h1>
             <p className="mt-4 text-slate-600 dark:text-slate-400">

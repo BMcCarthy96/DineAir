@@ -56,8 +56,6 @@ const validateLogin = [
 
 // Sign up
 router.post("/signup", validateSignup, async (req, res, next) => {
-    console.log("Request Body:", req.body); // Log the request body
-
     const { firstName, lastName, email, password, username, userType } =
         req.body;
 

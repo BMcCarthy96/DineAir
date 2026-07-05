@@ -7,6 +7,7 @@ const helmet = require("helmet");
 const cookieParser = require("cookie-parser");
 const routes = require("./routes");
 const { initSocket } = require("./utils/socket");
+const { getFrontendOrigins, DEFAULT_FRONTEND_ORIGINS } = require("./utils/corsOrigins");
 
 const { environment } = require("./config");
 const isProduction = environment === "production";
@@ -20,37 +21,18 @@ app.use(morgan("dev"));
 app.use(cookieParser());
 app.use(express.json());
 
-const defaultFrontendOrigins = [
-    "http://localhost:5173",
-    "http://127.0.0.1:5173",
-    "http://localhost:5174",
-    "http://127.0.0.1:5174",
-    "http://localhost:5175",
-    "http://127.0.0.1:5175",
-    "https://dineair.onrender.com",
-];
-
-function parseFrontendOrigins() {
-    const fromEnv = process.env.FRONTEND_URLS
-        ? process.env.FRONTEND_URLS.split(",")
-              .map((s) => s.trim())
-              .filter(Boolean)
-        : [];
-    return fromEnv.length ? fromEnv : defaultFrontendOrigins;
-}
-
 // CORS: required when the SPA and API are on different origins (e.g. two Render services).
 if (isProduction) {
     app.use(
         cors({
-            origin: parseFrontendOrigins(),
+            origin: getFrontendOrigins(),
             credentials: true,
         })
     );
 } else {
     app.use(
         cors({
-            origin: defaultFrontendOrigins.filter((o) => o.startsWith("http://")),
+            origin: DEFAULT_FRONTEND_ORIGINS.filter((o) => o.startsWith("http://")),
             credentials: true,
         })
     );
@@ -60,6 +42,33 @@ if (isProduction) {
 app.use(
     helmet.crossOriginResourcePolicy({
         policy: "cross-origin",
+    })
+);
+
+app.use(
+    helmet.contentSecurityPolicy({
+        directives: {
+            defaultSrc: ["'self'"],
+            scriptSrc: ["'self'", "https://maps.googleapis.com"],
+            styleSrc: ["'self'", "'unsafe-inline'"],
+            fontSrc: ["'self'"],
+            imgSrc: [
+                "'self'",
+                "data:",
+                "blob:",
+                "https://*.googleapis.com",
+                "https://*.gstatic.com",
+                "https://images.unsplash.com",
+                "https://upload.wikimedia.org",
+                "https://commons.wikimedia.org",
+            ],
+            connectSrc: [
+                "'self'",
+                "https://maps.googleapis.com",
+                "ws:",
+                "wss:",
+            ],
+        },
     })
 );
 

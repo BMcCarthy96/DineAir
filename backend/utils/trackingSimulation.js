@@ -105,6 +105,28 @@ function leave(orderId) {
     }
 }
 
+/** Forcibly ends the simulation regardless of refCount — used when an order is delivered. */
+function stop(orderId) {
+    const sim = simulations.get(orderId);
+    if (!sim) return;
+    if (sim.intervalId) clearInterval(sim.intervalId);
+    simulations.delete(orderId);
+}
+
+/**
+ * @param {number} orderId
+ * @returns {{ lat: number, lng: number } | null}
+ */
+function getLocation(orderId) {
+    const sim = simulations.get(orderId);
+    if (!sim) return null;
+    const t = ease(sim.progress);
+    return {
+        lat: sim.origin.lat + (sim.gate.lat - sim.origin.lat) * t,
+        lng: sim.origin.lng + (sim.gate.lng - sim.origin.lng) * t,
+    };
+}
+
 /**
  * @param {number} orderId
  * @param {string} status
@@ -131,6 +153,8 @@ function pauseForRealRunner(orderId) {
 module.exports = {
     start,
     leave,
+    stop,
+    getLocation,
     setOrderStatus,
     pauseForRealRunner,
     TRAVEL_STATUSES,

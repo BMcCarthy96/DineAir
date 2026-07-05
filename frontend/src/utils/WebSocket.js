@@ -3,7 +3,6 @@ import {
     notifyGateChange,
     notifyFlightDelay,
     notifyOrderStatus,
-    // notifyRunnerLocation,
 } from "./Notifications";
 import { trackingLog, trackingWarn } from "./trackingLog";
 import { getApiBaseUrl } from "./apiBaseUrl";
@@ -65,12 +64,6 @@ socket.on("gateChange", ({ gate, terminal }) => {
 socket.on("flightDelay", ({ flightNumber, delayTime }) => {
     notifyFlightDelay(flightNumber, delayTime);
 });
-
-// Listen for runner location updates
-// socket.on("runnerLocationUpdate", ({ runnerId, location }) => {
-//     console.log(`Runner ${runnerId} location updated:`, location);
-//     notifyRunnerLocation();
-// });
 
 // Listen for order status updates
 socket.on("orderStatusUpdate", ({ orderId, status }) => {

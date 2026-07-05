@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import Cookies from "js-cookie";
 import { toast } from "react-toastify";
 import { PiReceipt } from "react-icons/pi";
 import EmptyState from "../ui/EmptyState";
+import PageHeader from "../ui/PageHeader";
+import StatusChip from "../ui/StatusChip";
 import { Skeleton } from "../ui/Skeleton";
 import { apiFetch } from "../../utils/apiFetch";
 
@@ -16,11 +17,7 @@ function OrderHistoryPage() {
         let cancelled = false;
         async function fetchOrders() {
             try {
-                const response = await apiFetch("/api/orders", {
-                    headers: {
-                        Authorization: `Bearer ${localStorage.getItem("token") || ""}`,
-                    },
-                });
+                const response = await apiFetch("/api/orders");
                 if (response.ok) {
                     const data = await response.json();
                     if (!cancelled) setOrders(data);
@@ -41,11 +38,6 @@ function OrderHistoryPage() {
         try {
             const response = await apiFetch(`/api/orders/${orderId}/reorder`, {
                 method: "POST",
-                headers: {
-                    Authorization: `Bearer ${localStorage.getItem("token") || ""}`,
-                    "Content-Type": "application/json",
-                    "XSRF-Token": Cookies.get("XSRF-TOKEN") || "",
-                },
             });
 
             if (response.ok) {
@@ -66,12 +58,11 @@ function OrderHistoryPage() {
 
     return (
         <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6 lg:px-8">
-            <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
-                Order history
-            </h1>
-            <p className="mt-2 text-slate-600 dark:text-slate-400">
-                Reorder past meals or review gate delivery details.
-            </p>
+            <PageHeader
+                eyebrow="History"
+                title="Order history"
+                description="Reorder past meals or review gate delivery details."
+            />
 
             {loading ? (
                 <div className="mt-10 space-y-4">
@@ -108,10 +99,10 @@ function OrderHistoryPage() {
                                         {order.Restaurant?.name || "Restaurant"}{" "}
                                         · Gate {order.gate || "—"}
                                     </p>
-                                    <p className="mt-2 text-xs font-medium uppercase tracking-wide text-slate-500">
-                                        {order.status}
-                                    </p>
-                                    <p className="mt-1 text-lg font-bold text-slate-900 dark:text-white">
+                                    <div className="mt-2">
+                                        <StatusChip status={order.status} />
+                                    </div>
+                                    <p className="mt-2 font-mono text-lg font-bold text-slate-900 dark:text-white">
                                         $
                                         {!Number.isNaN(Number(order.totalPrice))
                                             ? Number(order.totalPrice).toFixed(2)

@@ -127,6 +127,7 @@ export function useTrackingDemoProgress(orderId, serverStatus) {
 
     const startedAt = useMemo(
         () => readOrInitAnchor(orderId),
+        // eslint-disable-next-line react-hooks/exhaustive-deps -- anchorVersion is a deliberate cache-bust trigger, not read in the body
         [orderId, anchorVersion]
     );
 
@@ -166,9 +167,12 @@ export function useTrackingDemoProgress(orderId, serverStatus) {
             orderId == null || startedAt == null
                 ? null
                 : demoStatusFromElapsed(elapsedMs);
-        const a = orderStatusRank(normalizedServer);
+        // Server is authoritative once it reports anything — the demo clock only fills in
+        // before the first server status arrives (e.g. the instant the page mounts).
         const b = orderStatusRank(demoPhase);
-        let merged = rankToDbStatus(Math.max(a, b));
+        let merged = normalizedServer
+            ? rankToDbStatus(orderStatusRank(normalizedServer))
+            : rankToDbStatus(b);
 
         let pathT =
             orderId == null || startedAt == null
@@ -177,11 +181,12 @@ export function useTrackingDemoProgress(orderId, serverStatus) {
 
         // Keep map position aligned with visible phase (not ahead of status chip).
         if (merged === "pending" || merged === "preparing") pathT = 0;
-        if (pathT >= 0.999) {
-            // Completion guarantee: never sit in "on_the_way" once visual progress reached destination.
-            merged = "delivered";
+        if (merged === "delivered") {
             pathT = 1;
-        } else if (merged === "delivered") {
+        } else if (!normalizedServer && pathT >= 0.999) {
+            // Pure-fallback completion guarantee (no server data at all): never sit in
+            // "on_the_way" once the local demo clock's own visual progress reached the gate.
+            merged = "delivered";
             pathT = 1;
         }
 
@@ -191,6 +196,7 @@ export function useTrackingDemoProgress(orderId, serverStatus) {
             runnerMapProgress: pathT,
             elapsedMs,
         };
+        // eslint-disable-next-line react-hooks/exhaustive-deps -- tick is a deliberate per-second clock trigger, not read in the body
     }, [normalizedServer, orderId, startedAt, tick]);
 
     useEffect(() => {

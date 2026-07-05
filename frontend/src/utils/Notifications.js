@@ -22,9 +22,3 @@ export const notifyOrderStatus = (status) => {
         lastStatus = status;
     }
 };
-
-export const notifyRunnerLocation = () => {
-    toast.info("Runner is on the way!", {
-        position: "top-center",
-    });
-};

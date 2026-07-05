@@ -15,13 +15,32 @@ exports.getCartItems = async (req, res) => {
 
 exports.addItemToCart = async (req, res) => {
     const cart = await Cart.findOrCreate({ where: { userId: req.user.id } });
-    const item = await CartItem.create({ ...req.body, cartId: cart[0].id });
+    const cartId = cart[0].id;
+    const { menuItemId, quantity = 1 } = req.body;
+
+    const existing = await CartItem.findOne({ where: { cartId, menuItemId } });
+    if (existing) {
+        existing.quantity += quantity;
+        await existing.save();
+        return res.status(200).json(existing);
+    }
+
+    const item = await CartItem.create({ cartId, menuItemId, quantity });
     res.status(201).json(item);
 };
+
+async function ownsCartItem(userId, item) {
+    if (!item) return false;
+    const cart = await Cart.findByPk(item.cartId);
+    return Boolean(cart && cart.userId === userId);
+}
 
 exports.updateCartItem = async (req, res) => {
     const item = await CartItem.findByPk(req.params.id);
     if (!item) return res.status(404).json({ error: "Not found" });
+    if (!(await ownsCartItem(req.user.id, item))) {
+        return res.status(403).json({ error: "Forbidden" });
+    }
     await item.update(req.body);
     res.json(item);
 };
@@ -29,6 +48,9 @@ exports.updateCartItem = async (req, res) => {
 exports.deleteCartItem = async (req, res) => {
     const item = await CartItem.findByPk(req.params.id);
     if (!item) return res.status(404).json({ error: "Not found" });
+    if (!(await ownsCartItem(req.user.id, item))) {
+        return res.status(403).json({ error: "Forbidden" });
+    }
     await item.destroy();
     res.status(204).end();
 };

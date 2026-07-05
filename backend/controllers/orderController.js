@@ -6,6 +6,8 @@ const {
     Restaurant,
     OrderItem,
 } = require("../db/models");
+const { getSocket } = require("../utils/socket");
+const orderLifecycle = require("../utils/orderLifecycle");
 
 exports.getUserOrders = async (req, res) => {
     try {
@@ -114,6 +116,11 @@ exports.createOrder = async (req, res) => {
         // Clear the user's cart
         await CartItem.destroy({ where: { cartId: cart.id } });
 
+        // Kick off the server-owned status/runner timeline; don't block the response on it.
+        orderLifecycle
+            .start(getSocket(), newOrder.id)
+            .catch((err) => console.error("orderLifecycle.start", err));
+
         res.status(201).json(newOrder);
     } catch (err) {
         console.error("Error creating order:", err);
@@ -140,7 +147,7 @@ exports.deleteOrder = async (req, res, next) => {
         }
 
         // Check if the user is the owner of the order or an admin
-        if (order.userId !== req.user.id && !req.user.isAdmin) {
+        if (order.userId !== req.user.id && req.user.userType !== "admin") {
             return res.status(403).json({ error: "Forbidden" });
         }
 

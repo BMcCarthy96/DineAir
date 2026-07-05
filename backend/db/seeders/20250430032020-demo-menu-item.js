@@ -5,6 +5,9 @@ if (process.env.NODE_ENV === "production") {
     options.schema = process.env.SCHEMA;
 }
 
+const img = (id) =>
+    `https://images.unsplash.com/photo-${id}?auto=format&fit=crop&w=800&q=80`;
+
 /** @type {import('sequelize-cli').Migration} */
 
 module.exports = {
@@ -13,6 +16,7 @@ module.exports = {
         await queryInterface.bulkInsert(
             options,
             [
+                // --- Original 30 items: order/ids preserved (cart/order/review seeders reference these by id) ---
                 // Taco 'Bout It
                 {
                     restaurantId: 1,
@@ -20,8 +24,7 @@ module.exports = {
                     description: "A taco with all the fixings!",
                     price: 8.99,
                     available: true,
-                    imageUrl:
-                        "https://media.istockphoto.com/id/1146906219/photo/small-4inch-soft-beef-tacos.jpg?s=2048x2048&w=is&k=20&c=lE1T__n4nYwVzq7UpdMtpZ95GGjO9rdl4JEx0U-1GB0=",
+                    imageUrl: "https://commons.wikimedia.org/wiki/Special:FilePath/(El%20Flaco)%20Al%20Pastor%20Tacos.jpg?width=800",
                 },
                 {
                     restaurantId: 1,
@@ -29,8 +32,7 @@ module.exports = {
                     description: "Loaded nachos with jalapeños and cheese.",
                     price: 7.99,
                     available: true,
-                    imageUrl:
-                        "https://media.istockphoto.com/id/588215300/photo/homemade-barbecue-pulled-pork-nachos.jpg?s=2048x2048&w=is&k=20&c=CSgRAgIU4sgdR0OFt2c6UFiqB2IgvbtD0YEBdLc-GD0=",
+                    imageUrl: img("1513456852971-30c0b8199d4d"),
                 },
                 {
                     restaurantId: 1,
@@ -38,8 +40,7 @@ module.exports = {
                     description: "Sweet cinnamon churros with chocolate dip.",
                     price: 4.99,
                     available: true,
-                    imageUrl:
-                        "https://media.istockphoto.com/id/528418040/photo/churros-with-hot-chocolate-and-powdered-sugar.jpg?s=2048x2048&w=is&k=20&c=uaCT6EEc5KpX5xJTy0vLIDUYfilix1f-gNtrANxxCbk=",
+                    imageUrl: "https://commons.wikimedia.org/wiki/Special:FilePath/Chocolate%20con%20churros%20de%20lazo.jpg?width=800",
                 },
 
                 // The Wok and Roll
@@ -49,8 +50,7 @@ module.exports = {
                     description: "A roll of sushi that’s totally on a roll!",
                     price: 12.99,
                     available: true,
-                    imageUrl:
-                        "https://media.istockphoto.com/id/135849804/photo/sushi.jpg?s=2048x2048&w=is&k=20&c=MnvR4zVobM9zc19Ga5cvfX-1VqE2CUMdok7qBe6oJR4=",
+                    imageUrl: img("1553621042-f6e147245754"),
                 },
                 {
                     restaurantId: 2,
@@ -58,8 +58,7 @@ module.exports = {
                     description: "Grilled chicken with teriyaki sauce.",
                     price: 10.99,
                     available: true,
-                    imageUrl:
-                        "https://media.istockphoto.com/id/1348103225/photo/healthy-asian-teriyaki-chicken.jpg?s=612x612&w=0&k=20&c=GTgt3CDSaF3tjGzS_leHTj0YQKRvX87TtP0nVuP2TEQ=",
+                    imageUrl: "https://commons.wikimedia.org/wiki/Special:FilePath/Pollo%20teriyaki%20de%20Sarku%20Japan%20(Colombia).jpg?width=800",
                 },
                 {
                     restaurantId: 2,
@@ -68,8 +67,7 @@ module.exports = {
                         "Traditional Japanese soup with tofu and seaweed.",
                     price: 3.99,
                     available: true,
-                    imageUrl:
-                        "https://media.istockphoto.com/id/155341533/photo/miso-soup.jpg?s=612x612&w=0&k=20&c=0614e4CQibtJ5RlwsHfdFuVPa9FS6QG38ITuBXoh4Qk=",
+                    imageUrl: "https://commons.wikimedia.org/wiki/Special:FilePath/Miso%20Soup%20001.jpg?width=800",
                 },
 
                 // Pasta La Vista
@@ -79,8 +77,7 @@ module.exports = {
                     description: "Classic Italian pasta with creamy sauce.",
                     price: 14.99,
                     available: true,
-                    imageUrl:
-                        "https://media.istockphoto.com/id/1201523342/photo/spaghetti-carbonara.jpg?s=612x612&w=0&k=20&c=qRapeFYq9sKOeKFi-obdtoF5l-5Pti5ydUjO1zfMoJA=",
+                    imageUrl: img("1551183053-bf91a1d81141"),
                 },
                 {
                     restaurantId: 3,
@@ -88,8 +85,7 @@ module.exports = {
                     description: "Fresh pizza with mozzarella and basil.",
                     price: 12.99,
                     available: true,
-                    imageUrl:
-                        "https://media.istockphoto.com/id/1518606270/photo/directly-above-freshly-baked-pizza-margherita.jpg?s=612x612&w=0&k=20&c=7Q-aYhT2kjBxnhQFJmwjgxMsvkWaSMIo8J0gNqDGVN8=",
+                    imageUrl: img("1513104890138-7c749659a591"),
                 },
                 {
                     restaurantId: 3,
@@ -98,8 +94,7 @@ module.exports = {
                         "Traditional Italian dessert with coffee flavor.",
                     price: 6.99,
                     available: true,
-                    imageUrl:
-                        "https://media.istockphoto.com/id/956986120/photo/italian-dessert-tiramisu-with-mascarpone-cheese-and-espresso-coffee.jpg?s=612x612&w=0&k=20&c=XAyRuKGFSX3iAQXG69_ADauMTOvrtfcks9BbuppAcmA=",
+                    imageUrl: img("1571877227200-a0d98ea607e9"),
                 },
 
                 // Bagel Space
@@ -110,8 +105,7 @@ module.exports = {
                         "Bagel with cream cheese and everything seasoning.",
                     price: 5.99,
                     available: true,
-                    imageUrl:
-                        "https://media.istockphoto.com/id/493161146/photo/toasted-bagel-with-cream-cheese-at-your-desk.jpg?s=612x612&w=0&k=20&c=3G0HjCkBcj2FWrfvcbb_0M18IhRVMZpu5sbufSmrElU=",
+                    imageUrl: "https://commons.wikimedia.org/wiki/Special:FilePath/Bagel-Plain-Alt.jpg?width=800",
                 },
                 {
                     restaurantId: 4,
@@ -120,8 +114,7 @@ module.exports = {
                         "Bagel with smoked salmon, cream cheese, capers, and dill.",
                     price: 8.99,
                     available: true,
-                    imageUrl:
-                        "https://media.istockphoto.com/id/160142349/photo/bagel.jpg?s=612x612&w=0&k=20&c=HNpbgipnVSj78KadCgxFOmSPlPs4syvmEQai7gUuWGo=",
+                    imageUrl: "https://commons.wikimedia.org/wiki/Special:FilePath/Bagel%20with%20cream%20cheese%2C%20salmon%20and%20vegetables%20-%20Sarah%20Stierch.jpg?width=800",
                 },
                 {
                     restaurantId: 4,
@@ -129,8 +122,7 @@ module.exports = {
                     description: "Bagel with egg, cheese, and bacon.",
                     price: 7.99,
                     available: true,
-                    imageUrl:
-                        "https://media.istockphoto.com/id/534159727/photo/hearty-breakfast-sandwich-on-a-bagel.jpg?s=612x612&w=0&k=20&c=tUIgL9GFlT5wx9p9GVaSM85O03CERb9L3oE_xxaKJ5g=",
+                    imageUrl: "https://commons.wikimedia.org/wiki/Special:FilePath/BEC%20Sandwich%20on%20Everything%20Bagel.jpg?width=800",
                 },
 
                 // Brew & Fly
@@ -140,7 +132,7 @@ module.exports = {
                     description: "Rich espresso with steamed milk and foam.",
                     price: 4.99,
                     available: true,
-                    imageUrl: "/images/cappuccino.jpg",
+                    imageUrl: img("1572442388796-11668a67e53d"),
                 },
                 {
                     restaurantId: 5,
@@ -148,8 +140,7 @@ module.exports = {
                     description: "Smooth espresso with steamed milk.",
                     price: 4.49,
                     available: true,
-                    imageUrl:
-                        "https://media.istockphoto.com/id/505168330/photo/cup-of-cafe-latte-with-coffee-beans-and-cinnamon-sticks.jpg?s=612x612&w=0&k=20&c=h7v8kAfWOpRapv6hrDwmmB54DqrGQWxlhP_mTeqTQPA=",
+                    imageUrl: img("1461023058943-07fcbe16d735"),
                 },
                 {
                     restaurantId: 5,
@@ -157,8 +148,7 @@ module.exports = {
                     description: "Freshly baked muffin with blueberries.",
                     price: 3.99,
                     available: true,
-                    imageUrl:
-                        "https://media.istockphoto.com/id/478095157/photo/blueberry-muffins.jpg?s=612x612&w=0&k=20&c=bdYN4O2Furch6BAWOLhWmlnaRU5uGaxrpgMgWCeqqdw=",
+                    imageUrl: img("1607958996333-41aef7caefaa"),
                 },
 
                 // Burger Terminal
@@ -169,8 +159,7 @@ module.exports = {
                         "A juicy 100% Angus beef patty with melted cheese.",
                     price: 9.99,
                     available: true,
-                    imageUrl:
-                        "https://media.istockphoto.com/id/467416670/photo/huge-grass-fed-bison-hamburger-with-chips-beer.jpg?s=612x612&w=0&k=20&c=NA5S3gfJYRydMViaUMHz2d7wHuexygVM02xkiaE2p3c=",
+                    imageUrl: img("1550547660-d9450f859349"),
                 },
                 {
                     restaurantId: 6,
@@ -179,8 +168,7 @@ module.exports = {
                         "100% Angus beef patty topped with crispy Benton's bacon.",
                     price: 11.99,
                     available: true,
-                    imageUrl:
-                        "https://media.istockphoto.com/id/1399889993/photo/bacon-cheeseburger-on-a-toasted-bun.jpg?s=612x612&w=0&k=20&c=wh6yoDztVz7EeinrqJuk-nxAJ5UD42Rhg9eQmuXob2g=",
+                    imageUrl: img("1553979459-d2229ba7433b"),
                 },
                 {
                     restaurantId: 6,
@@ -188,8 +176,7 @@ module.exports = {
                     description: "Crispy golden fries with ketchup and ranch.",
                     price: 3.99,
                     available: true,
-                    imageUrl:
-                        "https://media.istockphoto.com/id/614420426/photo/basket-of-french-fries.jpg?s=612x612&w=0&k=20&c=o6IZg_NPJkOaICTa883jd49BwZvvI7wlP6SnjhyxqsI=",
+                    imageUrl: img("1573080496219-bb080dd4f877"),
                 },
 
                 // Pho Real
@@ -200,8 +187,7 @@ module.exports = {
                         "Traditional Vietnamese noodle soup with beef.",
                     price: 12.99,
                     available: true,
-                    imageUrl:
-                        "https://media.istockphoto.com/id/535168737/photo/vietnamese-pho-noodle-soup-dish.jpg?s=612x612&w=0&k=20&c=3-p-S7Ugpug95YnKS3qrUHSkKPvfIYDmuyiYlHVhF0M=",
+                    imageUrl: "https://commons.wikimedia.org/wiki/Special:FilePath/Beef-pho-vietnamese-soup.jpg?width=800",
                 },
                 {
                     restaurantId: 7,
@@ -209,8 +195,7 @@ module.exports = {
                     description: "Classic pho with tender chicken slices.",
                     price: 11.99,
                     available: true,
-                    imageUrl:
-                        "https://media.istockphoto.com/id/2149960806/photo/traditional-vietnamese-soup-pho-vietnamese-cuisine-soup-pho-ga-with-chicken-rice-noodles.jpg?s=612x612&w=0&k=20&c=3Oq97QWE_hm57BT5zTg_itGDukks1f1-wpHAW3xcfb8=",
+                    imageUrl: "https://commons.wikimedia.org/wiki/Special:FilePath/Chicken-pho-vietnamese-soup.JPG?width=800",
                 },
                 {
                     restaurantId: 7,
@@ -218,8 +203,7 @@ module.exports = {
                     description: "Fresh rolls with shrimp and peanut sauce.",
                     price: 6.99,
                     available: true,
-                    imageUrl:
-                        "https://media.istockphoto.com/id/1324861648/photo/vietnamese-cuisine-with-a-variety-of-delicious-flavors.jpg?s=612x612&w=0&k=20&c=N9upjmCbzaKo7o998dUDT7TBtJ42l5ndqH4JMFM8NYc=",
+                    imageUrl: "https://commons.wikimedia.org/wiki/Special:FilePath/Vietnamese%20fried%20spring%20rolls%20in%20Ho%20Chi%20Minh%20City%2C%20Vietnam.jpg?width=800",
                 },
 
                 // The Flying Curry
@@ -229,8 +213,7 @@ module.exports = {
                     description: "Creamy curry with tender chicken pieces.",
                     price: 13.99,
                     available: true,
-                    imageUrl:
-                        "https://media.istockphoto.com/id/1312459972/photo/homemade-indian-butter-chicken-with-rice.jpg?s=612x612&w=0&k=20&c=QJcSuJJuusJh1sWpW-l6BNHVlUlodVwO-gtcRrYgHj8=",
+                    imageUrl: img("1585937421612-70a008356fbe"),
                 },
                 {
                     restaurantId: 8,
@@ -239,8 +222,7 @@ module.exports = {
                         "A mix of fresh vegetables in a spicy curry sauce.",
                     price: 11.99,
                     available: true,
-                    imageUrl:
-                        "https://media.istockphoto.com/id/1215400520/photo/curried-roasted-eggplant-with-smoked-cardamom-and-coconut-milk.jpg?s=612x612&w=0&k=20&c=x3sxttxsD4skearzDzdhu0Uid097N6En8Ee-CG6Feqo=",
+                    imageUrl: "https://commons.wikimedia.org/wiki/Special:FilePath/Mixed%20Vegetable%20Curry.JPG?width=800",
                 },
                 {
                     restaurantId: 8,
@@ -248,8 +230,7 @@ module.exports = {
                     description: "Soft naan bread with a hint of garlic.",
                     price: 3.99,
                     available: true,
-                    imageUrl:
-                        "https://media.istockphoto.com/id/1298748782/photo/traditional-indian-naan-flatbread.jpg?s=612x612&w=0&k=20&c=x851gawu7ZROI2wMYa28DW2uCdqh9E56prMDIhj4akE=",
+                    imageUrl: "https://commons.wikimedia.org/wiki/Special:FilePath/Garlic%20Naan.JPG?width=800",
                 },
 
                 // Poke Paradise
@@ -260,8 +241,7 @@ module.exports = {
                         "Fresh ahi tuna with rice and tropical toppings.",
                     price: 14.99,
                     available: true,
-                    imageUrl:
-                        "https://media.istockphoto.com/id/694569604/photo/raw-organic-ahi-tuna-poke-bowl.jpg?s=612x612&w=0&k=20&c=T0kl8HrfHl_iUmMOKBJPRtKjtj9pzVMQB50Dx68SVl0=",
+                    imageUrl: "https://commons.wikimedia.org/wiki/Special:FilePath/Uwajimaya%20Poke%20Bowl%20with%20salmon%2C%20tuna%2C%20ginger%2C%20and%202%20scoops%20of%20rice.jpg?width=800",
                 },
                 {
                     restaurantId: 9,
@@ -269,8 +249,7 @@ module.exports = {
                     description: "Salmon with avocado, rice, and sesame seeds.",
                     price: 13.99,
                     available: true,
-                    imageUrl:
-                        "https://media.istockphoto.com/id/1001332318/photo/hawaiian-salmon-fish-poke-bowl-with-rice-radish-cucumber-tomato-sesame-seeds-and-seaweeds.jpg?s=612x612&w=0&k=20&c=Aq1K0UuFKZO3OpcKZPmuo9FHlxnTZmWw2tFpeHAUF3s=",
+                    imageUrl: "https://commons.wikimedia.org/wiki/Special:FilePath/Salmon%20%26%20Tuna%20Poke%20Bowl%20(M)%20with%20Spicy%20Mayo%20sauce%20-%20Kitokito%202025-04-25.jpg?width=800",
                 },
                 {
                     restaurantId: 9,
@@ -279,8 +258,7 @@ module.exports = {
                         "A vegetarian option with tofu and fresh veggies.",
                     price: 12.99,
                     available: true,
-                    imageUrl:
-                        "https://media.istockphoto.com/id/878734076/photo/healthy-organic-tofu-and-rice-buddha-bowl.jpg?s=612x612&w=0&k=20&c=RE8aZvjQEsr9r3x07IO5HWbaB2PW6xJC-7D9TnjSs9g=",
+                    imageUrl: "https://commons.wikimedia.org/wiki/Special:FilePath/Fried%20Tofu%20Poke%20Bowl%20(S)%20with%20kimchi%20sauce%20-%20Kitokito.jpg?width=800",
                 },
 
                 // Crepe Escape
@@ -290,8 +268,7 @@ module.exports = {
                     description: "Sweet crepe filled with Nutella and bananas.",
                     price: 8.99,
                     available: true,
-                    imageUrl:
-                        "https://media.istockphoto.com/id/1132230754/photo/tasty-crepe-with-hazelnut-chocolate-spread-and-banana.jpg?s=612x612&w=0&k=20&c=YuS4lqR6iW018g2cpo_a7MMJ0h0OJBdHXDPZUwZauac=",
+                    imageUrl: "https://commons.wikimedia.org/wiki/Special:FilePath/Nutella%20%26%20banana%20cr%C3%AApe%20and%20classic%20galette%20-%20Oui%20Cr%C3%AAperie.jpg?width=800",
                 },
                 {
                     restaurantId: 10,
@@ -299,8 +276,7 @@ module.exports = {
                     description: "Savory crepe with ham and melted cheese.",
                     price: 9.99,
                     available: true,
-                    imageUrl:
-                        "https://media.istockphoto.com/id/1611524601/photo/fried-crepe-with-ham-and-cream.jpg?s=612x612&w=0&k=20&c=EuAfDiYTDsxGIKyAwS9yp_aGB5ZISEStOoWYen7EhiI=",
+                    imageUrl: "https://commons.wikimedia.org/wiki/Special:FilePath/Savoyarde%20buckwheat%20crepe%2C%20with%20prosciutto%2C%20cheese%2C%20potato%2C%20shallots%2C%20cornichons%20-%20San%20Francisco%2C%20CA.jpg?width=800",
                 },
                 {
                     restaurantId: 10,
@@ -308,8 +284,169 @@ module.exports = {
                     description: "Fresh strawberries with whipped cream.",
                     price: 8.99,
                     available: true,
-                    imageUrl:
-                        "https://media.istockphoto.com/id/477056522/photo/food-strawberry-crepes.jpg?s=612x612&w=0&k=20&c=YdV4qua0nj5EYQcP0zQHX5yp2CcqaT8LGcxT1-b4NSI=",
+                    imageUrl: "https://commons.wikimedia.org/wiki/Special:FilePath/Cr%C3%AApe%20with%20Strawberry%20Ice%20Cream.JPG?width=800",
+                },
+
+                // --- New items appended after id 30 so existing cart/order/review seeders stay valid ---
+                {
+                    restaurantId: 1,
+                    name: "Street Tacos",
+                    description: "Trio of grilled street tacos with lime and onion.",
+                    price: 9.49,
+                    available: true,
+                    imageUrl: img("1611250188496-e966043a0629"),
+                },
+                {
+                    restaurantId: 1,
+                    name: "Chicken Quesadilla",
+                    description: "Grilled quesadilla with melted cheese and pico de gallo.",
+                    price: 8.49,
+                    available: true,
+                    imageUrl: img("1618040996337-56904b7850b9"),
+                },
+                {
+                    restaurantId: 2,
+                    name: "Ramen Bowl",
+                    description: "Rich pork broth ramen with soft egg and scallions.",
+                    price: 11.99,
+                    available: true,
+                    imageUrl: img("1591814468924-caf88d1232e1"),
+                },
+                {
+                    restaurantId: 2,
+                    name: "Dumplings",
+                    description: "Steamed pork and chive dumplings, six pieces.",
+                    price: 7.49,
+                    available: true,
+                    imageUrl: img("1496116218417-1a781b1c416c"),
+                },
+                {
+                    restaurantId: 3,
+                    name: "Risotto",
+                    description: "Creamy parmesan risotto with wild mushrooms.",
+                    price: 13.99,
+                    available: true,
+                    imageUrl: img("1595908129746-57ca1a63dd4d"),
+                },
+                {
+                    restaurantId: 3,
+                    name: "Lasagna",
+                    description: "Layered pasta with beef ragu and béchamel.",
+                    price: 13.49,
+                    available: true,
+                    imageUrl: img("1619895092538-128341789043"),
+                },
+                {
+                    restaurantId: 4,
+                    name: "Butter Croissant",
+                    description: "Flaky, buttery French croissant.",
+                    price: 3.99,
+                    available: true,
+                    imageUrl: img("1555507036-ab1f4038808a"),
+                },
+                {
+                    restaurantId: 4,
+                    name: "Cinnamon Roll",
+                    description: "Warm cinnamon roll with cream cheese glaze.",
+                    price: 4.49,
+                    available: true,
+                    imageUrl: "https://commons.wikimedia.org/wiki/Special:FilePath/Rollo%20de%20canela%20(Cinnamon%20roll).jpg?width=800",
+                },
+                {
+                    restaurantId: 5,
+                    name: "Espresso Shot",
+                    description: "Double shot of rich, bold espresso.",
+                    price: 2.99,
+                    available: true,
+                    imageUrl: "https://commons.wikimedia.org/wiki/Special:FilePath/Espresso%20shot%20in%20a%20cappuccino%20cup.jpg?width=800",
+                },
+                {
+                    restaurantId: 5,
+                    name: "Iced Coffee",
+                    description: "Cold brew coffee over ice.",
+                    price: 3.99,
+                    available: true,
+                    imageUrl: "https://commons.wikimedia.org/wiki/Special:FilePath/Iced%20Coffee%20in%20Glass%20-%20Sunshine%20Coffee%20-%20Laramie%20Cafe%20(53838344552).jpg?width=800",
+                },
+                {
+                    restaurantId: 6,
+                    name: "Double Cheeseburger",
+                    description: "Two beef patties, double cheese, all the fixings.",
+                    price: 13.99,
+                    available: true,
+                    imageUrl: img("1586190848861-99aa4a171e90"),
+                },
+                {
+                    restaurantId: 6,
+                    name: "Milkshake",
+                    description: "Thick hand-spun vanilla milkshake.",
+                    price: 5.49,
+                    available: true,
+                    imageUrl: img("1579954115545-a95591f28bfc"),
+                },
+                {
+                    restaurantId: 7,
+                    name: "Banh Mi",
+                    description: "Vietnamese baguette with pork and pickled veggies.",
+                    price: 8.99,
+                    available: true,
+                    imageUrl: "https://commons.wikimedia.org/wiki/Special:FilePath/B%C3%A1nh%20mi%20Sandwich(Takadanobaba)IMG%2020220215%20104413%2003.jpg?width=800",
+                },
+                {
+                    restaurantId: 7,
+                    name: "Fried Rice",
+                    description: "Wok-fried rice with egg and scallions.",
+                    price: 7.99,
+                    available: true,
+                    imageUrl: img("1603133872878-684f208fb84b"),
+                },
+                {
+                    restaurantId: 8,
+                    name: "Chicken Biryani",
+                    description: "Fragrant basmati rice with spiced chicken.",
+                    price: 13.49,
+                    available: true,
+                    imageUrl: img("1563379091339-03b21ab4a4f8"),
+                },
+                {
+                    restaurantId: 8,
+                    name: "Samosa",
+                    description: "Crispy pastry filled with spiced potato and peas.",
+                    price: 4.99,
+                    available: true,
+                    imageUrl: img("1601050690597-df0568f70950"),
+                },
+                {
+                    restaurantId: 9,
+                    name: "Spicy Tuna Poke",
+                    description: "Spicy tuna over rice with crunchy toppings.",
+                    price: 14.49,
+                    available: true,
+                    imageUrl: "https://commons.wikimedia.org/wiki/Special:FilePath/Spicy%20ahi%20tunna.jpg?width=800",
+                },
+                {
+                    restaurantId: 9,
+                    name: "Classic Poke Bowl",
+                    description: "House special with a mix of fresh fish.",
+                    price: 15.49,
+                    available: true,
+                    imageUrl: "https://commons.wikimedia.org/wiki/Special:FilePath/Poke%20Bowl%20at%20Churutto.jpg?width=800",
+                },
+                {
+                    restaurantId: 10,
+                    name: "Chocolate Crepe",
+                    description: "Warm crepe drizzled with rich chocolate sauce.",
+                    price: 8.49,
+                    available: true,
+                    imageUrl: "https://commons.wikimedia.org/wiki/Special:FilePath/Crepe%20with%20strawberries%20and%20banana%20and%20chocolate%20in%20it.jpg?width=800",
+                },
+                {
+                    restaurantId: 10,
+                    name: "Banana Split Crepe",
+                    description: "Crepe with banana, ice cream, and syrup.",
+                    price: 9.49,
+                    available: true,
+                    imageUrl: "https://commons.wikimedia.org/wiki/Special:FilePath/Royal%20Street%20Bananas%20Foster%20Crepe%20-%208567020641.jpg?width=800",
                 },
             ],
             { validate: true }

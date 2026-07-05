@@ -1,33 +1,12 @@
-import Cookies from "js-cookie";
-import { resolveApiUrl } from "../utils/apiBaseUrl";
+import { apiFetch } from "../utils/apiFetch";
 
+/**
+ * @deprecated prefer `apiFetch` from utils/apiFetch — this is a thin shim that keeps the legacy
+ * throw-on-4xx/5xx contract for call sites that still expect it.
+ */
 export async function csrfFetch(url, options = {}) {
-    // set options.method to 'GET' if there is no method
-    options.method = options.method || "GET";
-    // set options.headers to an empty object if there is no headers
-    options.headers = options.headers || {};
-
-    // if the options.method is not 'GET', then set the "Content-Type" header to
-    // "application/json", and set the "XSRF-TOKEN" header to the value of the
-    // "XSRF-TOKEN" cookie
-    if (options.method.toUpperCase() !== "GET") {
-        options.headers["Content-Type"] =
-            options.headers["Content-Type"] || "application/json";
-        options.headers["XSRF-Token"] = Cookies.get("XSRF-TOKEN");
-    }
-    // call the default window's fetch with the url and the options passed in
-    const resolved = typeof url === "string" ? resolveApiUrl(url) : url;
-    const res = await window.fetch(resolved, {
-        ...options,
-        credentials: options.credentials ?? "include",
-    });
-
-    // if the response status code is 400 or above, then throw an error with the
-    // error being the response
+    const res = await apiFetch(url, options);
     if (res.status >= 400) throw res;
-
-    // if the response status code is under 400, then return the response to the
-    // next promise chain
     return res;
 }
 

@@ -67,7 +67,6 @@ const restoreUser = (req, res, next) => {
 // If there is no current user, return an error
 const requireAuth = function (req, _res, next) {
     if (req.user) {
-        console.log("Authenticated user:", req.user); // Debugging
         return next();
     }
 

@@ -1,4 +1,3 @@
-const axios = require("axios");
 const { Flight } = require("../db/models");
 const { getSocket } = require("../utils/socket");
 

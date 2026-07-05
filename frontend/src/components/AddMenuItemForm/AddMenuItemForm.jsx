@@ -1,7 +1,7 @@
 import { useState } from "react";
-import Cookies from "js-cookie";
 import { toast } from "react-toastify";
 import { apiFetch } from "../../utils/apiFetch";
+import FormField from "../ui/FormField";
 
 function AddMenuItemForm({ restaurantId, onMenuItemAdded }) {
     const [name, setName] = useState("");
@@ -28,10 +28,6 @@ function AddMenuItemForm({ restaurantId, onMenuItemAdded }) {
                 `/api/restaurants/${restaurantId}/menu-items`,
                 {
                     method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "XSRF-Token": Cookies.get("XSRF-TOKEN") || "",
-                    },
                     body: JSON.stringify(newItem),
                 }
             );
@@ -71,10 +67,7 @@ function AddMenuItemForm({ restaurantId, onMenuItemAdded }) {
                     {error}
                 </p>
             )}
-            <div>
-                <label htmlFor="mi-name" className="da-label">
-                    Name
-                </label>
+            <FormField label="Name" id="mi-name">
                 <input
                     id="mi-name"
                     type="text"
@@ -83,22 +76,16 @@ function AddMenuItemForm({ restaurantId, onMenuItemAdded }) {
                     className="da-input"
                     required
                 />
-            </div>
-            <div>
-                <label htmlFor="mi-desc" className="da-label">
-                    Description
-                </label>
+            </FormField>
+            <FormField label="Description" id="mi-desc">
                 <textarea
                     id="mi-desc"
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
                     className="da-input min-h-[88px] resize-y"
                 />
-            </div>
-            <div>
-                <label htmlFor="mi-price" className="da-label">
-                    Price
-                </label>
+            </FormField>
+            <FormField label="Price" id="mi-price">
                 <input
                     id="mi-price"
                     type="number"
@@ -108,11 +95,8 @@ function AddMenuItemForm({ restaurantId, onMenuItemAdded }) {
                     className="da-input"
                     required
                 />
-            </div>
-            <div>
-                <label htmlFor="mi-img" className="da-label">
-                    Image URL
-                </label>
+            </FormField>
+            <FormField label="Image URL" id="mi-img">
                 <input
                     id="mi-img"
                     type="text"
@@ -120,7 +104,7 @@ function AddMenuItemForm({ restaurantId, onMenuItemAdded }) {
                     onChange={(e) => setImageUrl(e.target.value)}
                     className="da-input"
                 />
-            </div>
+            </FormField>
             <label className="flex cursor-pointer items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-300">
                 <input
                     type="checkbox"

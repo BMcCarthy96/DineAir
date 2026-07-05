@@ -3,6 +3,8 @@ const jwt = require("jsonwebtoken");
 const { jwtConfig } = require("../config");
 const { Order } = require("../db/models");
 const trackingSimulation = require("./trackingSimulation");
+const orderLifecycle = require("./orderLifecycle");
+const { getFrontendOrigins } = require("./corsOrigins");
 
 let io;
 
@@ -19,28 +21,10 @@ function parseTokenFromCookie(cookieHeader) {
     return null;
 }
 
-function defaultCorsOrigins() {
-    const fromEnv = process.env.FRONTEND_URLS
-        ? process.env.FRONTEND_URLS.split(",").map((s) => s.trim())
-        : null;
-    if (fromEnv && fromEnv.length) return fromEnv;
-    /** Default Vite ports + production (credentials require explicit origins, not *). */
-    const defaults = [
-        "http://localhost:5173",
-        "http://127.0.0.1:5173",
-        "http://localhost:5174",
-        "http://127.0.0.1:5174",
-        "http://localhost:5175",
-        "http://127.0.0.1:5175",
-        "https://dineair.onrender.com",
-    ];
-    return defaults;
-}
-
 function initSocket(server) {
     io = new Server(server, {
         cors: {
-            origin: defaultCorsOrigins(),
+            origin: getFrontendOrigins(),
             methods: ["GET", "POST"],
             credentials: true,
         },
@@ -79,6 +63,7 @@ function initSocket(server) {
                     return;
                 }
                 await socket.join(`order:${orderId}`);
+                await orderLifecycle.resumeLifecycle(io, orderId);
                 await trackingSimulation.start(io, orderId);
                 cb?.({ ok: true });
             } catch (e) {

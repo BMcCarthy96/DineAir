@@ -9,11 +9,9 @@ import {
     FaTowerBroadcast,
     FaUtensils,
 } from "react-icons/fa6";
-import { addFavorite, removeFavorite } from "../../store/favorites";
+import { favoriteRestaurant, unfavoriteRestaurant } from "../../store/favorites";
 import RestaurantCard from "../ui/RestaurantCard";
 import { RestaurantCardSkeleton } from "../ui/Skeleton";
-
-const fastPrepIds = [4, 5, 9, 10];
 
 const fadeIn = {
     hidden: { opacity: 0, y: 20 },
@@ -33,9 +31,12 @@ function LandingPage() {
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
-    const fastPrepRestaurants = restaurants.filter((r) =>
-        fastPrepIds.includes(r.id)
-    );
+    const topRatedRestaurants = [...restaurants]
+        .filter((r) => Number(r.reviewCount) > 0)
+        .sort((a, b) => Number(b.avgRating) - Number(a.avgRating))
+        .slice(0, 4);
+
+    const boardRows = restaurants.slice(0, 6);
 
     useEffect(() => {
         let cancelled = false;
@@ -60,9 +61,9 @@ function LandingPage() {
     const toggleFavorite = (restaurant, event) => {
         event.stopPropagation();
         if (favorites.some((fav) => fav.id === restaurant.id)) {
-            dispatch(removeFavorite(restaurant.id));
+            dispatch(unfavoriteRestaurant(restaurant.id));
         } else {
-            dispatch(addFavorite(restaurant));
+            dispatch(favoriteRestaurant(restaurant));
         }
     };
 
@@ -89,17 +90,17 @@ function LandingPage() {
     ];
 
     return (
-        <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
+        <div className="min-h-screen bg-slate-50 dark:bg-night-950">
             <section
-                className="relative overflow-hidden border-b border-slate-200/80 bg-white dark:border-slate-800 dark:bg-slate-900"
+                className="relative overflow-hidden border-b border-slate-200/80 bg-white dark:border-night-700 dark:bg-night-900"
                 aria-label="Hero"
             >
                 <div
-                    className="pointer-events-none absolute -right-24 -top-24 h-96 w-96 rounded-full bg-brand-200/40 blur-3xl dark:bg-brand-900/30"
+                    className="pointer-events-none absolute -right-24 -top-24 h-96 w-96 rounded-full bg-brand-200/40 blur-3xl dark:bg-brand-500/10"
                     aria-hidden
                 />
                 <div
-                    className="pointer-events-none absolute -bottom-32 -left-24 h-80 w-80 rounded-full bg-sky-200/50 blur-3xl dark:bg-sky-900/20"
+                    className="pointer-events-none absolute -bottom-32 -left-24 h-80 w-80 rounded-full bg-sky-200/50 blur-3xl dark:bg-sky-500/5"
                     aria-hidden
                 />
 
@@ -117,9 +118,9 @@ function LandingPage() {
                         <motion.p
                             variants={fadeIn}
                             custom={0}
-                            className="mb-4 inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-slate-600 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300"
+                            className="da-eyebrow mb-4 justify-center rounded-full border border-slate-200 bg-slate-50 px-4 py-1.5 dark:border-night-600 dark:bg-night-800"
                         >
-                            <FaUtensils className="text-brand-500" aria-hidden />
+                            <FaUtensils aria-hidden />
                             Airport dining, reimagined
                         </motion.p>
                         <motion.h1
@@ -162,6 +163,45 @@ function LandingPage() {
                 </div>
             </section>
 
+            {!loading && boardRows.length > 0 && (
+                <section
+                    className="border-b border-night-700 bg-night-950 py-10"
+                    aria-label="Departures"
+                >
+                    <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+                        <div className="mb-4 flex items-center justify-between font-mono text-xs uppercase tracking-widest text-slate-500">
+                            <span>Now serving</span>
+                            <span className="flex items-center gap-2 text-brand-400">
+                                <span className="h-1.5 w-1.5 animate-flicker rounded-full bg-brand-400" />
+                                Live
+                            </span>
+                        </div>
+                        <div className="divide-y divide-night-700 rounded-2xl border border-night-700 bg-black/20">
+                            <div className="hidden grid-cols-[1fr_auto_auto] gap-4 px-5 py-2 font-mono text-[11px] uppercase tracking-widest text-slate-500 sm:grid">
+                                <span>Restaurant</span>
+                                <span>Terminal</span>
+                                <span>Gate</span>
+                            </div>
+                            {boardRows.map((r) => (
+                                <Link
+                                    key={r.id}
+                                    to={`/restaurants/${r.id}`}
+                                    className="grid grid-cols-[1fr_auto] items-center gap-4 px-5 py-3 font-mono text-sm text-slate-200 transition hover:bg-brand-500/5 sm:grid-cols-[1fr_auto_auto]"
+                                >
+                                    <span className="truncate">{r.name}</span>
+                                    <span className="hidden text-slate-400 sm:inline">
+                                        T{r.terminal}
+                                    </span>
+                                    <span className="text-brand-400">
+                                        {r.gate}
+                                    </span>
+                                </Link>
+                            ))}
+                        </div>
+                    </div>
+                </section>
+            )}
+
             <section
                 className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:px-8"
                 aria-labelledby="features-heading"
@@ -185,7 +225,7 @@ function LandingPage() {
                             }}
                             className="da-card p-6"
                         >
-                            <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-brand-50 text-brand-600 dark:bg-brand-950 dark:text-brand-300">
+                            <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-brand-50 text-brand-600 dark:bg-brand-500/15 dark:text-brand-300">
                                 <Icon className="h-6 w-6" aria-hidden />
                             </div>
                             <h3 className="text-lg font-semibold text-slate-900 dark:text-white">
@@ -200,18 +240,18 @@ function LandingPage() {
             </section>
 
             <section
-                className="border-t border-slate-200/80 bg-white py-16 dark:border-slate-800 dark:bg-slate-900"
-                aria-label="Fast prep picks"
+                className="border-t border-slate-200/80 bg-white py-16 dark:border-night-700 dark:bg-night-900"
+                aria-label="Top rated picks"
             >
                 <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
                     <div className="mb-10 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
                         <div>
+                            <p className="da-eyebrow mb-2">Fan favorites</p>
                             <h2 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
-                                Fast prep picks
+                                Top rated
                             </h2>
                             <p className="mt-1 text-slate-600 dark:text-slate-400">
-                                Vendors tuned for tight connections—typically
-                                ready in minutes.
+                                The best-reviewed vendors across every terminal.
                             </p>
                         </div>
                         <Link
@@ -234,19 +274,18 @@ function LandingPage() {
                                 <RestaurantCardSkeleton key={k} />
                             ))}
                         </div>
-                    ) : fastPrepRestaurants.length > 0 ? (
+                    ) : topRatedRestaurants.length > 0 ? (
                         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                            {fastPrepRestaurants.map((restaurant) => (
+                            {topRatedRestaurants.map((restaurant) => (
                                 <RestaurantCard
                                     key={restaurant.id}
                                     restaurant={restaurant}
                                     onSelect={handleCardClick}
-                                    fastPrepIds={fastPrepIds}
                                     favoriteControl={
                                         sessionUser ? (
                                             <button
                                                 type="button"
-                                                className="rounded-full bg-white/95 p-2.5 shadow-soft backdrop-blur-sm transition hover:scale-105 dark:bg-slate-900/95"
+                                                className="rounded-full bg-white/95 p-2.5 shadow-soft backdrop-blur-sm transition hover:scale-105 dark:bg-night-900/95"
                                                 aria-label={
                                                     favorites.some(
                                                         (f) =>
@@ -282,64 +321,11 @@ function LandingPage() {
                         </div>
                     ) : (
                         <p className="text-center text-slate-600 dark:text-slate-400">
-                            No featured restaurants right now—browse the full
-                            list.
+                            No reviews yet—browse the full list.
                         </p>
                     )}
                 </div>
             </section>
-
-            <footer className="border-t border-slate-200 bg-slate-50 py-12 dark:border-slate-800 dark:bg-slate-950">
-                <div className="mx-auto flex max-w-6xl flex-col gap-8 px-4 sm:px-6 lg:flex-row lg:justify-between lg:px-8">
-                    <div>
-                        <div className="text-lg font-bold text-slate-900 dark:text-white">
-                            DineAir
-                        </div>
-                        <p className="mt-2 max-w-xs text-sm text-slate-600 dark:text-slate-400">
-                            Food at the airport, without the sprint.
-                        </p>
-                    </div>
-                    <div className="flex flex-wrap gap-8 text-sm">
-                        <div className="space-y-2">
-                            <div className="font-semibold text-slate-900 dark:text-white">
-                                Product
-                            </div>
-                            <Link
-                                to="/restaurants"
-                                className="block text-slate-600 hover:text-brand-600 dark:text-slate-400 dark:hover:text-brand-400"
-                            >
-                                Restaurants
-                            </Link>
-                            <Link
-                                to="/orders"
-                                className="block text-slate-600 hover:text-brand-600 dark:text-slate-400 dark:hover:text-brand-400"
-                            >
-                                Orders
-                            </Link>
-                        </div>
-                        <div className="space-y-2">
-                            <div className="font-semibold text-slate-900 dark:text-white">
-                                Account
-                            </div>
-                            <Link
-                                to="/login"
-                                className="block text-slate-600 hover:text-brand-600 dark:text-slate-400 dark:hover:text-brand-400"
-                            >
-                                Log in
-                            </Link>
-                            <Link
-                                to="/signup"
-                                className="block text-slate-600 hover:text-brand-600 dark:text-slate-400 dark:hover:text-brand-400"
-                            >
-                                Sign up
-                            </Link>
-                        </div>
-                    </div>
-                </div>
-                <div className="mx-auto mt-10 max-w-6xl border-t border-slate-200 px-4 pt-8 text-center text-xs text-slate-500 dark:border-slate-800 dark:text-slate-500 sm:px-6 lg:px-8">
-                    © {new Date().getFullYear()} DineAir. Capstone demo.
-                </div>
-            </footer>
         </div>
     );
 }

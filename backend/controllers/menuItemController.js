@@ -1,4 +1,12 @@
-const { MenuItem } = require("../db/models");
+const { MenuItem, Restaurant } = require("../db/models");
+
+function canManage(user, restaurant) {
+    return (
+        user &&
+        restaurant &&
+        (user.userType === "admin" || user.id === restaurant.ownerId)
+    );
+}
 
 exports.getMenuItemsByRestaurant = async (req, res, next) => {
     try {
@@ -50,6 +58,14 @@ exports.createMenuItem = async (req, res, next) => {
         const { restaurantId } = req.params;
         const { name, description, price, available, imageUrl } = req.body;
 
+        const restaurant = await Restaurant.findByPk(restaurantId);
+        if (!restaurant) {
+            return res.status(404).json({ error: "Restaurant not found" });
+        }
+        if (!canManage(req.user, restaurant)) {
+            return res.status(403).json({ error: "Forbidden" });
+        }
+
         const item = await MenuItem.create({
             restaurantId,
             name,
@@ -77,6 +93,10 @@ exports.updateMenuItem = async (req, res, next) => {
                 message: "The requested resource couldn't be found.",
             });
         }
+        const restaurant = await Restaurant.findByPk(menuItem.restaurantId);
+        if (!canManage(req.user, restaurant)) {
+            return res.status(403).json({ error: "Forbidden" });
+        }
 
         await menuItem.update({
             name,
@@ -95,6 +115,10 @@ exports.deleteMenuItem = async (req, res, next) => {
     try {
         const item = await MenuItem.findByPk(req.params.id);
         if (!item) return res.status(404).json({ error: "Not found" });
+        const restaurant = await Restaurant.findByPk(item.restaurantId);
+        if (!canManage(req.user, restaurant)) {
+            return res.status(403).json({ error: "Forbidden" });
+        }
         await item.destroy();
         res.status(204).end();
     } catch (err) {

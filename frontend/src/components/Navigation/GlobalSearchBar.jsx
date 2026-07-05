@@ -28,7 +28,7 @@ function GlobalSearchBar({
                 />
             </form>
             {showDropdown && (
-                <div className="absolute left-0 right-0 top-full z-50 mt-2 max-h-80 overflow-y-auto rounded-2xl border border-slate-200 bg-white py-2 shadow-soft-lg dark:border-slate-700 dark:bg-slate-900">
+                <div className="absolute left-0 right-0 top-full z-50 mt-2 max-h-80 overflow-y-auto rounded-2xl border border-slate-200 bg-white py-2 shadow-soft-lg dark:border-night-700 dark:bg-night-900">
                     {searchResults.restaurants.length > 0 && (
                         <div className="px-3 pb-2">
                             <p className="px-2 py-1 text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
@@ -39,7 +39,7 @@ function GlobalSearchBar({
                                     <li key={restaurant.id}>
                                         <button
                                             type="button"
-                                            className="w-full rounded-lg px-3 py-2 text-left text-sm text-slate-800 transition hover:bg-slate-50 dark:text-slate-100 dark:hover:bg-slate-800"
+                                            className="w-full rounded-lg px-3 py-2 text-left text-sm text-slate-800 transition hover:bg-slate-50 dark:text-slate-100 dark:hover:bg-night-800"
                                             onClick={() =>
                                                 onSelectRestaurant(
                                                     restaurant.id
@@ -63,7 +63,7 @@ function GlobalSearchBar({
                                     <li key={menuItem.id}>
                                         <button
                                             type="button"
-                                            className="w-full rounded-lg px-3 py-2 text-left text-sm text-slate-800 transition hover:bg-slate-50 dark:text-slate-100 dark:hover:bg-slate-800"
+                                            className="w-full rounded-lg px-3 py-2 text-left text-sm text-slate-800 transition hover:bg-slate-50 dark:text-slate-100 dark:hover:bg-night-800"
                                             onClick={() =>
                                                 onSelectMenuItem(
                                                     menuItem.id,

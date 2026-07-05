@@ -102,13 +102,14 @@ function DeliveryTrackingPage() {
     useEffect(() => {
         async function fetchFlightInfo() {
             try {
+                const today = new Date().toISOString().slice(0, 10);
                 const response = await apiFetch(
-                    "/api/flights?flightNumber=DL123&date=2023-10-01"
+                    `/api/flights?flightNumber=DL123&date=${today}`
                 );
                 if (response.ok) {
                     const data = await response.json();
                     setFlightNumber(data.flightNumber);
-                    setDate(data.date || "2023-10-01");
+                    setDate(data.date || today);
                 } else {
                     throw new Error("Failed to fetch flight information");
                 }
@@ -177,7 +178,7 @@ function DeliveryTrackingPage() {
                                 Live
                             </span>
                         ) : connectionMode === "connecting" ? (
-                            <span className="rounded-full bg-slate-100 px-3 py-1 text-slate-600 dark:bg-slate-800 dark:text-slate-300">
+                            <span className="rounded-full bg-slate-100 px-3 py-1 text-slate-600 dark:bg-night-800 dark:text-slate-300">
                                 Connecting…
                             </span>
                         ) : (

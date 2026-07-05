@@ -100,7 +100,8 @@ function LoginFormPage() {
         <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center px-4 py-12">
             <div className="w-full max-w-md">
                 <div className="da-card p-8 shadow-soft-lg sm:p-10">
-                    <h1 className="text-center text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
+                    <p className="da-eyebrow justify-center">DineAir</p>
+                    <h1 className="mt-2 text-center text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
                         Welcome back
                     </h1>
                     <p className="mt-2 text-center text-sm text-slate-600 dark:text-slate-400">
@@ -154,9 +155,9 @@ function LoginFormPage() {
                         </button>
                     </form>
 
-                    <div className="mt-10 border-t border-slate-200 pt-8 dark:border-slate-700">
+                    <div className="mt-10 border-t border-slate-200 pt-8 dark:border-night-700">
                         <p className="text-center text-sm font-medium text-slate-700 dark:text-slate-300">
-                            Demo: pick a role
+                            Recruiter demo — tour any role, no signup needed
                         </p>
                         <div className="mt-4 flex flex-wrap justify-center gap-2">
                             {roles.map((role) => (
@@ -167,7 +168,7 @@ function LoginFormPage() {
                                     className={`rounded-full px-3 py-1.5 text-xs font-semibold transition ${
                                         selectedRole === role
                                             ? "bg-brand-600 text-white shadow-soft"
-                                            : "bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
+                                            : "bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-night-800 dark:text-slate-200 dark:hover:bg-night-700"
                                     }`}
                                 >
                                     {role}
@@ -179,10 +180,7 @@ function LoginFormPage() {
                             className="da-btn-secondary mt-4 w-full !py-3"
                             onClick={handleDemoLogin}
                         >
-                            Log in as{" "}
-                            {selectedRole === "Customer"
-                                ? "Customer"
-                                : selectedRole}
+                            Tour as {selectedRole}
                         </button>
                     </div>
 

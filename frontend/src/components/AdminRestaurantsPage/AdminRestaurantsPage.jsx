@@ -1,15 +1,18 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Cookies from "js-cookie";
 import { toast } from "react-toastify";
 import { apiFetch } from "../../utils/apiFetch";
 import EmptyState from "../ui/EmptyState";
+import PageHeader from "../ui/PageHeader";
+import Modal from "../ui/Modal";
+import ManagementRestaurantCard from "../ui/ManagementRestaurantCard";
 import { FaShieldHalved } from "react-icons/fa6";
 import { Skeleton } from "../ui/Skeleton";
 
 function AdminRestaurantsPage() {
     const [restaurants, setRestaurants] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [pendingDelete, setPendingDelete] = useState(null);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -35,18 +38,13 @@ function AdminRestaurantsPage() {
         };
     }, []);
 
-    const handleDelete = async (restaurantId) => {
-        if (!window.confirm("Delete this restaurant?")) return;
+    const handleDelete = async () => {
+        const restaurantId = pendingDelete.id;
+        setPendingDelete(null);
         try {
             const response = await apiFetch(
                 `/api/admin/restaurants/${restaurantId}`,
-                {
-                    method: "DELETE",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "XSRF-Token": Cookies.get("XSRF-TOKEN") || "",
-                    },
-                }
+                { method: "DELETE" }
             );
             if (response.ok) {
                 setRestaurants((prev) =>
@@ -63,23 +61,20 @@ function AdminRestaurantsPage() {
 
     return (
         <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                <div>
-                    <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
-                        Admin · Restaurants
-                    </h1>
-                    <p className="mt-1 text-slate-600 dark:text-slate-400">
-                        Full directory management.
-                    </p>
-                </div>
-                <button
-                    type="button"
-                    className="da-btn-primary shrink-0"
-                    onClick={() => navigate("/restaurants/new")}
-                >
-                    New restaurant
-                </button>
-            </div>
+            <PageHeader
+                eyebrow="Admin"
+                title="Restaurant directory"
+                description="Full directory management across every terminal."
+                actions={
+                    <button
+                        type="button"
+                        className="da-btn-primary shrink-0"
+                        onClick={() => navigate("/restaurants/new")}
+                    >
+                        New restaurant
+                    </button>
+                }
+            />
 
             {loading ? (
                 <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -99,50 +94,51 @@ function AdminRestaurantsPage() {
                 <ul className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                     {restaurants.map((restaurant) => (
                         <li key={restaurant.id}>
-                            <article className="da-card overflow-hidden">
-                                <img
-                                    src={
-                                        restaurant.imageUrl ||
-                                        "https://via.placeholder.com/400x240"
-                                    }
-                                    alt=""
-                                    className="h-40 w-full object-cover"
-                                />
-                                <div className="p-5">
-                                    <h2 className="text-lg font-semibold text-slate-900 dark:text-white">
-                                        {restaurant.name}
-                                    </h2>
-                                    <p className="mt-2 line-clamp-2 text-sm text-slate-600 dark:text-slate-400">
-                                        {restaurant.description}
-                                    </p>
-                                    <div className="mt-4 flex flex-wrap gap-2">
-                                        <button
-                                            type="button"
-                                            className="da-btn-secondary !py-2 !text-sm"
-                                            onClick={() =>
-                                                navigate(
-                                                    `/restaurants/${restaurant.id}/edit`
-                                                )
-                                            }
-                                        >
-                                            Edit
-                                        </button>
-                                        <button
-                                            type="button"
-                                            className="rounded-xl border border-red-200 bg-red-50 px-4 py-2 text-sm font-semibold text-red-700 dark:border-red-900 dark:bg-red-950/40 dark:text-red-300"
-                                            onClick={() =>
-                                                handleDelete(restaurant.id)
-                                            }
-                                        >
-                                            Delete
-                                        </button>
-                                    </div>
-                                </div>
-                            </article>
+                            <ManagementRestaurantCard
+                                restaurant={restaurant}
+                                onManageMenu={() =>
+                                    navigate(
+                                        `/restaurants/${restaurant.id}/menu-items`
+                                    )
+                                }
+                                onEdit={() =>
+                                    navigate(
+                                        `/restaurants/${restaurant.id}/edit`
+                                    )
+                                }
+                                onDelete={() => setPendingDelete(restaurant)}
+                            />
                         </li>
                     ))}
                 </ul>
             )}
+
+            <Modal
+                open={Boolean(pendingDelete)}
+                onClose={() => setPendingDelete(null)}
+                title="Delete this restaurant?"
+                footer={
+                    <>
+                        <button
+                            type="button"
+                            className="da-btn-danger flex-1"
+                            onClick={handleDelete}
+                        >
+                            Yes, delete
+                        </button>
+                        <button
+                            type="button"
+                            className="da-btn-secondary flex-1"
+                            onClick={() => setPendingDelete(null)}
+                        >
+                            Cancel
+                        </button>
+                    </>
+                }
+            >
+                {pendingDelete?.name} and its full menu will be permanently
+                removed.
+            </Modal>
         </div>
     );
 }

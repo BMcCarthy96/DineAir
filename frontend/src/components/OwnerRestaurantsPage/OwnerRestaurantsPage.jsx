@@ -1,15 +1,18 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Cookies from "js-cookie";
 import { toast } from "react-toastify";
 import { apiFetch } from "../../utils/apiFetch";
 import EmptyState from "../ui/EmptyState";
+import PageHeader from "../ui/PageHeader";
+import Modal from "../ui/Modal";
+import ManagementRestaurantCard from "../ui/ManagementRestaurantCard";
 import { FaStore } from "react-icons/fa";
 import { Skeleton } from "../ui/Skeleton";
 
 function OwnerRestaurantsPage() {
     const [restaurants, setRestaurants] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [pendingDelete, setPendingDelete] = useState(null);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -37,18 +40,13 @@ function OwnerRestaurantsPage() {
         };
     }, []);
 
-    const handleDelete = async (restaurantId) => {
-        if (!window.confirm("Delete this restaurant?")) return;
+    const handleDelete = async () => {
+        const restaurantId = pendingDelete.id;
+        setPendingDelete(null);
         try {
             const response = await apiFetch(
                 `/api/restaurants/${restaurantId}`,
-                {
-                    method: "DELETE",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "XSRF-Token": Cookies.get("XSRF-TOKEN") || "",
-                    },
-                }
+                { method: "DELETE" }
             );
             if (response.ok) {
                 setRestaurants((prev) =>
@@ -65,23 +63,20 @@ function OwnerRestaurantsPage() {
 
     return (
         <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                <div>
-                    <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
-                        My restaurants
-                    </h1>
-                    <p className="mt-1 text-slate-600 dark:text-slate-400">
-                        Manage menus and details for your locations.
-                    </p>
-                </div>
-                <button
-                    type="button"
-                    className="da-btn-primary shrink-0"
-                    onClick={() => navigate("/restaurants/new")}
-                >
-                    New restaurant
-                </button>
-            </div>
+            <PageHeader
+                eyebrow="Owner"
+                title="My restaurants"
+                description="Manage menus and details for your locations."
+                actions={
+                    <button
+                        type="button"
+                        className="da-btn-primary shrink-0"
+                        onClick={() => navigate("/restaurants/new")}
+                    >
+                        New restaurant
+                    </button>
+                }
+            />
 
             {loading ? (
                 <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -110,60 +105,51 @@ function OwnerRestaurantsPage() {
                 <ul className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                     {restaurants.map((restaurant) => (
                         <li key={restaurant.id}>
-                            <article className="da-card flex h-full flex-col overflow-hidden transition hover:-translate-y-0.5">
-                                <button
-                                    type="button"
-                                    className="block flex-1 text-left"
-                                    onClick={() =>
-                                        navigate(
-                                            `/restaurants/${restaurant.id}/menu-items`
-                                        )
-                                    }
-                                >
-                                    <img
-                                        src={
-                                            restaurant.imageUrl ||
-                                            "https://via.placeholder.com/400x240"
-                                        }
-                                        alt=""
-                                        className="h-44 w-full object-cover"
-                                    />
-                                    <div className="p-5">
-                                        <h2 className="text-lg font-semibold text-slate-900 dark:text-white">
-                                            {restaurant.name}
-                                        </h2>
-                                        <p className="mt-2 line-clamp-2 text-sm text-slate-600 dark:text-slate-400">
-                                            {restaurant.description}
-                                        </p>
-                                    </div>
-                                </button>
-                                <div className="flex gap-2 border-t border-slate-100 p-4 dark:border-slate-800">
-                                    <button
-                                        type="button"
-                                        className="da-btn-secondary flex-1 !py-2 !text-sm"
-                                        onClick={() =>
-                                            navigate(
-                                                `/restaurants/${restaurant.id}/edit`
-                                            )
-                                        }
-                                    >
-                                        Edit
-                                    </button>
-                                    <button
-                                        type="button"
-                                        className="flex-1 rounded-xl border border-red-200 bg-red-50 py-2 text-sm font-semibold text-red-700 hover:bg-red-100 dark:border-red-900 dark:bg-red-950/40 dark:text-red-300"
-                                        onClick={() =>
-                                            handleDelete(restaurant.id)
-                                        }
-                                    >
-                                        Delete
-                                    </button>
-                                </div>
-                            </article>
+                            <ManagementRestaurantCard
+                                restaurant={restaurant}
+                                onManageMenu={() =>
+                                    navigate(
+                                        `/restaurants/${restaurant.id}/menu-items`
+                                    )
+                                }
+                                onEdit={() =>
+                                    navigate(
+                                        `/restaurants/${restaurant.id}/edit`
+                                    )
+                                }
+                                onDelete={() => setPendingDelete(restaurant)}
+                            />
                         </li>
                     ))}
                 </ul>
             )}
+
+            <Modal
+                open={Boolean(pendingDelete)}
+                onClose={() => setPendingDelete(null)}
+                title="Delete this restaurant?"
+                footer={
+                    <>
+                        <button
+                            type="button"
+                            className="da-btn-danger flex-1"
+                            onClick={handleDelete}
+                        >
+                            Yes, delete
+                        </button>
+                        <button
+                            type="button"
+                            className="da-btn-secondary flex-1"
+                            onClick={() => setPendingDelete(null)}
+                        >
+                            Cancel
+                        </button>
+                    </>
+                }
+            >
+                {pendingDelete?.name} and its full menu will be permanently
+                removed.
+            </Modal>
         </div>
     );
 }

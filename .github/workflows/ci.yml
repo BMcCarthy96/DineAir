@@ -22,17 +22,22 @@ jobs:
           cache-dependency-path: frontend/package-lock.json
       - run: npm ci
       - run: npm run lint
+      - run: npm test
       - run: npm run build
         env:
           # Empty is OK: Map shows setup message; build must succeed in CI
           VITE_GOOGLE_MAPS_API_KEY: ""
 
   backend:
-    name: Backend install
+    name: Backend tests
     runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: backend
+    env:
+      NODE_ENV: test
+      JWT_SECRET: ci-only-secret-not-for-production
+      JWT_EXPIRES_IN: "604800"
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -41,3 +46,6 @@ jobs:
           cache: "npm"
           cache-dependency-path: backend/package-lock.json
       - run: npm ci
+      - name: Run migrations (smoke test against in-memory sqlite)
+        run: npx sequelize-cli db:migrate
+      - run: npm test

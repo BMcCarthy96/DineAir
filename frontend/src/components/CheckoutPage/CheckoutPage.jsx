@@ -1,11 +1,12 @@
 import { useEffect, useState, useMemo } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import Cookies from "js-cookie";
 import { toast } from "react-toastify";
 import { FaCheck } from "react-icons/fa";
 import { gateCoordinates } from "../../utils/gateCoordinates";
 import GateSelector from "../ui/GateSelector";
+import SmartImage from "../ui/SmartImage";
 import { apiFetch } from "../../utils/apiFetch";
+import { computeCartTotals, formatMoney } from "../../utils/cartMath";
 
 const PREVIEW_STEPS = [
     { key: "placed", label: "Order placed" },
@@ -36,11 +37,7 @@ function CheckoutPage() {
         let cancelled = false;
         async function fetchCartItems() {
             try {
-                const response = await apiFetch("/api/carts/items", {
-                    headers: {
-                        Authorization: `Bearer ${localStorage.getItem("token") || ""}`,
-                    },
-                });
+                const response = await apiFetch("/api/carts/items");
                 const data = await response.json();
                 if (!cancelled && response.ok) setCartItems(data);
             } catch {
@@ -55,15 +52,8 @@ function CheckoutPage() {
         };
     }, []);
 
-    const subtotal = cartItems.reduce(
-        (total, item) =>
-            total + item.quantity * Number(item.MenuItem?.price || 0),
-        0
-    );
-    const taxEstimate = subtotal * 0.0825;
-    const serviceFee = cartItems.length ? 2.49 : 0;
-    const total = subtotal + taxEstimate + serviceFee;
-    const fmt = (n) => (!Number.isNaN(n) ? n.toFixed(2) : "0.00");
+    const { subtotal, taxEstimate, serviceFee, total } = computeCartTotals(cartItems);
+    const fmt = formatMoney;
 
     const handlePlaceOrder = async () => {
         const gateCoord = gateCoordinates[gate];
@@ -75,11 +65,6 @@ function CheckoutPage() {
         try {
             const response = await apiFetch("/api/orders", {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${localStorage.getItem("token") || ""}`,
-                    "XSRF-Token": Cookies.get("XSRF-TOKEN") || "",
-                },
                 body: JSON.stringify({
                     gate,
                     gateLat: gateCoord.lat,
@@ -107,8 +92,9 @@ function CheckoutPage() {
 
     return (
         <div className="mx-auto min-h-screen max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
-            <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
+            <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
                 <div>
+                    <p className="da-eyebrow mb-2">Step 2 of 2</p>
                     <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
                         Checkout
                     </h1>
@@ -190,7 +176,7 @@ function CheckoutPage() {
                                             className={`flex h-10 w-10 items-center justify-center rounded-full text-sm font-bold ${
                                                 i === 0
                                                     ? "bg-brand-600 text-white"
-                                                    : "bg-slate-100 text-slate-400 dark:bg-slate-800 dark:text-slate-500"
+                                                    : "bg-slate-100 text-slate-400 dark:bg-night-800 dark:text-slate-500"
                                             }`}
                                         >
                                             {i === 0 ? (
@@ -215,15 +201,12 @@ function CheckoutPage() {
                                 {cartItems.map((item) => (
                                     <li
                                         key={item.id}
-                                        className="flex gap-4 rounded-2xl border border-slate-200 p-4 dark:border-slate-700"
+                                        className="flex gap-4 rounded-2xl border border-slate-200 p-4 dark:border-night-700"
                                     >
-                                        <img
-                                            src={
-                                                item.MenuItem.imageUrl ||
-                                                "https://via.placeholder.com/150"
-                                            }
+                                        <SmartImage
+                                            src={item.MenuItem.imageUrl}
                                             alt=""
-                                            className="h-16 w-16 rounded-xl object-cover"
+                                            className="h-16 w-16 shrink-0 rounded-xl"
                                         />
                                         <div className="min-w-0 flex-1">
                                             <p className="font-medium text-slate-900 dark:text-white">
@@ -264,7 +247,7 @@ function CheckoutPage() {
                                     <dt>Service fee</dt>
                                     <dd>${fmt(serviceFee)}</dd>
                                 </div>
-                                <div className="flex justify-between border-t border-slate-200 pt-3 text-base font-bold dark:border-slate-700">
+                                <div className="flex justify-between border-t border-slate-200 pt-3 text-base font-bold dark:border-night-700">
                                     <dt className="text-slate-900 dark:text-white">
                                         Total
                                     </dt>

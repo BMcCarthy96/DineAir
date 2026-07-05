@@ -52,11 +52,8 @@ export function useLiveRunnerTracking({
     const travelActive =
         orderStatus === "picked_up" || orderStatus === "on_the_way";
 
-    /** Server sim may lead the demo clock; use socket only in that narrow window. */
-    const socketDrivesPosition =
-        travelActive &&
-        isDbTravelStatus(orderDbStatus) &&
-        runnerMapProgress < 0.02;
+    /** Server is authoritative for the whole travel window; demo interpolation is the fallback. */
+    const socketDrivesPosition = travelActive && isDbTravelStatus(orderDbStatus);
     const socketMsSinceLast =
         lastSocketMeaningfulAtRef.current > 0
             ? Date.now() - lastSocketMeaningfulAtRef.current

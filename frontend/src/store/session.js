@@ -1,5 +1,5 @@
 import { csrfFetch } from "./csrf";
-import { setFavorites } from "./favorites";
+import { setFavorites, fetchFavorites } from "./favorites";
 
 // action creators
 const SET_USER = "session/setUser";
@@ -38,6 +38,7 @@ export const signup = (user) => async (dispatch) => {
     });
     const data = await response.json();
     dispatch(setUser(data.user));
+    if (data.user) dispatch(fetchFavorites());
     return response;
 };
 
@@ -55,6 +56,7 @@ export const login = (user) => async (dispatch) => {
     if (response.ok) {
         const data = await response.json();
         dispatch(setUser(data.user));
+        dispatch(fetchFavorites());
         return response;
     } else {
         throw new Error("Login failed");
@@ -78,6 +80,7 @@ export const restoreUser = () => async (dispatch) => {
     const response = await csrfFetch("/api/auth/session");
     const data = await response.json();
     dispatch(setUser(data.user));
+    if (data.user) dispatch(fetchFavorites());
     return response;
 };
 

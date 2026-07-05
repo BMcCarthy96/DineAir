@@ -2,11 +2,11 @@ import { useState, useEffect, lazy, Suspense } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { createBrowserRouter, RouterProvider, Outlet } from "react-router-dom";
 import Navigation from "./components/Navigation";
+import Footer from "./components/ui/Footer";
 import PageLoader from "./components/PageLoader";
+import { RequireAuth, RequireRole } from "./components/ProtectedRoute";
 import * as sessionActions from "./store/session";
 import { csrfFetch } from "./store/csrf";
-import { io } from "socket.io-client";
-import { notifyGateChange } from "./utils/Notifications";
 import "./utils/WebSocket";
 import ThemedToastContainer from "./components/ThemedToastContainer";
 import "react-toastify/dist/ReactToastify.css";
@@ -74,7 +74,7 @@ function Layout() {
         <>
             <a
                 href="#main-content"
-                className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[2000] focus:rounded-xl focus:bg-white focus:px-4 focus:py-3 focus:text-sm focus:font-semibold focus:text-slate-900 focus:shadow-soft-lg focus:outline-none focus:ring-2 focus:ring-brand-500 dark:focus:bg-slate-900 dark:focus:text-white"
+                className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[2000] focus:rounded-xl focus:bg-white focus:px-4 focus:py-3 focus:text-sm focus:font-semibold focus:text-slate-900 focus:shadow-soft-lg focus:outline-none focus:ring-2 focus:ring-brand-500 dark:focus:bg-night-900 dark:focus:text-white"
             >
                 Skip to main content
             </a>
@@ -88,6 +88,7 @@ function Layout() {
                     >
                         <Outlet context={{ sessionUser }} />
                     </main>
+                    <Footer />
                 </Suspense>
             )}
             {!isLoaded && <PageLoader />}
@@ -103,13 +104,31 @@ const router = createBrowserRouter([
             { path: "/login", element: <LoginFormPage /> },
             { path: "/signup", element: <SignupFormPage /> },
             { path: "/cart", element: <CartPage /> },
-            { path: "/checkout", element: <CheckoutPage /> },
-            { path: "/orders", element: <OrderHistoryPage /> },
+            {
+                path: "/checkout",
+                element: (
+                    <RequireAuth>
+                        <CheckoutPage />
+                    </RequireAuth>
+                ),
+            },
+            {
+                path: "/orders",
+                element: (
+                    <RequireAuth>
+                        <OrderHistoryPage />
+                    </RequireAuth>
+                ),
+            },
             { path: "/restaurants", element: <AllRestaurantsPage /> },
             { path: "/restaurants/:restaurantId", element: <RestaurantPage /> },
             {
                 path: "/restaurants/:restaurantId/edit",
-                element: <EditRestaurantPage />,
+                element: (
+                    <RequireRole roles={["admin", "restaurantOwner"]}>
+                        <EditRestaurantPage />
+                    </RequireRole>
+                ),
             },
             {
                 path: "/restaurants/:restaurantId/menu-items",
@@ -119,42 +138,68 @@ const router = createBrowserRouter([
                 path: "/restaurants/:restaurantId/menu-items/:menuItemId",
                 element: <MenuItemPage />,
             },
-            { path: "/restaurants/admin", element: <AdminRestaurantsPage /> },
-            { path: "/restaurants/owner", element: <OwnerRestaurantsPage /> },
-            { path: "/restaurants/new", element: <CreateRestaurantPage /> },
+            {
+                path: "/restaurants/admin",
+                element: (
+                    <RequireRole roles={["admin"]}>
+                        <AdminRestaurantsPage />
+                    </RequireRole>
+                ),
+            },
+            {
+                path: "/restaurants/owner",
+                element: (
+                    <RequireRole roles={["admin", "restaurantOwner"]}>
+                        <OwnerRestaurantsPage />
+                    </RequireRole>
+                ),
+            },
+            {
+                path: "/restaurants/new",
+                element: (
+                    <RequireRole roles={["admin", "restaurantOwner"]}>
+                        <CreateRestaurantPage />
+                    </RequireRole>
+                ),
+            },
             {
                 path: "/delivery-tracking",
-                element: <DeliveryTrackingPage />,
+                element: (
+                    <RequireAuth>
+                        <DeliveryTrackingPage />
+                    </RequireAuth>
+                ),
             },
             {
                 path: "/runner-dashboard",
-                element: <RunnerDashboardPage />,
+                element: (
+                    <RequireRole roles={["runner"]}>
+                        <RunnerDashboardPage />
+                    </RequireRole>
+                ),
             },
-            { path: "/favorites", element: <FavoritesPage /> },
-            { path: "/account", element: <AccountPage /> },
+            {
+                path: "/favorites",
+                element: (
+                    <RequireAuth>
+                        <FavoritesPage />
+                    </RequireAuth>
+                ),
+            },
+            {
+                path: "/account",
+                element: (
+                    <RequireAuth>
+                        <AccountPage />
+                    </RequireAuth>
+                ),
+            },
             { path: "*", element: <NotFoundPage /> },
         ],
     },
 ]);
 
 function App() {
-    useEffect(() => {
-        const backendUrl =
-            import.meta.env.MODE === "production"
-                ? undefined
-                : "http://localhost:8000";
-
-        const socket = io(backendUrl);
-
-        socket.on("gateChange", ({ gate, terminal }) => {
-            notifyGateChange(gate, terminal);
-        });
-
-        return () => {
-            socket.disconnect();
-        };
-    }, []);
-
     return (
         <>
             <RouterProvider router={router} />

@@ -37,7 +37,7 @@ function GateSelector({
                 required
                 className={
                     isOnBrand
-                        ? "w-full cursor-pointer rounded-xl border border-white/20 bg-white/95 px-4 py-3 text-slate-900 shadow-sm outline-none transition focus:ring-2 focus:ring-white/40 dark:bg-slate-900/95 dark:text-slate-100 dark:focus:ring-white/20"
+                        ? "w-full cursor-pointer rounded-xl border border-white/20 bg-white/95 px-4 py-3 text-slate-900 shadow-sm outline-none transition focus:ring-2 focus:ring-white/40 dark:bg-night-900/95 dark:text-slate-100 dark:focus:ring-white/20"
                         : "da-input cursor-pointer"
                 }
             >

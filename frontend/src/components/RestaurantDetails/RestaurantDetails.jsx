@@ -6,11 +6,14 @@ import {
     useNavigate,
     useLocation,
 } from "react-router-dom";
-import Cookies from "js-cookie";
 import { toast } from "react-toastify";
+import { FaStar } from "react-icons/fa";
 import AddMenuItemForm from "../AddMenuItemForm/AddMenuItemForm";
 import { apiFetch } from "../../utils/apiFetch";
 import { Skeleton } from "../ui/Skeleton";
+import SmartImage from "../ui/SmartImage";
+import MenuItemCard from "../ui/MenuItemCard";
+import { formatRating } from "../../utils/restaurantDisplay";
 
 function RestaurantDetails() {
     const { restaurantId } = useParams();
@@ -66,11 +69,6 @@ function RestaurantDetails() {
         try {
             const response = await apiFetch("/api/carts/items", {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${localStorage.getItem("token") || ""}`,
-                    "XSRF-Token": Cookies.get("XSRF-TOKEN") || "",
-                },
                 body: JSON.stringify({ menuItemId, quantity: 1 }),
             });
 
@@ -97,13 +95,7 @@ function RestaurantDetails() {
         try {
             const response = await apiFetch(
                 `/api/restaurants/${restaurantId}/menu-items/${menuItemId}`,
-                {
-                    method: "DELETE",
-                    headers: {
-                        Authorization: `Bearer ${localStorage.getItem("token") || ""}`,
-                        "XSRF-Token": Cookies.get("XSRF-TOKEN") || "",
-                    },
-                }
+                { method: "DELETE" }
             );
             if (response.ok) {
                 setMenuItems((prev) =>
@@ -154,27 +146,38 @@ function RestaurantDetails() {
         );
     }
 
+    const rating = formatRating(restaurant.avgRating, restaurant.reviewCount);
+
     return (
         <div className="space-y-10">
-            <header className="overflow-hidden rounded-2xl shadow-soft-lg">
+            <header className="relative overflow-hidden rounded-2xl shadow-soft-lg">
+                <SmartImage
+                    src={restaurant.imageUrl}
+                    alt=""
+                    className="absolute inset-0 h-full w-full"
+                />
                 <div
-                    className="relative min-h-[280px] bg-cover bg-center"
+                    className="relative min-h-[280px]"
                     style={{
-                        backgroundImage: `linear-gradient(to top, rgba(15,23,42,0.88), rgba(15,23,42,0.35)), url(${
-                            restaurant.imageUrl ||
-                            "https://via.placeholder.com/1200x400"
-                        })`,
+                        background:
+                            "linear-gradient(to top, rgba(6,9,19,0.9), rgba(6,9,19,0.25))",
                     }}
                 >
                     <div className="flex min-h-[280px] flex-col justify-end px-6 py-10 sm:px-10">
-                        <h1 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
-                            {restaurant.name}
-                        </h1>
+                        <div className="flex flex-wrap items-center gap-3">
+                            <h1 className="font-display text-3xl font-bold tracking-tight text-white sm:text-4xl">
+                                {restaurant.name}
+                            </h1>
+                            <span className="flex items-center gap-1 rounded-lg bg-white/15 px-2.5 py-1 text-sm font-semibold text-white backdrop-blur-sm">
+                                <FaStar className="text-brand-400" aria-hidden />
+                                {rating}
+                            </span>
+                        </div>
                         <p className="mt-3 max-w-2xl text-lg text-white/90">
                             {restaurant.description}
                         </p>
                         <div className="mt-4 flex flex-wrap gap-2 text-sm font-medium text-white/85">
-                            <span className="rounded-lg bg-white/15 px-3 py-1 backdrop-blur-sm">
+                            <span className="rounded-md border border-white/20 bg-black/20 px-3 py-1 font-mono text-xs uppercase tracking-widest backdrop-blur-sm">
                                 Terminal {restaurant.terminal} · Gate{" "}
                                 {restaurant.gate}
                             </span>
@@ -212,70 +215,47 @@ function RestaurantDetails() {
                 )}
 
                 {menuItems.length === 0 ? (
-                    <p className="rounded-2xl border border-dashed border-slate-200 bg-slate-50/80 px-6 py-12 text-center text-slate-600 dark:border-slate-700 dark:bg-slate-900/40 dark:text-slate-400">
+                    <p className="rounded-2xl border border-dashed border-slate-200 bg-slate-50/80 px-6 py-12 text-center text-slate-600 dark:border-night-700 dark:bg-night-900/40 dark:text-slate-400">
                         No menu items yet.
                     </p>
                 ) : (
                     <ul className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                         {menuItems.map((item) => (
                             <li key={item.id}>
-                                <article className="da-card flex h-full flex-col overflow-hidden transition hover:-translate-y-0.5">
-                                    <Link
-                                        to={`/restaurants/${restaurantId}/menu-items/${item.id}`}
-                                        className="block flex flex-1 flex-col text-inherit no-underline"
-                                    >
-                                        <img
-                                            src={
-                                                item.imageUrl ||
-                                                "https://via.placeholder.com/400x240"
-                                            }
-                                            alt=""
-                                            className="h-48 w-full object-cover"
-                                        />
-                                        <div className="flex flex-1 flex-col p-5">
-                                            <h3 className="text-lg font-semibold text-slate-900 dark:text-white">
-                                                {item.name}
-                                            </h3>
-                                            <p className="mt-2 line-clamp-2 flex-1 text-sm text-slate-600 dark:text-slate-400">
-                                                {item.description}
-                                            </p>
-                                            <p className="mt-3 text-lg font-bold text-brand-600 dark:text-brand-400">
-                                                $
-                                                {!Number.isNaN(
-                                                    Number(item.price)
-                                                )
-                                                    ? Number(
-                                                          item.price
-                                                      ).toFixed(2)
-                                                    : "0.00"}
-                                            </p>
-                                        </div>
-                                    </Link>
-                                    <div className="flex flex-wrap gap-2 border-t border-slate-100 p-4 dark:border-slate-800">
-                                        <button
-                                            type="button"
-                                            className="da-btn-primary flex-1 !py-2.5 !text-sm"
-                                            onClick={(e) =>
-                                                handleAddToCart(item.id, e)
-                                            }
-                                        >
-                                            Add to cart
-                                        </button>
-                                        {canManageMenu && (
+                                <MenuItemCard
+                                    item={item}
+                                    onClick={() =>
+                                        navigate(
+                                            `/restaurants/${restaurantId}/menu-items/${item.id}`
+                                        )
+                                    }
+                                    actions={
+                                        <div className="flex flex-1 flex-wrap justify-end gap-2">
                                             <button
                                                 type="button"
-                                                className="rounded-xl border border-red-200 bg-red-50 px-4 py-2.5 text-sm font-semibold text-red-700 transition hover:bg-red-100 dark:border-red-900 dark:bg-red-950/40 dark:text-red-300 dark:hover:bg-red-950/60"
-                                                onClick={() =>
-                                                    handleDeleteMenuItem(
-                                                        item.id
-                                                    )
+                                                className="da-btn-primary !py-2 !text-xs"
+                                                onClick={(e) =>
+                                                    handleAddToCart(item.id, e)
                                                 }
                                             >
-                                                Delete
+                                                Add to cart
                                             </button>
-                                        )}
-                                    </div>
-                                </article>
+                                            {canManageMenu && (
+                                                <button
+                                                    type="button"
+                                                    className="rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-xs font-semibold text-red-700 transition hover:bg-red-100 dark:border-red-900 dark:bg-red-950/40 dark:text-red-300 dark:hover:bg-red-950/60"
+                                                    onClick={() =>
+                                                        handleDeleteMenuItem(
+                                                            item.id
+                                                        )
+                                                    }
+                                                >
+                                                    Delete
+                                                </button>
+                                            )}
+                                        </div>
+                                    }
+                                />
                             </li>
                         ))}
                     </ul>

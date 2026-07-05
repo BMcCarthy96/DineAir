@@ -2,14 +2,12 @@ import { useEffect, useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { FaStar } from "react-icons/fa";
-import { addFavorite, removeFavorite } from "../../store/favorites";
+import { favoriteRestaurant, unfavoriteRestaurant } from "../../store/favorites";
 import RestaurantCard from "../ui/RestaurantCard";
 import EmptyState from "../ui/EmptyState";
+import PageHeader from "../ui/PageHeader";
 import { RestaurantCardSkeleton } from "../ui/Skeleton";
-import { displayRating } from "../../utils/restaurantDisplay";
 import { FaUtensils } from "react-icons/fa6";
-
-const fastPrepIds = [4, 5, 9, 10];
 
 function AllRestaurantsPage() {
     const [restaurants, setRestaurants] = useState([]);
@@ -60,9 +58,8 @@ function AllRestaurantsPage() {
                 (r.terminal || "").toLowerCase().includes(q);
             const matchesCuisine =
                 !cuisineFilter || r.cuisineType === cuisineFilter;
-            const rRating = Number(displayRating(r.id));
             const matchesRating =
-                !ratingFilter || rRating >= Number(ratingFilter);
+                !ratingFilter || Number(r.avgRating) >= Number(ratingFilter);
             return matchesQuery && matchesCuisine && matchesRating;
         });
     }, [restaurants, query, cuisineFilter, ratingFilter]);
@@ -70,9 +67,9 @@ function AllRestaurantsPage() {
     const toggleFavorite = (restaurant, event) => {
         event.stopPropagation();
         if (favorites.some((fav) => fav.id === restaurant.id)) {
-            dispatch(removeFavorite(restaurant.id));
+            dispatch(unfavoriteRestaurant(restaurant.id));
         } else {
-            dispatch(addFavorite(restaurant));
+            dispatch(favoriteRestaurant(restaurant));
         }
     };
 
@@ -86,13 +83,11 @@ function AllRestaurantsPage() {
             aria-label="All restaurants"
         >
             <header className="mb-10">
-                <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-4xl">
-                    Restaurants
-                </h1>
-                <p className="mt-2 max-w-2xl text-slate-600 dark:text-slate-400">
-                    Browse by cuisine, rating, or terminal. Same great menus—now
-                    with a clearer layout.
-                </p>
+                <PageHeader
+                    eyebrow="Every terminal"
+                    title="Restaurants"
+                    description="Browse by cuisine, rating, or terminal."
+                />
 
                 <div className="mt-8 flex flex-col gap-4 lg:flex-row lg:items-end">
                     <div className="flex-1">
@@ -190,12 +185,11 @@ function AllRestaurantsPage() {
                             key={restaurant.id}
                             restaurant={restaurant}
                             onSelect={handleCardClick}
-                            fastPrepIds={fastPrepIds}
                             favoriteControl={
                                 sessionUser ? (
                                     <button
                                         type="button"
-                                        className="rounded-full bg-white/95 p-2.5 shadow-soft backdrop-blur-sm transition hover:scale-105 dark:bg-slate-900/95"
+                                        className="rounded-full bg-white/95 p-2.5 shadow-soft backdrop-blur-sm transition hover:scale-105 dark:bg-night-900/95"
                                         aria-label={
                                             favorites.some(
                                                 (f) => f.id === restaurant.id

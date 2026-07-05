@@ -44,3 +44,15 @@ exports.getFavorites = async (req, res, next) => {
         next(err);
     }
 };
+
+exports.removeFavorite = async (req, res, next) => {
+    try {
+        const { restaurantId } = req.params;
+        await Favorite.destroy({
+            where: { userId: req.user.id, restaurantId },
+        });
+        res.status(204).end();
+    } catch (err) {
+        next(err);
+    }
+};

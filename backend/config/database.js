@@ -8,6 +8,12 @@ module.exports = {
         logQueryParameters: true,
         typeValidation: true,
     },
+    test: {
+        storage: ":memory:",
+        dialect: "sqlite",
+        seederStorage: "sequelize",
+        logging: false,
+    },
     production: {
         use_env_variable: "DATABASE_URL",
         dialect: "postgres",

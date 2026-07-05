@@ -1,3 +1,5 @@
+import { apiFetch } from "../utils/apiFetch";
+
 // Action Types
 const ADD_FAVORITE = "favorites/ADD_FAVORITE";
 const REMOVE_FAVORITE = "favorites/REMOVE_FAVORITE";
@@ -19,12 +21,38 @@ export const setFavorites = (favorites) => ({
     favorites,
 });
 
-// Thunk to fetch favorites for the current user
+// Thunk to load the current user's favorites (called after login/signup/session restore)
 export const fetchFavorites = () => async (dispatch) => {
-    const res = await fetch("/api/favorites");
+    const res = await apiFetch("/api/favorites");
     if (res.ok) {
         const data = await res.json();
         dispatch(setFavorites(data));
+    }
+};
+
+// Thunk to persist adding a favorite
+export const favoriteRestaurant = (restaurant) => async (dispatch) => {
+    dispatch(addFavorite(restaurant));
+    const res = await apiFetch("/api/favorites", {
+        method: "POST",
+        body: JSON.stringify({ restaurantId: restaurant.id }),
+    });
+    if (!res.ok) {
+        // Roll back on failure (e.g. already favorited, network error)
+        dispatch(removeFavorite(restaurant.id));
+    }
+};
+
+// Thunk to persist removing a favorite
+export const unfavoriteRestaurant = (restaurantId) => async (dispatch, getState) => {
+    const previous = getState().favorites.find((f) => f.id === restaurantId);
+    dispatch(removeFavorite(restaurantId));
+    const res = await apiFetch(`/api/favorites/${restaurantId}`, {
+        method: "DELETE",
+    });
+    if (!res.ok && previous) {
+        // Roll back on failure
+        dispatch(addFavorite(previous));
     }
 };
 

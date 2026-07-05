@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef, useMemo } from "react";
-import Cookies from "js-cookie";
 import { apiFetch } from "../../utils/apiFetch";
 import { haversineMeters, estimateWalkMinutes } from "../../utils/geo";
 import { trackingLog } from "../../utils/trackingLog";
@@ -160,11 +159,6 @@ function RunnerETA({ runnerLocation, gateLocation, effectiveStatus }) {
             try {
                 const response = await apiFetch("/api/deliveries/calculate-eta", {
                     method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${localStorage.getItem("token") || ""}`,
-                        "XSRF-Token": Cookies.get("XSRF-TOKEN") || "",
-                    },
                     body: JSON.stringify({
                         runnerLocation: from,
                         gateLocation: to,

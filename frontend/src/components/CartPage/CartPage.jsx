@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
-import Cookies from "js-cookie";
 import { motion } from "framer-motion";
 import { FaShoppingBag } from "react-icons/fa";
 import EmptyState from "../ui/EmptyState";
+import PageHeader from "../ui/PageHeader";
 import { Skeleton } from "../ui/Skeleton";
+import SmartImage from "../ui/SmartImage";
 import { apiFetch } from "../../utils/apiFetch";
+import { computeCartTotals, formatMoney } from "../../utils/cartMath";
 
 function CartPage() {
     const [cartItems, setCartItems] = useState([]);
@@ -17,12 +19,7 @@ function CartPage() {
     async function fetchCartItems() {
         setLoadError(null);
         try {
-            const response = await apiFetch("/api/carts/items", {
-                headers: {
-                    Authorization: `Bearer ${localStorage.getItem("token") || ""}`,
-                    "XSRF-Token": Cookies.get("XSRF-TOKEN") || "",
-                },
-            });
+            const response = await apiFetch("/api/carts/items");
             if (response.ok) {
                 const data = await response.json();
                 setCartItems(data);
@@ -49,10 +46,6 @@ function CartPage() {
         try {
             const response = await apiFetch(`/api/carts/items/${itemId}`, {
                 method: "DELETE",
-                headers: {
-                    Authorization: `Bearer ${localStorage.getItem("token") || ""}`,
-                    "XSRF-Token": Cookies.get("XSRF-TOKEN") || "",
-                },
             });
 
             if (response.ok) {
@@ -69,11 +62,6 @@ function CartPage() {
         try {
             const response = await apiFetch(`/api/carts/items/${itemId}`, {
                 method: "PUT",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${localStorage.getItem("token") || ""}`,
-                    "XSRF-Token": Cookies.get("XSRF-TOKEN") || "",
-                },
                 body: JSON.stringify({ quantity: newQuantity }),
             });
 
@@ -96,27 +84,15 @@ function CartPage() {
         navigate("/checkout");
     };
 
-    const subtotal = cartItems.reduce(
-        (total, item) =>
-            total + item.quantity * Number(item.MenuItem?.price || 0),
-        0
-    );
-
-    const taxEstimate = subtotal * 0.0825;
-    const serviceFee = cartItems.length ? 2.49 : 0;
-    const total = subtotal + taxEstimate + serviceFee;
-
-    const formatMoney = (n) =>
-        !Number.isNaN(n) ? n.toFixed(2) : "0.00";
+    const { subtotal, taxEstimate, serviceFee, total } = computeCartTotals(cartItems);
 
     return (
         <div className="mx-auto min-h-screen max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
-            <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
-                Your cart
-            </h1>
-            <p className="mt-2 text-slate-600 dark:text-slate-400">
-                Review items before checkout. Quantities sync with your account.
-            </p>
+            <PageHeader
+                eyebrow="Step 1 of 2"
+                title="Your cart"
+                description="Review items before checkout. Quantities sync with your account."
+            />
 
             {loadError && (
                 <p className="mt-6 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900 dark:border-amber-900 dark:bg-amber-950/40 dark:text-amber-100">
@@ -164,13 +140,10 @@ function CartPage() {
                                 animate={{ opacity: 1, y: 0 }}
                                 className="da-card flex flex-col gap-4 p-4 sm:flex-row"
                             >
-                                <img
-                                    src={
-                                        item.MenuItem.imageUrl ||
-                                        "https://via.placeholder.com/150"
-                                    }
+                                <SmartImage
+                                    src={item.MenuItem.imageUrl}
                                     alt=""
-                                    className="h-28 w-full rounded-xl object-cover sm:h-24 sm:w-24 sm:shrink-0"
+                                    className="h-28 w-full shrink-0 rounded-xl sm:h-24 sm:w-24"
                                 />
                                 <div className="min-w-0 flex-1">
                                     <h3 className="font-semibold text-slate-900 dark:text-white">
@@ -180,10 +153,10 @@ function CartPage() {
                                         {item.MenuItem.description}
                                     </p>
                                     <div className="mt-4 flex flex-wrap items-center gap-3">
-                                        <div className="inline-flex items-center rounded-xl border border-slate-200 dark:border-slate-700">
+                                        <div className="inline-flex items-center rounded-xl border border-slate-200 dark:border-night-700">
                                             <button
                                                 type="button"
-                                                className="px-3 py-2 text-lg font-medium text-slate-700 transition hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-slate-800"
+                                                className="px-3 py-2 text-lg font-medium text-slate-700 transition hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-night-800"
                                                 onClick={() =>
                                                     handleQuantityChange(
                                                         item.id,
@@ -199,7 +172,7 @@ function CartPage() {
                                             </span>
                                             <button
                                                 type="button"
-                                                className="px-3 py-2 text-lg font-medium text-slate-700 transition hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-slate-800"
+                                                className="px-3 py-2 text-lg font-medium text-slate-700 transition hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-night-800"
                                                 onClick={() =>
                                                     handleQuantityChange(
                                                         item.id,
@@ -257,7 +230,7 @@ function CartPage() {
                                         ${formatMoney(serviceFee)}
                                     </dd>
                                 </div>
-                                <div className="flex justify-between border-t border-slate-200 pt-3 text-base font-semibold dark:border-slate-700">
+                                <div className="flex justify-between border-t border-slate-200 pt-3 text-base font-semibold dark:border-night-700">
                                     <dt className="text-slate-900 dark:text-white">
                                         Total
                                     </dt>

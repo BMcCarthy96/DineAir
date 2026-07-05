@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import Cookies from "js-cookie";
 import { toast } from "react-toastify";
 import { apiFetch } from "../../utils/apiFetch";
+import FormField from "../ui/FormField";
 
 function CreateRestaurantPage() {
     const [name, setName] = useState("");
@@ -34,10 +34,6 @@ function CreateRestaurantPage() {
         try {
             const response = await apiFetch("/api/restaurants", {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "XSRF-Token": Cookies.get("XSRF-TOKEN") || "",
-                },
                 body: JSON.stringify(newRestaurant),
             });
 
@@ -169,18 +165,6 @@ function CreateRestaurantPage() {
                     Create restaurant
                 </button>
             </form>
-        </div>
-    );
-}
-
-function FormField({ label, id, required, children }) {
-    return (
-        <div>
-            <label htmlFor={id} className="da-label">
-                {label}
-                {required ? " *" : ""}
-            </label>
-            {children}
         </div>
     );
 }
