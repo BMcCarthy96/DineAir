@@ -35,7 +35,7 @@ That single decision — real backend state ownership instead of a `setTimeout` 
 | Backend | Node.js, Express, Sequelize (SQLite dev / PostgreSQL prod), bcrypt, JWT (httpOnly cookie), csurf, Socket.IO, Helmet (CSP) |
 | Testing | Vitest + React Testing Library (frontend), Jest + Supertest (backend, in-memory SQLite) |
 | Maps | Google Maps JavaScript API (legacy `Marker` + `DirectionsService`/`DirectionsRenderer`) |
-| CI/Deploy | GitHub Actions, Render (static frontend + web service backend) |
+| CI/Deploy | GitHub Actions, Render (single web service — Express serves the built frontend) |
 
 ---
 
@@ -145,20 +145,12 @@ The map uses the legacy `google.maps.Marker` API rather than `AdvancedMarkerElem
 
 ## Deploying (Render)
 
-Two services: a **static site** for the frontend and a **web service** for the backend.
+**Single web service** — Express serves both the API and the built frontend from one process. In production, `backend/routes/index.js` serves `frontend/dist/index.html` (and its static assets) for any non-`/api` route, so there's no separate static site to configure.
 
-**Backend (web service):**
-- Build command: `npm run render-build` (repo root) — builds the frontend, builds the backend, and runs `db:migrate`. It deliberately does **not** run seeders on every deploy (seeders aren't idempotent against existing data).
-- Start command: `npm start --prefix backend`
-- Environment: `NODE_ENV=production`, `DATABASE_URL` (Render Postgres), `JWT_SECRET`, `JWT_EXPIRES_IN`, `FRONTEND_URLS` (comma-separated allowed origins), `GOOGLE_MAPS_API_KEY` (server-side Directions calls).
-- First deploy only: seed demo data once via Render's shell — `npm run db:deploy --prefix backend`. The seeders reference hardcoded row IDs and assume a pristine database, so this isn't safe to repeat against a database that already has rows in it (see `backend/.env.example` for the full explanation and reset procedure).
-
-**Frontend (static site):**
-- Build command: `npm ci && npm run build`
-- Publish directory: `dist`
-- Environment: `VITE_GOOGLE_MAPS_API_KEY` — this is a **build-time** variable (Vite inlines it), so it must be set before the build runs, not just at runtime.
-
-If the two services live on different Render domains, also set `TOKEN_COOKIE_SAMESITE=none` on the backend so the auth cookie survives cross-site credentialed requests (requires HTTPS, which Render provides by default).
+- **Build command:** `npm run render-build` (repo root). This installs and builds the frontend (producing `frontend/dist`, which Express serves), installs the backend, and runs `db:migrate`. It deliberately does **not** run seeders on every deploy (seeders aren't idempotent against existing data) — see below.
+- **Start command:** `npm start` (repo root → `npm start --prefix backend` → `node ./bin/www`).
+- **Environment:** `NODE_ENV=production`, `DATABASE_URL` (Render Postgres), `JWT_SECRET`, `JWT_EXPIRES_IN`, `FRONTEND_URLS` (comma-separated allowed origins — same-origin here, so this mostly matters if you later split the frontend out), `GOOGLE_MAPS_API_KEY` (server-side Directions calls), and `VITE_GOOGLE_MAPS_API_KEY` (browser Maps key). **`VITE_GOOGLE_MAPS_API_KEY` is a build-time variable** — Vite inlines it into the compiled bundle, so changing it in the Render dashboard has no effect until the *next* build. If you rotate the key, trigger a new deploy (Manual Deploy → Deploy latest commit) rather than assuming the saved env var alone takes effect.
+- **First deploy only:** seed demo data once via Render's shell — `npm run db:deploy --prefix backend`. The seeders reference hardcoded row IDs and assume a pristine database, so this isn't safe to repeat against a database that already has rows in it (see `backend/.env.example` for the full explanation and reset procedure). In particular, avoid wiring a full `db:seed:undo:all && db:migrate:undo:all && db:migrate && db:seed:all` sequence into the Build Command itself — it works (dropping every table resets auto-increment, so the hardcoded seed IDs stay valid), but it means every deploy destroys and resets the entire database, including any real signups/orders/favorites created by people trying the live demo.
 
 ---
 
