@@ -11,7 +11,7 @@
     "sequelize-cli": "npm run --prefix backend sequelize-cli",
     "start": "npm start --prefix backend",
     "build": "npm run --prefix backend build",
-    "render-build": "npm --prefix frontend ci && npm --prefix frontend run build && npm --prefix backend ci && npm --prefix backend run build && npm --prefix backend run db:migrate"
+    "render-build": "npm --prefix frontend ci --include=dev && npm --prefix frontend run build && npm --prefix backend ci --include=dev && npm --prefix backend run build && npm --prefix backend run db:migrate"
   },
   "keywords": [],
   "author": "",
