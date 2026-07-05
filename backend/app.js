@@ -68,6 +68,11 @@ app.use(
                 "ws:",
                 "wss:",
             ],
+            // canvas-confetti (delivery celebration) renders via a blob: Web Worker by
+            // default for performance. Without this, worker-src falls back to script-src,
+            // which doesn't allow blob: — the Worker silently never runs (no thrown error,
+            // no console warning) and confetti just never appears.
+            workerSrc: ["'self'", "blob:"],
         },
     })
 );
