@@ -1,16 +1,23 @@
 const { Restaurant, sequelize } = require("../db/models");
 
+// Schema-qualify the raw table reference when a Postgres SCHEMA is configured — the
+// Sequelize-generated part of the query already qualifies via config/database.js's
+// `define.schema`, but a hand-written literal doesn't inherit that automatically.
+const reviewsRef = process.env.SCHEMA
+    ? `"${process.env.SCHEMA}"."Reviews"`
+    : '"Reviews"';
+
 const ratingAttributes = {
     include: [
         [
             sequelize.literal(
-                '(SELECT AVG(rating) FROM "Reviews" WHERE "Reviews"."restaurantId" = "Restaurant"."id")'
+                `(SELECT AVG(rating) FROM ${reviewsRef} WHERE ${reviewsRef}."restaurantId" = "Restaurant"."id")`
             ),
             "avgRating",
         ],
         [
             sequelize.literal(
-                '(SELECT COUNT(*) FROM "Reviews" WHERE "Reviews"."restaurantId" = "Restaurant"."id")'
+                `(SELECT COUNT(*) FROM ${reviewsRef} WHERE ${reviewsRef}."restaurantId" = "Restaurant"."id")`
             ),
             "reviewCount",
         ],
@@ -24,16 +31,22 @@ exports.getAllRestaurants = async (req, res) => {
         });
         res.json(restaurants);
     } catch (err) {
+        console.error("Error fetching restaurants:", err);
         res.status(500).json({ error: "Failed to fetch restaurants" });
     }
 };
 
 exports.getRestaurantById = async (req, res) => {
-    const restaurant = await Restaurant.findByPk(req.params.id, {
-        attributes: ratingAttributes,
-    });
-    if (!restaurant) return res.status(404).json({ error: "Not found" });
-    res.json(restaurant);
+    try {
+        const restaurant = await Restaurant.findByPk(req.params.id, {
+            attributes: ratingAttributes,
+        });
+        if (!restaurant) return res.status(404).json({ error: "Not found" });
+        res.json(restaurant);
+    } catch (err) {
+        console.error("Error fetching restaurant:", err);
+        res.status(500).json({ error: "Failed to fetch restaurant" });
+    }
 };
 
 exports.createRestaurant = async (req, res) => {
