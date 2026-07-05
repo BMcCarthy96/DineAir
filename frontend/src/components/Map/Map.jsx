@@ -323,6 +323,10 @@ function Map({
                 new window.google.maps.DirectionsRenderer({
                     map: mapInstance.current,
                     suppressMarkers: true,
+                    // Without this, every new route (re-requested every ~12s or 85m of runner
+                    // movement) auto-fits the map to it, silently overriding any manual zoom/pan
+                    // the customer just did. We already frame the view once via fitBounds above.
+                    preserveViewport: true,
                     polylineOptions: {
                         strokeColor: "#e94e3c",
                         strokeWeight: 5,
