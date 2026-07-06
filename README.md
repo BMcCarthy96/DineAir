@@ -169,15 +169,9 @@ After seeding, use **Demo login** on the sign-in page, or:
 
 ## Screenshots
 
-_Add 3–5 images here for GitHub/portfolio (hero, restaurant grid, cart/checkout, tracking map, mobile nav)._
+![Live departures board](docs/screenshots/liveboard.jpg)
 
-```text
-docs/screenshots/
-  landing.png
-  restaurants.png
-  checkout-gate.png
-  tracking.png
-```
+*The "NOW SERVING" departures board — live order status driven by the server-owned lifecycle described above, not client-side timers.*
 
 ---
 
